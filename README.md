@@ -153,6 +153,38 @@ DATABASE_URL="postgresql://benutzer:passwort@host:5432/leviz?schema=public"
 Danach `npm run db:migrate` und `npm run db:seed`. Die Skripte `db:init`,
 `db:start` und `db:stop` werden dann nicht mehr gebraucht.
 
+### Supabase
+
+Für den gemeinsamen Stand liegt ein Supabase-Projekt bereit:
+
+| | |
+|---|---|
+| Projekt | `leviz` |
+| Kennung | `xupfqllspnlvuiakaatk` |
+| Region | eu-central-1 (Frankfurt) |
+| Schema | alle 34 Tabellen, 83 Indizes und 51 Fremdschlüssel sind eingespielt |
+
+Das Datenbankpasswort steht ausschließlich im Dashboard unter
+**Project Settings → Database → Connection string**. Ist es nicht mehr bekannt,
+setzt **Reset database password** ein neues.
+
+Zum Anbinden in `.env` die **direkte** Verbindung eintragen:
+
+```
+DATABASE_URL="postgresql://postgres.xupfqllspnlvuiakaatk:PASSWORT@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+```
+
+Danach `npm run db:seed`. Für den Betrieb später die gepoolte Verbindung auf
+Port **6543** mit `?pgbouncer=true` — der Seed braucht aber Port 5432, weil der
+Pooler keine Transaktion über mehrere Anweisungen halten kann.
+
+**Zeilenschutz (RLS) ist bewusst noch aus.** LEVIZ spricht über Prisma und die
+Postgres-Rolle mit der Datenbank, nicht über die Supabase-Bibliotheken mit dem
+öffentlichen Schlüssel. Solange dieser Schlüssel nirgends veröffentlicht wird,
+ist nichts offen. Sobald das Projekt öffentlich erreichbar ist, gehört RLS
+eingeschaltet: ohne Regeln sperrt es `anon` und `authenticated` vollständig
+aus, während Prisma als Eigentümer der Tabellen weiterarbeitet.
+
 ### Anmelde-Geheimnis
 
 `.env.example` enthält kein Geheimnis. Erzeuge eines mit:
