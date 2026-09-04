@@ -9,10 +9,7 @@ import { prisma } from '@/lib/db';
 import { RATE_LIMITS, rateLimiter } from '@/lib/rate-limit';
 import { getRequestIp } from '@/lib/request-ip';
 
-export const REPORT_REASONS = [
-  'FRAUD', 'WRONG_PRICE', 'FAKE_VEHICLE', 'DUPLICATE',
-  'OFFENSIVE', 'WRONG_INFO', 'ALREADY_SOLD', 'OTHER',
-] as const;
+import { REPORT_REASONS } from './constants';
 
 const reportSchema = z.object({
   vehicleId: z.string().min(1),

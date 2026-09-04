@@ -127,10 +127,12 @@ export async function listPayments(userId: string, take = 20) {
       amountCents: true,
       currency: true,
       status: true,
-      description: true,
       provider: true,
       paidAt: true,
       createdAt: true,
+      // Der Bezug wird angezeigt, nicht die eingefrorene Beschreibung.
+      vehicle: { select: { title: true } },
+      package: { select: { nameSq: true, nameDe: true, nameEn: true } },
     },
   });
 }

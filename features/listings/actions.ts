@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 
 import { fail, fromZod, ok, type ActionResult } from '@/lib/action-result';
 import { canManage, requireUser } from '@/lib/auth/guards';
+import { canPublishMore } from '@/features/packages/entitlements';
+import { getLimits } from '@/features/packages/queries';
 import { prisma } from '@/lib/db';
 import type { VehicleStatus } from '@/lib/generated/prisma/enums';
 import { buildVehicleSlug, generatePublicCode } from '@/features/vehicles/slug';
@@ -108,6 +110,13 @@ export async function saveListingAction(
   if (!parsed.success) return fromZod(parsed.error.issues);
 
   const data = parsed.data;
+
+  // Die Bildgrenze des Pakets wird hier durchgesetzt. Der Assistent begrenzt
+  // die Auswahl bereits, aber das ist Bequemlichkeit und kein Schutz.
+  const limits = await getLimits(user.id);
+  if (data.images.length > limits.photoLimit) {
+    return fail(`Pakoja jote lejon më së shumti ${limits.photoLimit} foto`);
+  }
 
   const [model, city, importedFrom, existing, account] = await Promise.all([
     prisma.model.findFirst({
@@ -311,14 +320,36 @@ export async function publishListingAction(
   if (!loaded.ok) return fail(loaded.error);
 
   const { vehicle } = loaded;
+
+  // Die Paketgrenze gilt beim Schalten, nicht beim Speichern: einen Entwurf
+  // darf jeder anlegen, sichtbar werden nur so viele, wie das Paket zulaesst.
+  const [limits, published] = await Promise.all([
+    getLimits(vehicle.sellerId),
+    prisma.vehicle.count({
+      where: {
+        sellerId: vehicle.sellerId,
+        status: { in: ['ACTIVE', 'PENDING_REVIEW', 'PAUSED'] },
+        id: { not: vehicle.id },
+      },
+    }),
+  ]);
+
+  if (!canPublishMore(limits, published)) {
+    return fail('Ke arritur kufirin e shpalljeve të pakos sate');
+  }
+
   const needsReview = Boolean(vehicle.flaggedReason);
   const status = needsReview ? 'PENDING_REVIEW' : 'ACTIVE';
 
+  // Die Laufzeit kommt aus dem Paket; die Plattformeinstellung ist der
+  // Rueckfallwert, falls ein Paket dort nichts festlegt.
   const duration = await prisma.platformSetting.findUnique({
     where: { key: 'listing.defaultDurationDays' },
     select: { value: true },
   });
-  const days = typeof duration?.value === 'number' ? duration.value : 60;
+  const days =
+    limits.listingDurationDays ||
+    (typeof duration?.value === 'number' ? duration.value : 60);
 
   await prisma.vehicle.update({
     where: { id: vehicle.id },

@@ -13,7 +13,8 @@ import { Label } from '@/components/ui/label';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { REPORT_REASONS, reportVehicleAction } from '@/features/reports/actions';
+import { reportVehicleAction } from '@/features/reports/actions';
+import { REPORT_REASONS } from '@/features/reports/constants';
 
 export function ReportDialog({ vehicleId }: { vehicleId: string }) {
   const t = useTranslations('admin.reports');

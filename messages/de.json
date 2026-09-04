@@ -879,7 +879,8 @@
       "featuredScore": "Hervorhebungswert",
       "featuredDays": "Tage hervorgehoben",
       "active": "Aktiv",
-      "saved": "Paket gespeichert"
+      "saved": "Paket gespeichert",
+      "save": "Speichern"
     },
     "payments": {
       "title": "Zahlungen",
@@ -902,11 +903,11 @@
     "choose": "Wählen",
     "currentPackage": "Dein Paket",
     "loginToBuy": "Zum Fortfahren anmelden",
-    "listingsLimited": "Bis zu {count} Anzeigen",
+    "listingsLimited": "Bis zu {count, plural, one {# Anzeige} other {# Anzeigen}}",
     "listingsUnlimited": "Unbegrenzt Anzeigen",
-    "duration": "{days} Tage Laufzeit",
-    "photos": "{count} Fotos je Anzeige",
-    "featuredDays": "{days} Tage hervorgehoben",
+    "duration": "{days, plural, one {# Tag} other {# Tage}} Laufzeit",
+    "photos": "{count, plural, one {# Foto} other {# Fotos}} je Anzeige",
+    "featuredDays": "{days, plural, one {# Tag} other {# Tage}} hervorgehoben",
     "betterPlacement": "Bessere Platzierung in den Ergebnissen",
     "statistics": "Auswertungen zu deinen Anzeigen",
     "bulkTools": "Massenaktionen",

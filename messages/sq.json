@@ -879,7 +879,8 @@
       "featuredScore": "Pikë theksimi",
       "featuredDays": "Ditë theksimi",
       "active": "Aktive",
-      "saved": "Pakoja u ruajt"
+      "saved": "Pakoja u ruajt",
+      "save": "Ruaj"
     },
     "payments": {
       "title": "Pagesat",
@@ -902,11 +903,11 @@
     "choose": "Zgjidh",
     "currentPackage": "Pakoja jote",
     "loginToBuy": "Hyr për të vazhduar",
-    "listingsLimited": "Deri në {count} shpallje",
+    "listingsLimited": "Deri në {count, plural, one {# shpallje} other {# shpallje}}",
     "listingsUnlimited": "Shpallje pa kufi",
-    "duration": "{days} ditë kohëzgjatje",
-    "photos": "{count} foto për shpallje",
-    "featuredDays": "{days} ditë e theksuar",
+    "duration": "{days, plural, one {# ditë} other {# ditë}} kohëzgjatje",
+    "photos": "{count, plural, one {# foto} other {# foto}} për shpallje",
+    "featuredDays": "{days, plural, one {# ditë} other {# ditë}} e theksuar",
     "betterPlacement": "Vend më i mirë në rezultate",
     "statistics": "Statistika të shpalljeve",
     "bulkTools": "Veprime masive",

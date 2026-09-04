@@ -63,14 +63,36 @@ export function formatPrice(
     currency = DEFAULT_CURRENCY,
     locale,
     eurToAll = FALLBACK_EUR_TO_ALL,
-  }: { currency?: Currency; locale: Locale; eurToAll?: number },
+    withCents = false,
+  }: {
+    currency?: Currency;
+    locale: Locale;
+    eurToAll?: number;
+    /**
+     * Nachkommastellen ausschreiben. Fahrzeugpreise brauchen sie nicht und
+     * lesen sich ohne besser. Paketpreise brauchen sie zwingend: aus 9,99 €
+     * würde sonst 10 € — ein anderer Preis, als der Betreiber gesetzt hat.
+     */
+    withCents?: boolean;
+  },
 ): string {
-  const amount = Math.round(convertFromEurCents(eurCents, currency, eurToAll));
+  const exact = convertFromEurCents(eurCents, currency, eurToAll);
   const format = NUMBER_FORMAT[locale];
-  const grouped = groupDigits(amount, format.group);
   const symbol = SYMBOL[currency];
 
-  return format.symbolFirst ? `${symbol}${grouped}` : `${grouped} ${symbol}`;
+  // Lek wird ohnehin auf volle Hundert gerundet; Cent gibt es dort nicht.
+  const hasCents = withCents && currency === 'EUR' && eurCents % 100 !== 0;
+
+  const whole = Math.floor(Math.abs(hasCents ? exact : Math.round(exact)));
+  const grouped = groupDigits(whole, format.group);
+  const cents = hasCents
+    ? format.decimal + String(Math.abs(eurCents) % 100).padStart(2, '0')
+    : '';
+  const sign = exact < 0 ? '-' : '';
+
+  return format.symbolFirst
+    ? `${sign}${symbol}${grouped}${cents}`
+    : `${sign}${grouped}${cents} ${symbol}`;
 }
 
 export function formatNumber(value: number, locale: Locale): string {

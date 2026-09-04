@@ -307,3 +307,49 @@ export async function toggleBrandPopularAction(brandId: string): Promise<ActionR
   revalidatePath('/admin/brands');
   return ok();
 }
+
+/** Grenzen und Preis eines Pakets. Alle Werte sind hier änderbar. */
+const packageSchema = z.object({
+  id: z.string().min(1),
+  priceCents: z.number().int().min(0).max(10_000_00),
+  // `null` bedeutet unbegrenzt; das gilt nur für die oberste Händlerstufe.
+  listingLimit: z.number().int().min(1).max(100_000).nullable(),
+  listingDurationDays: z.number().int().min(1).max(365),
+  photoLimit: z.number().int().min(1).max(100),
+  featuredScore: z.number().int().min(0).max(100),
+  featuredDays: z.number().int().min(0).max(365),
+  active: z.boolean(),
+});
+
+/**
+ * Speichert ein Paket.
+ *
+ * Preise gehören in die Datenbank, nicht in den Code: eine Preisänderung darf
+ * keine Neuveröffentlichung der Anwendung verlangen.
+ */
+export async function savePackageAction(input: unknown): Promise<ActionResult> {
+  await requireAdmin();
+
+  const parsed = packageSchema.safeParse(input);
+  if (!parsed.success) return fromZod(parsed.error.issues);
+
+  const { id, ...values } = parsed.data;
+
+  const existing = await prisma.package.findUnique({
+    where: { id },
+    select: { tier: true },
+  });
+  if (!existing) return fail('Kjo pako nuk u gjet');
+
+  // Die kostenlose Stufe ist die Rückfallebene für jedes Konto ohne Abo. Ein
+  // Preis darauf oder ein Abschalten würde neue Nutzer aussperren.
+  if (existing.tier === 'FREE' && (values.priceCents > 0 || !values.active)) {
+    return fail('Pakoja falas nuk mund të ketë çmim dhe nuk mund të çaktivizohet');
+  }
+
+  await prisma.package.update({ where: { id }, data: values });
+
+  revalidatePath('/admin/packages');
+  revalidatePath('/pricing');
+  return ok();
+}

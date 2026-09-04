@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Car, Flag, LayoutDashboard, Settings, Store, Tags, Users,
+  Car, CreditCard, Flag, LayoutDashboard, Package, Settings, Store, Tags, Users,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -15,6 +15,8 @@ const ITEMS = [
   { href: '/admin/dealers', key: 'dealers', icon: Store },
   { href: '/admin/users', key: 'users', icon: Users },
   { href: '/admin/brands', key: 'brands', icon: Tags },
+  { href: '/admin/packages', key: 'packages', icon: Package },
+  { href: '/admin/payments', key: 'payments', icon: CreditCard },
   { href: '/admin/settings', key: 'settings', icon: Settings },
 ] as const;
 

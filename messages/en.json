@@ -879,7 +879,8 @@
       "featuredScore": "Featured score",
       "featuredDays": "Featured days",
       "active": "Active",
-      "saved": "Package saved"
+      "saved": "Package saved",
+      "save": "Save"
     },
     "payments": {
       "title": "Payments",
@@ -902,11 +903,11 @@
     "choose": "Choose",
     "currentPackage": "Your package",
     "loginToBuy": "Log in to continue",
-    "listingsLimited": "Up to {count} listings",
+    "listingsLimited": "Up to {count, plural, one {# listing} other {# listings}}",
     "listingsUnlimited": "Unlimited listings",
-    "duration": "{days} days runtime",
-    "photos": "{count} photos per listing",
-    "featuredDays": "{days} days featured",
+    "duration": "{days, plural, one {# day} other {# days}} runtime",
+    "photos": "{count, plural, one {# photo} other {# photos}} per listing",
+    "featuredDays": "{days, plural, one {# day} other {# days}} featured",
     "betterPlacement": "Better placement in the results",
     "statistics": "Listing statistics",
     "bulkTools": "Bulk actions",

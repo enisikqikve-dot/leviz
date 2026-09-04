@@ -50,3 +50,9 @@ next-env.d.ts
 
 # Hochgeladene Bilder der Entwicklungsumgebung
 /public/uploads/
+
+# Profil des Aufnahme-Browsers (npm run brand:shots)
+/.chrome-capture/
+
+# Zwischendateien des Videoschnitts (npm run brand:video)
+/.video-work/

@@ -223,6 +223,8 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 | `npm run db:reset` | Datenbank zurücksetzen und neu befüllen |
 | `npm run brand:avatar` | Profilbilder für soziale Netzwerke erzeugen |
 | `npm run brand:social` | Beitragsbilder für soziale Netzwerke erzeugen |
+| `npm run brand:shots` | Seiten in Telefonformat aufnehmen (Chrome nötig) |
+| `npm run brand:video` | 20-Sekunden-Video aus den Aufnahmen bauen (ffmpeg nötig) |
 
 ---
 
@@ -349,6 +351,6 @@ Beschriftungen 5,76:1 — beide über der WCAG-AA-Schwelle.
 - [x] **Phase 6** — Merkliste, Suchaufträge, Nachrichten, Vergleich
 - [x] **Phase 7** — Händlerprofile und Händler-Dashboard
 - [x] **Phase 8** — Verwaltungsbereich
-- [ ] **Phase 9** — Pakete und Zahlungen
+- [x] **Phase 9** — Pakete und Zahlungen
 - [ ] **Phase 10** — KI-Funktionen
 - [ ] **Phase 11** — SEO, Geschwindigkeit, Sicherheit, End-zu-End-Tests

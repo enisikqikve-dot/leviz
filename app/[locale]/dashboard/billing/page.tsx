@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { SubscriptionActions } from '@/features/packages/components/subscription-actions';
+import { isFeaturePayment, paymentSubject } from '@/features/packages/label';
 import {
   getActiveSubscription,
   listPayments,
@@ -38,6 +39,7 @@ export default async function BillingPage({ params }: PageProps) {
 
   const user = await requireUser();
   const t = await getTranslations('billing');
+  const tf = await getTranslations('feature');
 
   const [subscription, payments, currency, eurToAll] = await Promise.all([
     getActiveSubscription(user.id),
@@ -47,7 +49,7 @@ export default async function BillingPage({ params }: PageProps) {
   ]);
 
   const price = (cents: number) =>
-    formatPrice(cents, { currency, locale: locale as Locale, eurToAll });
+    formatPrice(cents, { currency, locale: locale as Locale, eurToAll, withCents: true });
 
   // Ohne Zeitzonenabhängigkeit: das ISO-Datum ist in jeder Sprache eindeutig.
   const day = (value: Date) => value.toISOString().slice(0, 10);
@@ -110,7 +112,10 @@ export default async function BillingPage({ params }: PageProps) {
                 className="bg-card text-card-foreground flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{payment.description}</p>
+                  <p className="truncate text-sm font-medium">
+                    {isFeaturePayment(payment) ? `${tf('title')} · ` : ''}
+                    {paymentSubject(payment, locale as Locale)}
+                  </p>
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     {day(payment.paidAt ?? payment.createdAt)}
                   </p>

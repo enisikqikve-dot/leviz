@@ -66,7 +66,7 @@ export default async function PricingPage({ params }: PageProps) {
     if (pkg.priceCents === 0) return { amount: t('free'), period: null };
 
     return {
-      amount: formatPrice(pkg.priceCents, { currency, locale: locale as Locale, eurToAll }),
+      amount: formatPrice(pkg.priceCents, { currency, locale: locale as Locale, eurToAll, withCents: true }),
       period:
         pkg.interval === 'MONTHLY'
           ? t('monthly')

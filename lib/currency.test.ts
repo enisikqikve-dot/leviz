@@ -109,3 +109,31 @@ describe('isCurrency', () => {
     expect(isCurrency(42)).toBe(false);
   });
 });
+
+describe('Paketpreise mit Nachkommastellen', () => {
+  it('schreibt Cent aus, wenn ausdrücklich verlangt', () => {
+    // Ohne diese Angabe würde aus 9,99 € ein anderer Preis: 10 €.
+    expect(formatPrice(999, { locale: 'de', withCents: true })).toBe('9,99 €');
+    expect(formatPrice(999, { locale: 'en', withCents: true })).toBe('€9.99');
+    expect(formatPrice(1999, { locale: 'sq', withCents: true })).toBe('19,99 €');
+  });
+
+  it('lässt runde Beträge ohne Nachkommastellen', () => {
+    expect(formatPrice(4900, { locale: 'de', withCents: true })).toBe('49 €');
+  });
+
+  it('gruppiert auch mit Nachkommastellen', () => {
+    expect(formatPrice(123456, { locale: 'de', withCents: true })).toBe('1.234,56 €');
+  });
+
+  it('rührt Fahrzeugpreise nicht an', () => {
+    expect(formatPrice(2999050, { locale: 'de' })).not.toContain(',');
+  });
+
+  it('zeigt in Lek keine Nachkommastellen', () => {
+    // Lek wird ohnehin auf volle Hundert gerundet.
+    expect(
+      formatPrice(999, { locale: 'sq', currency: 'ALL', eurToAll: 100, withCents: true }),
+    ).not.toContain(',');
+  });
+});

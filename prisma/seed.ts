@@ -401,6 +401,7 @@ async function seedVehicles(
   },
   users: SeededUser[],
   dealers: SeededDealer[],
+  demoUsers: Map<string, SeededUser>,
 ) {
   const { FEATURES } = await import('./seed/features.js');
   const { buildVehicle } = await import('./seed/vehicles.js');
@@ -433,6 +434,13 @@ async function seedVehicles(
   const sellers = users.filter((_, index) => index % 2 === 0);
   for (const user of sellers) {
     for (let i = 0; i < random.int(1, 2); i += 1) assignments.push({ user });
+  }
+
+  // Das dokumentierte Demo-Verkaeuferkonto braucht eigene Inserate, sonst ist
+  // seine Seite leer und der Ablauf "hervorheben" nicht vorfuehrbar.
+  const demoSeller = demoUsers.get('seller@leviz.dev');
+  if (demoSeller) {
+    for (let i = 0; i < 3; i += 1) assignments.push({ user: demoSeller });
   }
 
   let created = 0;
@@ -854,6 +862,7 @@ async function main() {
     { brandIds, modelIds, cityIds, countryIds, featureIds },
     users,
     dealers,
+    demoUsers,
   );
   await seedInteractions(users, demoUsers);
 

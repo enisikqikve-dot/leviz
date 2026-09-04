@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { CheckoutForm } from '@/features/packages/components/checkout-form';
+import { isFeaturePayment, paymentSubject } from '@/features/packages/label';
 import { getEurToAllRate } from '@/features/search/data';
 import { requireUser } from '@/lib/auth/guards';
 import { formatPrice } from '@/lib/currency';
@@ -36,6 +37,7 @@ export default async function CheckoutPage({ params }: PageProps) {
 
   const user = await requireUser();
   const t = await getTranslations('checkout');
+  const tf = await getTranslations('feature');
 
   const payment = await prisma.payment.findUnique({
     where: { id },
@@ -44,8 +46,9 @@ export default async function CheckoutPage({ params }: PageProps) {
       userId: true,
       amountCents: true,
       status: true,
-      description: true,
       provider: true,
+      vehicle: { select: { title: true } },
+      package: { select: { nameSq: true, nameDe: true, nameEn: true } },
     },
   });
 
@@ -56,6 +59,7 @@ export default async function CheckoutPage({ params }: PageProps) {
     currency,
     locale: locale as Locale,
     eurToAll,
+    withCents: true,
   });
 
   const settled = payment.status !== 'PENDING';
@@ -68,7 +72,10 @@ export default async function CheckoutPage({ params }: PageProps) {
         <dl className="mt-5 space-y-3 text-sm">
           <div className="flex items-start justify-between gap-4">
             <dt className="text-muted-foreground">{t('summary')}</dt>
-            <dd className="text-end font-medium">{payment.description}</dd>
+            <dd className="text-end font-medium">
+              {isFeaturePayment(payment) ? `${tf('title')} · ` : ''}
+              {paymentSubject(payment, locale as Locale)}
+            </dd>
           </div>
           <div className="flex items-center justify-between gap-4 border-t pt-3">
             <dt className="text-muted-foreground">{t('amount')}</dt>

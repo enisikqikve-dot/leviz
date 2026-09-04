@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { ListingActions } from '@/features/listings/components/listing-actions';
+import { FeatureListing } from '@/features/packages/components/feature-listing';
 import { getEurToAllRate } from '@/features/search/data';
 import { variantFromTitle } from '@/features/vehicles/format';
 import { requireUser } from '@/lib/auth/guards';
@@ -41,7 +42,7 @@ export default async function MyListingsPage({ params }: PageProps) {
   const user = await requireUser();
   const t = await getTranslations('myListings');
 
-  const [vehicles, currency, eurToAll] = await Promise.all([
+  const [vehicles, featurePackages, currency, eurToAll] = await Promise.all([
     prisma.vehicle.findMany({
       // Eigene Inserate und, für Händler, die des Autohauses.
       where: user.dealerId
@@ -50,15 +51,28 @@ export default async function MyListingsPage({ params }: PageProps) {
       select: {
         id: true, slug: true, title: true, status: true, priceCents: true,
         viewCount: true, inquiryCount: true, favoriteCount: true, qualityScore: true,
+        featuredUntil: true,
         brand: { select: { name: true } },
         model: { select: { name: true } },
         images: { select: { url: true }, orderBy: { position: 'asc' }, take: 1 },
       },
       orderBy: [{ updatedAt: 'desc' }],
     }),
+    // Nur Pakete, die tatsächlich eine Laufzeit als Hervorhebung gewähren.
+    prisma.package.findMany({
+      where: { active: true, featuredDays: { gt: 0 }, isDealerPackage: false },
+      orderBy: { sortOrder: 'asc' },
+      select: { id: true, featuredDays: true, priceCents: true },
+    }),
     getCurrency(),
     getEurToAllRate(),
   ]);
+
+  const featureOptions = featurePackages.map((pkg) => ({
+    packageId: pkg.id,
+    days: pkg.featuredDays,
+    price: formatPrice(pkg.priceCents, { currency, locale: locale as Locale, eurToAll, withCents: true }),
+  }));
 
   return (
     <div className="lv-container py-8 sm:py-12">
@@ -142,6 +156,18 @@ export default async function MyListingsPage({ params }: PageProps) {
                     </li>
                     <li>{t('quality')} {vehicle.qualityScore}%</li>
                   </ul>
+
+                  {vehicle.status === 'ACTIVE' ? (
+                    <FeatureListing
+                      vehicleId={vehicle.id}
+                      featuredUntil={
+                        vehicle.featuredUntil && vehicle.featuredUntil > new Date()
+                          ? vehicle.featuredUntil.toISOString().slice(0, 10)
+                          : null
+                      }
+                      options={featureOptions}
+                    />
+                  ) : null}
                 </div>
 
                 <div className="flex items-center gap-3 sm:flex-col sm:items-end">
