@@ -213,6 +213,7 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 | `npm run lint` | ESLint |
 | `npm test` | Tests einmalig |
 | `npm run test:watch` | Tests fortlaufend |
+| `npm run test:e2e` | End-zu-End-Tests (Playwright, eigener Chrome) |
 | `npm run db:init` | PostgreSQL-Cluster einmalig anlegen und starten |
 | `npm run db:start` | Lokale Datenbank starten |
 | `npm run db:stop` | Lokale Datenbank stoppen |
@@ -312,6 +313,74 @@ Karosserieform — nachvollziehbar und ohne Profilbildung.
 
 ---
 
+## Für Suchmaschinen
+
+Albanisch, Deutsch und Englisch haben **unterschiedliche Pfade** für dieselbe
+Seite — `/vetura/…` gegen `/de/fahrzeug/…` gegen `/en/vehicle/…`. Ohne
+ausdrücklichen Hinweis erkennt keine Suchmaschine, dass das Übersetzungen sind;
+sie behandelt die drei als konkurrierende Seiten und spielt im Kosovo womöglich
+die englische aus.
+
+Deshalb nennt **jede** öffentliche Seite ihre kanonische Adresse und alle
+Sprachfassungen ([`lib/seo/alternates.ts`](lib/seo/alternates.ts)), und die
+Sitemap führt sie zusätzlich mit. `x-default` zeigt auf Albanisch.
+
+| | |
+|---|---|
+| Sitemap | `/sitemap.xml` — statische Seiten, alle aktiven Fahrzeuge, alle Händler |
+| robots.txt | sperrt Konto, Verwaltung, Bezahlseiten und die API |
+| Strukturierte Daten | `Vehicle` je Inserat, `Organization` und `WebSite` auf der Startseite |
+
+Gefilterte Ergebnislisten stehen auf `noindex, follow`: die Links darin sollen
+verfolgt werden, die Liste selbst gehört nicht in den Index.
+
+---
+
+## Sicherheitskopfzeilen
+
+Gesetzt in [`next.config.ts`](next.config.ts), je mit einem Grund:
+
+| Kopfzeile | Wogegen |
+|---|---|
+| `X-Frame-Options: DENY` | Fremde setzen LEVIZ in einen Rahmen und fangen Klicks ab |
+| `X-Content-Type-Options: nosniff` | Ein hochgeladenes Bild wird als Skript ausgeführt |
+| `Referrer-Policy` | Der Zielserver erfährt, welches Fahrzeug jemand angesehen hat |
+| `Permissions-Policy` | Kamera, Mikrofon und Bezahlschnittstelle bleiben aus |
+| `Strict-Transport-Security` | Rückfall auf HTTP |
+
+Unter `/uploads` gilt zusätzlich eine eigene Inhaltsrichtlinie. Hochgeladene
+Dateien liegen unter derselben Herkunft wie die Anwendung — ohne diese Sperre
+könnte eine als Bild getarnte HTML-Datei Skripte im Namen von LEVIZ ausführen.
+
+---
+
+## End-zu-End-Tests
+
+```bash
+npm run test:e2e
+```
+
+64 Tests über Desktop und Telefon. Zwei Entscheidungen dahinter:
+
+**Geprüft wird gegen einen Produktionsbuild**, nicht gegen `next dev`. Zwei
+Fehler dieses Projekts sind ausschließlich im Produktionsbuild aufgetreten —
+ein Export aus einer `'use server'`-Datei kam im Browser als Platzhalter an und
+ließ die Fahrzeugseite in allen drei Sprachen mit 500 antworten.
+
+**Die Autorisierung wird über die Adresszeile geprüft**, nicht über versteckte
+Schaltflächen. Ein Käufer, der `/admin` direkt aufruft, muss 403 bekommen — dass
+der Verweis im Menü fehlt, ist kein Schutz.
+
+Abgedeckt sind unter anderem: Rollen und Sperren, gleiche Fehlermeldung für
+falsches Passwort und unbekanntes Konto, Ausbremsen wiederholter Fehlversuche,
+Suche mit Filtern und mit unsinnigen Werten, der Suchassistent, Merkliste,
+Vergleich, alle drei Sprachen, Sitemap, robots.txt und die Sicherheitskopfzeilen.
+
+Playwright nutzt den vorhandenen Chrome (`channel: 'chrome'`); es wird kein
+zusätzlicher Browser heruntergeladen.
+
+---
+
 ## Moderation
 
 Neue Inserate erscheinen **sofort**. Nur auffällige gehen vorher zur Prüfung —
@@ -408,4 +477,4 @@ Beschriftungen 5,76:1 — beide über der WCAG-AA-Schwelle.
 - [x] **Phase 8** — Verwaltungsbereich
 - [x] **Phase 9** — Pakete und Zahlungen
 - [x] **Phase 10** — KI-Funktionen
-- [ ] **Phase 11** — SEO, Geschwindigkeit, Sicherheit, End-zu-End-Tests
+- [x] **Phase 11** — SEO, Geschwindigkeit, Sicherheit, End-zu-End-Tests

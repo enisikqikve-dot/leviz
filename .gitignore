@@ -59,3 +59,7 @@ next-env.d.ts
 
 # Zwischendateien des Videoschnitts (npm run brand:video)
 /.video-work/
+
+# Ergebnisse der End-zu-End-Tests
+/test-results/
+/playwright-report/
