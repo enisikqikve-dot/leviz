@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/select';
 import { Field } from '@/features/auth/components/field';
 import { ImageUploader } from '@/features/listings/components/image-uploader';
+import { DescribeButton } from '@/features/ai/components/describe-button';
 import type { StepProps } from '@/features/listings/components/types';
 
 export function StepFeatures({ form, data }: StepProps) {
@@ -153,10 +154,15 @@ export function StepLocation({ form, data }: StepProps) {
   );
 }
 
-export function StepDescription({ form }: StepProps) {
+export function StepDescription({ form, data }: StepProps) {
   const t = useTranslations('listing.fields');
-  const { register, watch, formState: { errors } } = form;
+  // Der Textgenerator bekommt Anzeigenamen, keine Kennungen: „Naftë“ statt
+  // „DIESEL“, „Kamera prapa“ statt „rear-camera“.
+  const tv = useTranslations('vehicles');
+  const { register, watch, setValue, getValues, formState: { errors } } = form;
   const length = (watch('description') ?? '').length;
+
+  const featureLabels = new Map(data.features.map((entry) => [entry.slug, entry.label]));
 
   return (
     <Field
@@ -170,6 +176,49 @@ export function StepDescription({ form }: StepProps) {
         {...register('description')}
       />
       <p className="text-muted-foreground mt-1 text-end text-xs">{length} / 6000</p>
+
+      <DescribeButton
+        // Die Werte werden erst beim Klick gelesen: `watch` auf dem ganzen
+        // Formular würde bei jedem Tastendruck neu rendern.
+        draft={() => {
+          const values = getValues();
+
+          // Die Formularwerte sind vor der Zod-Prüfung noch Rohwerte aus den
+          // Eingabefeldern; Zahlen kommen dort als Zeichenkette an.
+          const num = (value: unknown): number | undefined => {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+          };
+          const text = (value: unknown): string | undefined =>
+            typeof value === 'string' && value.trim() !== '' ? value : undefined;
+
+          return {
+            brandSlug: values.brandSlug,
+            modelSlug: values.modelSlug,
+            variant: text(values.variant),
+            registrationYear: num(values.registrationYear),
+            mileageKm: num(values.mileageKm),
+            fuel: values.fuel ? tv(`fuel.${values.fuel}`) : undefined,
+            transmission: values.transmission
+              ? tv(`transmission.${values.transmission}`)
+              : undefined,
+            powerKw: num(values.powerKw),
+            bodyType: values.bodyType ? tv(`body.${values.bodyType}`) : undefined,
+            doors: num(values.doors),
+            seats: num(values.seats),
+            color: text(values.color),
+            customsStatus: values.customsStatus,
+            plateOrigin: values.plateOrigin,
+            accidentFree: values.accidentFree,
+            serviceHistory: values.serviceHistory,
+            ownersCount: num(values.ownersCount),
+            features: (values.features ?? []).map(
+              (slug) => featureLabels.get(slug) ?? slug,
+            ),
+          };
+        }}
+        onText={(text) => setValue('description', text, { shouldValidate: true, shouldDirty: true })}
+      />
     </Field>
   );
 }

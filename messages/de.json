@@ -951,5 +951,33 @@
     "book": "Hervorheben",
     "active": "Hervorgehoben bis {date}",
     "onlyActive": "Nur aktive Anzeigen lassen sich hervorheben."
+  },
+  "ai": {
+    "suggest": "Text vorschlagen",
+    "suggesting": "Wird geschrieben…",
+    "suggestHint": "Der Text entsteht aus deinen Angaben. Sieh ihn vor dem Speichern durch.",
+    "replaced": "Vorschlag eingesetzt",
+    "needsBasics": "Trage zuerst Marke, Modell und die technischen Daten ein."
+  },
+  "assistant": {
+    "title": "Mit eigenen Worten suchen",
+    "placeholder": "z. B. Golf Diesel Automatik bis 8000 Euro in Prishtinë",
+    "submit": "Suchen",
+    "understood": "Verstanden",
+    "ignored": "Nicht verstanden",
+    "nothing": "In diesem Text war kein Filter zu erkennen.",
+    "apply": "Filter übernehmen"
+  },
+  "estimate": {
+    "title": "Preiseinschätzung",
+    "range": "Von {low} bis {high}",
+    "average": "Mittelwert {value}",
+    "basedOn": "Aus {count} vergleichbaren Fahrzeugen",
+    "basedOnBrand": "Aus {count} vergleichbaren Fahrzeugen derselben Marke",
+    "below": "Unter dem Marktmittel",
+    "within": "Im Marktmittel",
+    "above": "Über dem Marktmittel",
+    "disclaimer": "Eine Einschätzung aus aktiven Anzeigen, kein amtlicher Wert.",
+    "tooFew": "Noch zu wenige vergleichbare Fahrzeuge für eine Einschätzung."
   }
 }

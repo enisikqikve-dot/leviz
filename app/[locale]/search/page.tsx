@@ -14,6 +14,7 @@ import { SaveSearchDialog } from '@/features/searches/components/save-search-dia
 import { suggestSearchName } from '@/features/searches/name';
 import { searchVehicles } from '@/features/search/queries';
 import { countActiveFilters, parseSearchParams, toQueryString } from '@/features/search/schema';
+import { SearchAssistant } from '@/features/ai/components/search-assistant';
 import { VehicleCard } from '@/features/vehicles/components/vehicle-card';
 import { formatNumber, formatPrice } from '@/lib/currency';
 import { getCurrency } from '@/lib/currency-server';
@@ -77,6 +78,10 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
   return (
     <div className="lv-container py-8">
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t('title')}</h1>
+
+      <div className="mt-4">
+        <SearchAssistant />
+      </div>
 
       <div className="mt-6 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
         {/* Auf dem Desktop dauerhaft sichtbar, auf Mobilgeraeten in der Schublade. */}

@@ -60,7 +60,7 @@ vollständig benutzbar** — echte Anbieter werden später nur eingehängt.
 
 | Modul | Produktiv | Ohne Schlüssel |
 |---|---|---|
-| `lib/ai` | OpenAI | nachvollziehbare Beispieltexte |
+| `lib/ai` | Sprachmodell | rechnet und formuliert selbst (siehe unten) |
 | `lib/payments` | Stripe | Mock-Buchungen ohne Geldfluss |
 | `lib/email` | Resend / SMTP | Ausgabe im Terminal |
 | `lib/sms` | Twilio | Einmalcode im Terminal |
@@ -257,6 +257,61 @@ R2-Anbieter eingehängt, ohne dass sich für die Aufrufer etwas ändert.
 
 ---
 
+## Die vier Helfer
+
+Was anderswo „KI-Funktionen“ heißt, rechnet und formuliert hier selbst. Das ist
+keine Notlösung, bis ein Schlüssel da ist — für drei der vier Aufgaben ist es
+die bessere Lösung.
+
+### Beschreibungsvorschlag
+
+Der Assistent baut den Text ausschließlich aus Feldern, die der Verkäufer
+eingetragen hat. Fehlt eine Angabe, fehlt der Satz — es wird nichts ergänzt.
+
+Genau das ist der Punkt: Ein Sprachmodell schreibt bereitwillig „gepflegter
+Zustand, scheckheftgepflegt“ zu einem Fahrzeug, bei dem nichts davon angegeben
+wurde. Auf einem Fahrzeugmarktplatz ist das eine Falschangabe, für die der
+Verkäufer haftet. Der Kommentar in [`lib/ai/openai.ts`](lib/ai/openai.ts) hält
+das für den Tag fest, an dem ein Modell angebunden wird.
+
+### Suchassistent
+
+Freitext wird gegen den **echten** Marken-, Modell- und Städtekatalog gelesen,
+nicht geraten. „Golf naftë automatik deri 8000 euro në Prishtinë“ ergibt
+`?make=volkswagen&model=golf&fuel=DIESEL&transmission=AUTOMATIC&priceMax=8000&city=prishtine`.
+
+Zwei Entscheidungen dabei:
+
+- Das Ergebnis läuft durch dasselbe Zod-Schema wie jede andere Suche. Der
+  Assistent ist eine Eingabehilfe, kein zweiter Weg an der Prüfung vorbei.
+- Er zeigt vor dem Ausführen, was er verstanden hat **und was nicht**. Eine
+  still gesetzte Preisgrenze, die niemand gemeint hat, wäre schlimmer als eine
+  Rückfrage.
+
+### Preisschätzung
+
+Ein Preis ist eine Zahl, die aus tatsächlichen Angeboten folgt — ein Modell
+würde sie plausibel klingend erfinden, ohne dass jemand sie nachrechnen kann.
+[`features/pricing/estimate.ts`](features/pricing/estimate.ts) gewichtet
+Vergleichsfahrzeuge nach Baujahr und Kilometerstand, wirft Ausreißer weg und
+gibt Spanne, Mittelwert und **Stichprobengröße** zurück.
+
+Zwei Regeln halten die Aussage ehrlich:
+
+- Unter vier Vergleichsfahrzeugen gibt es keine Schätzung. Eine Zahl aus zwei
+  Angeboten wäre eine Behauptung.
+- Reicht das gleiche Modell nicht, wird nur auf gleiche Marke **und** gleiche
+  Karosserieform **und** Baujahr ±5 erweitert. Ein 5er gegen alle BMW gerechnet
+  ergäbe zwangsläufig „unter dem Marktmittel“, weil X5 und 7er den Schnitt
+  heben.
+
+### Empfehlungen
+
+Ähnliche Fahrzeuge auf der Detailseite kommen aus Marke, Modell, Preisnähe und
+Karosserieform — nachvollziehbar und ohne Profilbildung.
+
+---
+
 ## Moderation
 
 Neue Inserate erscheinen **sofort**. Nur auffällige gehen vorher zur Prüfung —
@@ -352,5 +407,5 @@ Beschriftungen 5,76:1 — beide über der WCAG-AA-Schwelle.
 - [x] **Phase 7** — Händlerprofile und Händler-Dashboard
 - [x] **Phase 8** — Verwaltungsbereich
 - [x] **Phase 9** — Pakete und Zahlungen
-- [ ] **Phase 10** — KI-Funktionen
+- [x] **Phase 10** — KI-Funktionen
 - [ ] **Phase 11** — SEO, Geschwindigkeit, Sicherheit, End-zu-End-Tests

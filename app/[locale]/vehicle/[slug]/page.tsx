@@ -7,6 +7,8 @@ import { getFavoriteIds } from '@/features/favorites/queries';
 import { ReportDialog } from '@/features/reports/components/report-dialog';
 import { getEurToAllRate } from '@/features/search/data';
 import { VehicleGallery } from '@/features/vehicles/components/gallery';
+import { PriceEstimateCard } from '@/features/pricing/components/price-estimate';
+import { estimateForVehicle } from '@/features/pricing/queries';
 import { SellerCard } from '@/features/vehicles/components/seller-card';
 import { ShareButton } from '@/features/vehicles/components/share-button';
 import { SpecList } from '@/features/vehicles/components/spec-list';
@@ -86,11 +88,22 @@ export default async function VehiclePage({ params }: PageProps) {
 
   const td = await getTranslations('vehicleDetail');
 
-  const [viewer, currency, eurToAll, similar] = await Promise.all([
+  const [viewer, currency, eurToAll, similar, estimate] = await Promise.all([
     getSessionUser(),
     getCurrency(),
     getEurToAllRate(),
     getSimilarVehicles(vehicle),
+    // Die Schätzung entsteht aus aktiven Angeboten; ohne genug Vergleiche
+    // liefert sie null und der Abschnitt entfällt.
+    estimateForVehicle({
+      brandId: vehicle.brandId,
+      modelId: vehicle.modelId,
+      year: vehicle.firstRegistration ? vehicle.firstRegistration.getFullYear() : null,
+      mileageKm: vehicle.mileageKm,
+      fuel: vehicle.fuel,
+      bodyType: vehicle.bodyType,
+      excludeVehicleId: vehicle.id,
+    }),
   ]);
 
   const favorites = await getFavoriteIds([vehicle.id]);
@@ -166,6 +179,18 @@ export default async function VehiclePage({ params }: PageProps) {
                 className="size-11 border"
               />
             </div>
+
+            {estimate ? (
+              <div className="mt-4">
+                <PriceEstimateCard
+                  estimate={estimate}
+                  priceCents={vehicle.priceCents}
+                  locale={locale as Locale}
+                  currency={currency}
+                  eurToAll={eurToAll}
+                />
+              </div>
+            ) : null}
 
             {/* Melden steht bewusst unauffällig, aber immer erreichbar. */}
             <div className="mt-4 text-center">

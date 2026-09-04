@@ -86,4 +86,7 @@ export const RATE_LIMITS = {
   passwordReset: { limit: 4, windowMs: 60 * 60_000 },
   phoneCode: { limit: 4, windowMs: 15 * 60_000 },
   contactSeller: { limit: 12, windowMs: 60 * 60_000 },
+  // Textvorschläge sind heute billig, kosten aber Geld, sobald ein
+  // Sprachmodell dahintersteht. Die Grenze gilt deshalb von Anfang an.
+  aiDescribe: { limit: 20, windowMs: 60 * 60_000 },
 } as const;

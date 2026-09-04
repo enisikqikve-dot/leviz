@@ -951,5 +951,33 @@
     "book": "Feature",
     "active": "Featured until {date}",
     "onlyActive": "Only active listings can be featured."
+  },
+  "ai": {
+    "suggest": "Suggest text",
+    "suggesting": "Writing…",
+    "suggestHint": "The text comes from what you entered. Review it before saving.",
+    "replaced": "Suggestion inserted",
+    "needsBasics": "Fill in make, model and the technical details first."
+  },
+  "assistant": {
+    "title": "Search in your own words",
+    "placeholder": "e.g. Golf diesel automatic under 8000 euro in Prishtinë",
+    "submit": "Search",
+    "understood": "Understood",
+    "ignored": "Not understood",
+    "nothing": "No filters could be read from this text.",
+    "apply": "Apply filters"
+  },
+  "estimate": {
+    "title": "Price estimate",
+    "range": "From {low} to {high}",
+    "average": "Average {value}",
+    "basedOn": "Based on {count} comparable vehicles",
+    "basedOnBrand": "Based on {count} comparable vehicles of the same make",
+    "below": "Below the market average",
+    "within": "Within the market average",
+    "above": "Above the market average",
+    "disclaimer": "An estimate from active listings, not an official valuation.",
+    "tooFew": "Not enough comparable vehicles yet for an estimate."
   }
 }

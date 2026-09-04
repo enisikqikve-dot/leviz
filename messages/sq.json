@@ -951,5 +951,33 @@
     "book": "Thekso",
     "active": "E theksuar deri më {date}",
     "onlyActive": "Vetëm shpalljet aktive mund të theksohen."
+  },
+  "ai": {
+    "suggest": "Propozo tekstin",
+    "suggesting": "Duke shkruar…",
+    "suggestHint": "Teksti krijohet nga të dhënat që ke plotësuar. Rishikoje para se ta ruash.",
+    "replaced": "Teksti u propozua",
+    "needsBasics": "Plotëso së pari markën, modelin dhe të dhënat teknike."
+  },
+  "assistant": {
+    "title": "Kërko me fjalët e tua",
+    "placeholder": "p.sh. Golf naftë automatik deri 8000 euro në Prishtinë",
+    "submit": "Kërko",
+    "understood": "Kuptova",
+    "ignored": "Nuk e kuptova",
+    "nothing": "Nuk gjeta asnjë filtër në këtë tekst.",
+    "apply": "Apliko filtrat"
+  },
+  "estimate": {
+    "title": "Vlerësim i çmimit",
+    "range": "Nga {low} deri {high}",
+    "average": "Mesatarja {value}",
+    "basedOn": "Bazuar në {count} vetura të ngjashme",
+    "basedOnBrand": "Bazuar në {count} vetura të ngjashme të së njëjtës markë",
+    "below": "Nën mesataren e tregut",
+    "within": "Brenda mesatares së tregut",
+    "above": "Mbi mesataren e tregut",
+    "disclaimer": "Ky është vlerësim nga shpalljet aktive, jo çmim zyrtar.",
+    "tooFew": "Ende nuk ka mjaft vetura të ngjashme për një vlerësim."
   }
 }
