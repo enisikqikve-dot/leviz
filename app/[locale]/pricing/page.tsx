@@ -11,6 +11,7 @@ import { formatPrice } from '@/lib/currency';
 import { getCurrency } from '@/lib/currency-server';
 import { Link } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
+import { alternatesFor } from '@/lib/seo/alternates';
 import { cn } from '@/lib/utils';
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -18,7 +19,11 @@ type PageProps = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'pricing' });
-  return { title: t('title'), description: t('metaDescription') };
+  return {
+    title: t('title'),
+    description: t('metaDescription'),
+    alternates: alternatesFor('/pricing', locale as Locale),
+  };
 }
 
 export default async function PricingPage({ params }: PageProps) {

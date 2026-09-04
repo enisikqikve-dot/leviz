@@ -20,6 +20,7 @@ import { formatNumber, formatPrice } from '@/lib/currency';
 import { getCurrency } from '@/lib/currency-server';
 import { Link } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
+import { alternatesFor } from '@/lib/seo/alternates';
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -36,6 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // Gefilterte Ergebnislisten gehoeren nicht in den Suchindex; die
     // Fahrzeugseiten selbst schon.
     robots: { index: false, follow: true },
+    alternates: alternatesFor('/search', locale as Locale),
   };
 }
 

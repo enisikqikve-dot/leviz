@@ -1,9 +1,11 @@
+import type { Metadata } from 'next';
 import { ArrowRight, BadgeCheck, Gauge, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { BrandGrid } from '@/features/home/components/brand-grid';
 import { DealerGrid } from '@/features/home/components/dealer-grid';
+import { SiteJsonLd } from '@/features/home/components/site-json-ld';
 import { VehicleSection } from '@/features/home/components/vehicle-section';
 import {
   getFeaturedDealers, getFeaturedVehicles, getPopularBrands, getRecentVehicles,
@@ -12,7 +14,21 @@ import { HeroSearch } from '@/features/search/components/hero-search';
 import { getEurToAllRate } from '@/features/search/data';
 import { getCurrency } from '@/lib/currency-server';
 import type { Locale } from '@/lib/i18n/routing';
+import { alternatesFor } from '@/lib/seo/alternates';
 import { Link } from '@/lib/i18n/navigation';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  // Titel und Beschreibung kommen aus dem Layout; hier zählt der Verweis auf
+  // die Sprachfassungen. Ohne ihn konkurrieren `/`, `/de` und `/en`
+  // miteinander, statt sich als Übersetzungen zu erkennen.
+  return { alternates: alternatesFor('/', locale as Locale) };
+}
 
 const VALUE_PROPS = [
   { icon: ShieldCheck, title: 'customsTitle', body: 'customsBody' },
@@ -44,6 +60,8 @@ export default async function HomePage({
 
   return (
     <>
+      <SiteJsonLd locale={locale as Locale} />
+
       {/* Hero: setzt den dunklen Kopfbereich fort, die Suchkarte liegt hell darauf. */}
       <section className="bg-ink text-ink-foreground relative overflow-hidden">
         <div

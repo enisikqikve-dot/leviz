@@ -17,6 +17,7 @@ import { getCurrency } from '@/lib/currency-server';
 import { prisma } from '@/lib/db';
 import { Link } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
+import { alternatesFor } from '@/lib/seo/alternates';
 import { siteConfig } from '@/lib/site';
 
 type PageProps = { params: Promise<{ locale: string; slug: string }> };
@@ -33,6 +34,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description:
       dealer.description?.slice(0, 160) ?? t('vehicles', { count: dealer._count.vehicles }),
     openGraph: { title: dealer.companyName, type: 'website' },
+    alternates: alternatesFor(
+      { pathname: '/dealer/[slug]', params: { slug } },
+      locale as Locale,
+    ),
   };
 }
 

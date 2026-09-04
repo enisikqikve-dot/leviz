@@ -10,13 +10,18 @@ import { getEurToAllRate } from '@/features/search/data';
 import { getCurrency } from '@/lib/currency-server';
 import { Link } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
+import { alternatesFor } from '@/lib/seo/alternates';
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'compare' });
-  return { title: t('title'), robots: { index: false } };
+  return {
+    title: t('title'),
+    robots: { index: false },
+    alternates: alternatesFor('/compare', locale as Locale),
+  };
 }
 
 export default async function ComparePage({ params }: PageProps) {

@@ -5,6 +5,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { DealerCard } from '@/features/dealers/components/dealer-card';
 import { DealerFilters } from '@/features/dealers/components/dealer-filters';
 import { listDealers, type DealerSort } from '@/features/dealers/queries';
+import type { Locale } from '@/lib/i18n/routing';
+import { alternatesFor } from '@/lib/seo/alternates';
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -14,7 +16,11 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'dealers' });
-  return { title: t('title'), description: t('metaDescription') };
+  return {
+    title: t('title'),
+    description: t('metaDescription'),
+    alternates: alternatesFor('/dealers', locale as Locale),
+  };
 }
 
 const SORTS: DealerSort[] = ['rating', 'vehicles', 'name'];

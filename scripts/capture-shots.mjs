@@ -26,7 +26,13 @@ const PORT = 9333;
 /** Telefonmaße: iPhone-typische 390×844 Punkte bei knapp dreifacher Dichte. */
 const DEVICE = { width: 390, height: 844, scale: 2.7692 };
 
-/** Was aufgenommen wird. `height` in CSS-Punkten, damit lange Seiten passen. */
+/**
+ * Was aufgenommen wird. `height` in CSS-Punkten, damit lange Seiten passen.
+ *
+ * `url: null` steht für das automatisch gewählte Inserat. Bei `estimate` wird
+ * zusätzlich weit genug gescrollt, dass die Preiseinschätzung im Bild ist —
+ * sie steht auf dem Telefon unter der Verkäuferbox.
+ */
 const SCENES = [
   { name: '01-home', url: '/', height: 1300 },
   { name: '02-search', url: '/kerko', height: 1500 },
@@ -34,6 +40,7 @@ const SCENES = [
   { name: '04-compare', url: '/krahaso', height: 1100 },
   { name: '05-dealers', url: '/shitesit', height: 1300 },
   { name: '06-pricing', url: '/cmimet', height: 1500 },
+  { name: '07-estimate', url: null, height: 1400, scrollToText: 'Vlerësim i çmimit' },
 ];
 
 const CHROME_PATHS = [
@@ -187,6 +194,28 @@ async function main() {
       // Bilder und Schriften brauchen nach dem Ladeereignis noch einen Moment.
       await wait(2500);
 
+      if (scene.scrollToText) {
+        // Gezielt zum Abschnitt statt zu einer geratenen Pixelhoehe: die
+        // Seitenlaenge haengt an der Zahl der Fotos und Ausstattungszeilen.
+        await client.send('Runtime.evaluate', {
+          // Gesucht wird die Ueberschrift selbst, nicht ein Abschnitt, der den
+          // Text enthaelt: sonst trifft der umschliessende Bereich zuerst und
+          // in dessen Mitte liegt die Karte nicht.
+          expression: `
+            (() => {
+              const needle = ${JSON.stringify(scene.scrollToText)};
+              const heading = [...document.querySelectorAll('h1, h2, h3')]
+                .find((el) => el.textContent.trim() === needle);
+              if (heading) heading.scrollIntoView({ block: 'center' });
+              return Boolean(heading);
+            })()
+          `,
+          returnByValue: true,
+        });
+        // Nach dem Springen laden die Bilder darunter erst nach.
+        await wait(1800);
+      }
+
       // Bewusst nur der eingestellte Ausschnitt: die ganze Seite waere bis zu
       // 33.000 Pixel hoch und fuer das Video unbrauchbar. Die Hoehe je Szene
       // ist so gewaehlt, dass beim Schwenk Spielraum bleibt.
@@ -219,11 +248,19 @@ async function pickVehicles() {
   await client.connect();
 
   try {
+    // Nur Inserate, deren Modell genug aktive Vergleichsangebote hat: sonst
+    // verweigert die Preiseinschätzung zu Recht die Auskunft und fehlt im Bild.
     const { rows } = await client.query(
       `SELECT v.id, v.slug
          FROM "Vehicle" v
          JOIN "VehicleImage" i ON i."vehicleId" = v.id AND i.position = 0
         WHERE v.status = 'ACTIVE'
+          AND (
+            SELECT count(*) FROM "Vehicle" o
+             WHERE o."modelId" = v."modelId"
+               AND o.status = 'ACTIVE'
+               AND o.fuel = v.fuel
+          ) >= 5
         ORDER BY v."qualityScore" DESC, v."rankScore" DESC
         LIMIT 3`,
     );
