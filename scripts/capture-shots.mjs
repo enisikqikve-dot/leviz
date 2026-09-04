@@ -13,6 +13,7 @@ import 'dotenv/config';
 
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -76,7 +77,10 @@ function connect(url) {
     if (message.id && pending.has(message.id)) {
       const { resolve, reject } = pending.get(message.id);
       pending.delete(message.id);
-      message.error ? reject(new Error(message.error.message)) : resolve(message.result);
+
+      if (message.error) reject(new Error(message.error.message));
+      else resolve(message.result);
+
       return;
     }
 
@@ -129,7 +133,10 @@ async function main() {
       // Albanisch ist die Sprache des Zielmarkts und ohne Praefix erreichbar.
       '--accept-lang=sq-AL,sq',
       `--remote-debugging-port=${PORT}`,
-      `--user-data-dir=${path.join(ROOT, '.chrome-capture')}`,
+      // Das Profil liegt bewusst ausserhalb des Projekts: Chrome legt dort
+      // mitgelieferte Erweiterungen ab, die sonst mitgeprueft und mitversioniert
+      // wuerden.
+      `--user-data-dir=${path.join(tmpdir(), 'leviz-capture-profile')}`,
       'about:blank',
     ],
     { stdio: 'ignore', detached: false },

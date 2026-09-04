@@ -9,7 +9,7 @@
  * Aufruf: npm run brand:video
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -148,7 +148,6 @@ async function main() {
   const parts = [];
 
   for (const [index, scene] of SCENES.entries()) {
-    const frames = Math.round(scene.seconds * FPS);
     const clip = path.join(WORK, `scene-${index}.mp4`);
 
     if (!scene.shot) {

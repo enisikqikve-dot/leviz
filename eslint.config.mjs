@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Erzeugte und fremde Dateien: der Prisma-Client sowie die Arbeitsordner
+    // der Marken-Skripte. Ohne diese Zeilen prüft ESLint mitgelieferte
+    // Chrome-Erweiterungen und meldet Fehler, die uns nicht gehören.
+    "lib/generated/**",
+    ".video-work/**",
+    ".chrome-capture/**",
   ]),
 ]);
 
