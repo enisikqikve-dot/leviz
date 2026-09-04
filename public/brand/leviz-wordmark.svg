@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 72" role="img" aria-label="LEVIZ">
+  <g fill="#0A0F1C">
+    <path d="M0 0 H14 V58 H52 V72 H0 Z"/>
+    <path d="M0 0 H50 V14 H14 V29 H44 V43 H14 V58 H50 V72 H0 Z" transform="translate(64 0)"/>
+    <path d="M0 0 H14 V72 H0 Z" transform="translate(194 0)"/>
+    <path d="M0 0 H50 V14 L21 58 H50 V72 H0 V58 L29 14 H0 Z" transform="translate(220 0)"/>
+  </g>
+  <path d="M0 0 H16 L28 46 L40 0 H56 L34 72 H22 Z" transform="translate(126 0)" fill="#2F5BFF"/>
+</svg>

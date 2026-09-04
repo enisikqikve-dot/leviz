@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/lib/generated/prisma
+
+# Lokales PostgreSQL-Datenverzeichnis (npm run db:start)
+.postgres/
+
+# Generierter Prisma-Client
+/lib/generated/
+
+# Hochgeladene Bilder der Entwicklungsumgebung
+/public/uploads/

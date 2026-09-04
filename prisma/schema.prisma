@@ -1,0 +1,1133 @@
+// LEVIZ – Datenmodell
+// Preise stehen ausnahmslos in Euro-Cent (`priceCents`). Der Lek-Betrag entsteht
+// erst bei der Anzeige über einen Kurs aus `PlatformSetting`.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ===========================================================================
+// Aufzählungen
+// ===========================================================================
+
+enum UserRole {
+  USER
+  PRIVATE_SELLER
+  DEALER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum SellerType {
+  PRIVATE
+  DEALER
+}
+
+enum VehicleCategory {
+  CAR
+  VAN_TRUCK
+  MOTORCYCLE
+  CAMPER_TRAILER
+}
+
+enum VehicleStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  PAUSED
+  SOLD
+  REJECTED
+  EXPIRED
+}
+
+enum VehicleCondition {
+  NEW
+  USED
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  LPG
+  CNG
+  HYBRID_PETROL
+  HYBRID_DIESEL
+  PLUGIN_HYBRID
+  ELECTRIC
+  HYDROGEN
+  OTHER
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+  SEMI_AUTOMATIC
+}
+
+enum DriveType {
+  FWD
+  RWD
+  AWD
+}
+
+enum BodyType {
+  SEDAN
+  ESTATE
+  HATCHBACK
+  SUV
+  COUPE
+  CONVERTIBLE
+  VAN
+  PICKUP
+  MINIBUS
+  TRUCK
+  CHASSIS
+  OTHER
+}
+
+enum EmissionClass {
+  EURO_1
+  EURO_2
+  EURO_3
+  EURO_4
+  EURO_5
+  EURO_6
+  EURO_6D
+  NONE
+}
+
+// --- Regionale Besonderheiten des Import-Marktes ---------------------------
+
+/// Verzollt oder nicht — im Kosovo eines der wichtigsten Kaufkriterien.
+enum CustomsStatus {
+  CLEARED
+  NOT_CLEARED
+  NOT_APPLICABLE
+}
+
+/// Herkunft der Kennzeichen. Ein Großteil der Fahrzeuge ist importiert.
+enum PlateOrigin {
+  RKS
+  AL
+  MK
+  FOREIGN
+  NONE
+}
+
+enum SteeringSide {
+  LEFT
+  RIGHT
+}
+
+// ---------------------------------------------------------------------------
+
+enum FeatureCategory {
+  COMFORT
+  SAFETY
+  MULTIMEDIA
+  ASSISTANCE
+  EXTERIOR
+  INTERIOR
+}
+
+enum DealerVerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ReportReason {
+  FRAUD
+  WRONG_PRICE
+  FAKE_VEHICLE
+  DUPLICATE
+  OFFENSIVE
+  WRONG_INFO
+  ALREADY_SOLD
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+enum ModerationAction {
+  APPROVED
+  HIDDEN
+  DELETED
+  WARNED
+  RESTORED
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  SAVED_SEARCH_MATCH
+  LISTING_APPROVED
+  LISTING_REJECTED
+  LISTING_EXPIRING
+  VEHICLE_FAVORITED
+  PRICE_CHANGED
+  PAYMENT_SUCCEEDED
+  SUBSCRIPTION_EXPIRING
+  DEALER_VERIFIED
+}
+
+enum PackageTier {
+  FREE
+  PREMIUM
+  PREMIUM_PLUS
+  DEALER_STARTER
+  DEALER_PRO
+  DEALER_ENTERPRISE
+}
+
+enum PackageInterval {
+  ONE_TIME
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum ConversationStatus {
+  OPEN
+  ARCHIVED
+  BLOCKED
+}
+
+// ===========================================================================
+// Konten und Anmeldung
+// ===========================================================================
+
+model User {
+  id String @id @default(cuid())
+
+  email         String?   @unique
+  emailVerified DateTime?
+  phone         String?   @unique
+  phoneVerified DateTime?
+  passwordHash  String?
+
+  name  String?
+  image String?
+
+  role   UserRole   @default(USER)
+  status UserStatus @default(ACTIVE)
+  locale String     @default("sq")
+
+  /// Fließt in das Ranking ein: verifiziert, Alter des Kontos, Meldungen.
+  trustScore Int @default(50)
+
+  suspendedAt     DateTime?
+  suspendedReason String?
+  lastSeenAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  profile  Profile?
+  dealer   Dealer?
+  accounts Account[]
+  sessions Session[]
+
+  vehicles      Vehicle[]      @relation("VehicleSeller")
+  favorites     Favorite[]
+  savedSearches SavedSearch[]
+  searchHistory SearchHistory[]
+  notifications Notification[]
+  priceEstimates PriceEstimate[]
+
+  sentMessages   Message[]      @relation("MessageSender")
+  buyerThreads   Conversation[] @relation("ConversationBuyer")
+  sellerThreads  Conversation[] @relation("ConversationSeller")
+  inquiries      ListingInquiry[]
+  listingViews   ListingView[]
+
+  reportsFiled    Report[] @relation("ReportReporter")
+  reportsHandled  Report[] @relation("ReportHandler")
+  vehiclesModerated Vehicle[] @relation("VehicleModerator")
+
+  reviewsWritten Review[] @relation("ReviewAuthor")
+
+  subscriptions Subscription[]
+  payments      Payment[]
+
+  @@index([role, status])
+  @@index([createdAt])
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  firstName   String?
+  lastName    String?
+  bio         String?
+  countryId   String?
+  cityId      String?
+  postalCode  String?
+  addressLine String?
+
+  /// Kanäle für Benachrichtigungen; Push kommt später dazu.
+  notifyByEmail Boolean @default(true)
+  notifyBySms   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country Country? @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  city    City?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+/// Einmalcodes für die Anmeldung per Telefonnummer. Es wird nur der Hash
+/// gespeichert, damit ein Datenbankzugriff keine gültigen Codes preisgibt.
+model PhoneVerification {
+  id        String   @id @default(cuid())
+  phone     String
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([phone, expiresAt])
+}
+
+/// Einmal-Token zum Zurücksetzen des Passworts, ebenfalls nur als Hash.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// ===========================================================================
+// Händler
+// ===========================================================================
+
+model Dealer {
+  id     String @id @default(cuid())
+  userId String @unique
+  slug   String @unique
+
+  companyName        String
+  legalName          String?
+  /// Betriebsnummer, in der Region "numri i biznesit".
+  registrationNumber String?
+  vatNumber          String?
+
+  description String?
+  logoUrl     String?
+  coverUrl    String?
+  website     String?
+  phone       String?
+  publicEmail String?
+
+  countryId   String?
+  cityId      String?
+  postalCode  String?
+  addressLine String?
+  lat         Float?
+  lng         Float?
+
+  /// Öffnungszeiten je Wochentag, validiert über ein Zod-Schema.
+  openingHours Json?
+
+  verification DealerVerificationStatus @default(UNVERIFIED)
+  verifiedAt   DateTime?
+
+  ratingAvg   Float @default(0)
+  ratingCount Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country       Country?            @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  city          City?               @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  vehicles      Vehicle[]
+  reviews       Review[]
+  verifications DealerVerification[]
+  subscriptions Subscription[]
+
+  @@index([verification, ratingAvg])
+  @@index([cityId])
+}
+
+model DealerVerification {
+  id       String                   @id @default(cuid())
+  dealerId String
+  status   DealerVerificationStatus @default(PENDING)
+
+  /// Belege liegen im Dateispeicher; hier stehen nur Verweise.
+  documentUrls String[]
+  note         String?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime @default(now())
+
+  dealer Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  @@index([dealerId, status])
+  @@index([status, createdAt])
+}
+
+model Review {
+  id       String @id @default(cuid())
+  dealerId String
+  authorId String
+
+  rating  Int
+  title   String?
+  body    String?
+  /// Nur Käufer mit nachweisbarem Kontakt erhalten das Abzeichen.
+  verified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dealer Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  author User   @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@unique([dealerId, authorId])
+  @@index([dealerId, createdAt])
+}
+
+// ===========================================================================
+// Stammdaten: Marken, Modelle, Ausstattung
+// ===========================================================================
+
+model Brand {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
+
+  logoUrl    String?
+  popular    Boolean           @default(false)
+  categories VehicleCategory[]
+  sortOrder  Int               @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  models   Model[]
+  vehicles Vehicle[]
+
+  @@index([popular, sortOrder])
+}
+
+model Model {
+  id      String @id @default(cuid())
+  brandId String
+  slug    String
+  name    String
+
+  category  VehicleCategory @default(CAR)
+  bodyTypes BodyType[]
+  yearFrom  Int?
+  yearTo    Int?
+  popular   Boolean         @default(false)
+  sortOrder Int             @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brand    Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  variants VehicleVariant[]
+  vehicles Vehicle[]
+
+  @@unique([brandId, slug])
+  @@index([brandId, category])
+  @@index([popular, sortOrder])
+}
+
+model VehicleVariant {
+  id      String @id @default(cuid())
+  modelId String
+  slug    String
+  /// Ausstattungslinie oder Motorisierung, etwa "320d xDrive M Sport".
+  name    String
+
+  powerKw         Int?
+  fuel            FuelType?
+  transmission    Transmission?
+  displacementCcm Int?
+
+  createdAt DateTime @default(now())
+
+  model    Model     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  vehicles Vehicle[]
+
+  @@unique([modelId, slug])
+  @@index([modelId])
+}
+
+model Feature {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  nameSq String
+  nameDe String
+  nameEn String
+
+  group      FeatureCategory
+  categories VehicleCategory[]
+  /// Erscheint direkt im Filter statt hinter "mehr anzeigen".
+  popular    Boolean           @default(false)
+  sortOrder  Int               @default(0)
+
+  vehicles VehicleFeature[]
+
+  @@index([group, sortOrder])
+  @@index([popular])
+}
+
+model VehicleFeature {
+  vehicleId String
+  featureId String
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@id([vehicleId, featureId])
+  @@index([featureId])
+}
+
+// ===========================================================================
+// Standorte
+// ===========================================================================
+
+model Country {
+  id   String @id @default(cuid())
+  code String @unique
+
+  nameSq String
+  nameDe String
+  nameEn String
+
+  phonePrefix String
+  currency    String  @default("EUR")
+  /// Kernmärkte stehen in Auswahllisten oben.
+  isCoreMarket Boolean @default(false)
+  /// Länder, aus denen typischerweise importiert wird.
+  isImportOrigin Boolean @default(false)
+  sortOrder   Int     @default(0)
+
+  cities          City[]
+  dealers         Dealer[]
+  profiles        Profile[]
+  vehicles        Vehicle[]        @relation("VehicleCountry")
+  importedVehicles Vehicle[]       @relation("VehicleImportOrigin")
+
+  @@index([isCoreMarket, sortOrder])
+}
+
+model City {
+  id        String @id @default(cuid())
+  countryId String
+  slug      String
+  name      String
+
+  region     String?
+  postalCode String?
+  /// Koordinaten tragen die Umkreissuche: Bounding-Box plus Haversine,
+  /// dafür ist keine PostGIS-Erweiterung nötig.
+  lat        Float
+  lng        Float
+  population Int?
+
+  country  Country   @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  vehicles Vehicle[]
+  dealers  Dealer[]
+  profiles Profile[]
+
+  @@unique([countryId, slug])
+  @@index([countryId, name])
+  @@index([lat, lng])
+}
+
+// ===========================================================================
+// Fahrzeuge
+// ===========================================================================
+
+model Vehicle {
+  id String @id @default(cuid())
+  /// Sprechende Adresse mit Kurzcode am Ende:
+  /// bmw-320d-xdrive-2021-prishtine-a7f3k2
+  slug String @unique
+  /// Stabiler Kurzcode. Der Titel darf sich ändern, ohne den Link zu brechen.
+  publicCode String @unique
+
+  sellerId   String
+  dealerId   String?
+  sellerType SellerType @default(PRIVATE)
+
+  category  VehicleCategory @default(CAR)
+  brandId   String
+  modelId   String
+  variantId String?
+  title     String
+
+  condition VehicleCondition @default(USED)
+  status    VehicleStatus    @default(DRAFT)
+
+  // --- Preis (immer Euro-Cent) --------------------------------------------
+  priceCents         Int
+  previousPriceCents Int?
+  negotiable         Boolean @default(false)
+  vatDeductible      Boolean @default(false)
+  financingAvailable Boolean @default(false)
+  leasingAvailable   Boolean @default(false)
+
+  // --- Technik -------------------------------------------------------------
+  firstRegistration   DateTime?
+  mileageKm           Int?
+  fuel                FuelType?
+  transmission        Transmission?
+  powerKw             Int?
+  bodyType            BodyType?
+  driveType           DriveType?
+  doors               Int?
+  seats               Int?
+  cylinders           Int?
+  displacementCcm     Int?
+  color               String?
+  interiorColor       String?
+  emissionClass       EmissionClass?
+  co2Gkm              Int?
+  consumptionCombined Float?
+  electricRangeKm     Int?
+  batteryCapacityKwh  Float?
+
+  // --- Regionale Importfelder ---------------------------------------------
+  customsStatus    CustomsStatus @default(NOT_APPLICABLE)
+  plateOrigin      PlateOrigin   @default(NONE)
+  importedFromId   String?
+  registeredUntil  DateTime?
+  nextInspectionAt DateTime?
+  steeringSide     SteeringSide  @default(LEFT)
+
+  // --- Zustand und Historie ------------------------------------------------
+  accidentFree   Boolean?
+  serviceHistory Boolean?
+  warrantyMonths Int?
+  ownersCount    Int?
+  vin            String?
+
+  description            String?
+  descriptionAiGenerated Boolean @default(false)
+
+  // --- Standort ------------------------------------------------------------
+  countryId        String?
+  cityId           String?
+  postalCode       String?
+  addressLine      String?
+  hideExactAddress Boolean @default(true)
+  lat              Float?
+  lng              Float?
+
+  // --- Ranking (nie zufällig) ----------------------------------------------
+  /// Vollständigkeit des Inserats, 0–100. Berechnet in features/vehicles.
+  qualityScore  Int       @default(0)
+  /// Aus gebuchter Hervorhebung; 0 bedeutet reguläre Platzierung.
+  featuredScore Int       @default(0)
+  featuredUntil DateTime?
+  /// Vorberechnete Reihung aus featuredScore, qualityScore und dem
+  /// Vertrauenswert des Verkaeufers. Als Spalte gespeichert, damit die Suche
+  /// ueber einen Index danach sortieren kann statt zur Laufzeit zu rechnen.
+  /// Berechnung in features/search/ranking.ts.
+  rankScore     Int       @default(0)
+
+  viewCount     Int @default(0)
+  favoriteCount Int @default(0)
+  inquiryCount  Int @default(0)
+
+  /// Kategoriespezifische Angaben (Hubraum beim Motorrad, Schlafplätze beim
+  /// Wohnmobil). Pro Kategorie durch ein eigenes Zod-Schema validiert.
+  specs Json?
+
+  // --- Moderation ----------------------------------------------------------
+  moderationNote String?
+  moderatedAt    DateTime?
+  moderatedById  String?
+  /// Wird gesetzt, wenn eine automatische Prüfung angeschlagen hat.
+  flaggedReason  String?
+
+  publishedAt DateTime?
+  soldAt      DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  seller       User            @relation("VehicleSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  dealer       Dealer?         @relation(fields: [dealerId], references: [id], onDelete: SetNull)
+  brand        Brand           @relation(fields: [brandId], references: [id])
+  model        Model           @relation(fields: [modelId], references: [id])
+  variant      VehicleVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  country      Country?        @relation("VehicleCountry", fields: [countryId], references: [id], onDelete: SetNull)
+  city         City?           @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  importedFrom Country?        @relation("VehicleImportOrigin", fields: [importedFromId], references: [id], onDelete: SetNull)
+  moderatedBy  User?           @relation("VehicleModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  images        VehicleImage[]
+  features      VehicleFeature[]
+  favorites     Favorite[]
+  conversations Conversation[]
+  inquiries     ListingInquiry[]
+  views         ListingView[]
+  reports       Report[]
+  priceHistory  PriceHistory[]
+  payments      Payment[]
+
+  // Verbundindizes entlang der tatsächlichen Filterpfade der Suche.
+  @@index([status, brandId, modelId, priceCents])
+  @@index([status, cityId, priceCents])
+  @@index([status, category, fuel, transmission])
+  @@index([status, rankScore, publishedAt])
+  @@index([status, featuredScore, publishedAt])
+  @@index([status, priceCents])
+  @@index([status, mileageKm])
+  @@index([status, firstRegistration])
+  @@index([status, customsStatus, plateOrigin])
+  @@index([sellerId, status, updatedAt])
+  @@index([dealerId, status, updatedAt])
+  @@index([status, createdAt])
+  @@index([lat, lng])
+  @@index([expiresAt])
+}
+
+model VehicleImage {
+  id        String @id @default(cuid())
+  vehicleId String
+
+  url         String
+  /// Winziges Vorschaubild als Data-URL gegen Layoutsprünge beim Laden.
+  blurDataUrl String?
+  width       Int?
+  height      Int?
+  position    Int     @default(0)
+  isMain      Boolean @default(false)
+  altText     String?
+
+  createdAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, position])
+}
+
+/// Preisverlauf. Trägt die Benachrichtigung "Preis gesenkt" bei Merklisten.
+model PriceHistory {
+  id        String @id @default(cuid())
+  vehicleId String
+
+  priceCents Int
+  changedAt  DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId, changedAt])
+}
+
+// ===========================================================================
+// Interesse: Merkliste, Suchauftraege, Statistik
+// ===========================================================================
+
+model Favorite {
+  id        String @id @default(cuid())
+  userId    String
+  vehicleId String
+
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vehicleId])
+  @@index([userId, createdAt])
+  @@index([vehicleId])
+}
+
+model SavedSearch {
+  id     String @id @default(cuid())
+  userId String
+
+  /// Vom Nutzer vergeben, etwa BMW 3er unter 30k.
+  name String
+  /// Die Filter exakt so, wie sie in der Adresszeile stehen. Damit ist die
+  /// gespeicherte Suche jederzeit wieder aufrufbar und teilbar.
+  query Json
+
+  notifyByEmail  Boolean   @default(true)
+  notifyBySms    Boolean   @default(false)
+  lastNotifiedAt DateTime?
+  /// Zeitpunkt des letzten Abgleichs; nur neuere Treffer loesen aus.
+  lastCheckedAt  DateTime?
+  matchCount     Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([lastCheckedAt])
+}
+
+model SearchHistory {
+  id     String  @id @default(cuid())
+  userId String?
+
+  query       Json
+  resultCount Int     @default(0)
+  /// Anonyme Sitzungskennung fuer nicht angemeldete Besucher.
+  sessionId   String?
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model ListingView {
+  id        String  @id @default(cuid())
+  vehicleId String
+  userId    String?
+
+  sessionId String?
+  referrer  String?
+
+  createdAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([vehicleId, createdAt])
+  @@index([createdAt])
+}
+
+model ListingInquiry {
+  id        String  @id @default(cuid())
+  vehicleId String
+  userId    String?
+
+  name    String
+  email   String?
+  phone   String?
+  message String
+
+  createdAt DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([vehicleId, createdAt])
+}
+
+model PriceEstimate {
+  id     String  @id @default(cuid())
+  userId String?
+
+  /// Eingaben der Bewertung, damit ein Ergebnis nachvollziehbar bleibt.
+  input Json
+
+  lowCents     Int
+  averageCents Int
+  highCents    Int
+  /// Anzahl vergleichbarer Fahrzeuge, auf denen die Schaetzung beruht.
+  sampleSize   Int    @default(0)
+  confidence   Float  @default(0)
+  method       String @default("comparables")
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+// ===========================================================================
+// Nachrichten
+// ===========================================================================
+
+model Conversation {
+  id        String @id @default(cuid())
+  vehicleId String
+  buyerId   String
+  sellerId  String
+
+  status ConversationStatus @default(OPEN)
+
+  lastMessageAt DateTime  @default(now())
+  buyerReadAt   DateTime?
+  sellerReadAt  DateTime?
+  blockedById   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehicle  Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  buyer    User      @relation(name: "ConversationBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User      @relation(name: "ConversationSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  /// Pro Fahrzeug und Kaeufer genau ein Gespraechsfaden.
+  @@unique([vehicleId, buyerId])
+  @@index([buyerId, lastMessageAt])
+  @@index([sellerId, lastMessageAt])
+}
+
+model Message {
+  id             String @id @default(cuid())
+  conversationId String
+  senderId       String
+
+  body String
+  /// Anhaenge liegen im Dateispeicher; hier stehen nur Verweise.
+  attachmentUrls String[]
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(name: "MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+
+  type  NotificationType
+  title String
+  body  String?
+  /// Zieladresse innerhalb der Anwendung.
+  href  String?
+  /// Zusatzangaben wie Fahrzeug- oder Gespraechskennung.
+  data  Json?
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@index([userId, createdAt])
+}
+
+// ===========================================================================
+// Moderation
+// ===========================================================================
+
+model Report {
+  id         String  @id @default(cuid())
+  vehicleId  String
+  reporterId String?
+
+  reason  ReportReason
+  details String?
+  status  ReportStatus @default(OPEN)
+
+  handledById String?
+  handledAt   DateTime?
+  action      ModerationAction?
+  resolution  String?
+
+  createdAt DateTime @default(now())
+
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  reporter  User?   @relation(name: "ReportReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  handledBy User?   @relation(name: "ReportHandler", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([vehicleId, status])
+}
+
+// ===========================================================================
+// Pakete und Zahlungen
+// ===========================================================================
+
+model Package {
+  id   String      @id @default(cuid())
+  tier PackageTier @unique
+
+  nameSq String
+  nameDe String
+  nameEn String
+
+  descriptionSq String?
+  descriptionDe String?
+  descriptionEn String?
+
+  /// Preise sind im Verwaltungsbereich aenderbar. Keine fest verdrahteten Werte.
+  priceCents Int
+  interval   PackageInterval @default(ONE_TIME)
+
+  listingLimit        Int?
+  listingDurationDays Int     @default(60)
+  photoLimit          Int     @default(20)
+  /// Punktwert fuer die Platzierung in den Ergebnissen.
+  featuredScore       Int     @default(0)
+  featuredDays        Int     @default(0)
+  hasStatistics       Boolean @default(false)
+  hasBulkTools        Boolean @default(false)
+  hasApiAccess        Boolean @default(false)
+  isDealerPackage     Boolean @default(false)
+
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  /// Bezug zum Zahlungsanbieter. Leer, solange der Mock-Anbieter laeuft.
+  stripePriceId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions Subscription[]
+  payments      Payment[]
+
+  @@index([active, sortOrder])
+}
+
+model Subscription {
+  id        String  @id @default(cuid())
+  userId    String
+  dealerId  String?
+  packageId String
+
+  status SubscriptionStatus @default(ACTIVE)
+
+  currentPeriodStart DateTime  @default(now())
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean   @default(false)
+  canceledAt         DateTime?
+
+  stripeSubscriptionId String? @unique
+  stripeCustomerId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dealer  Dealer? @relation(fields: [dealerId], references: [id], onDelete: SetNull)
+  package Package @relation(fields: [packageId], references: [id])
+
+  @@index([userId, status])
+  @@index([status, currentPeriodEnd])
+}
+
+model Payment {
+  id        String  @id @default(cuid())
+  userId    String
+  packageId String?
+  vehicleId String?
+
+  amountCents Int
+  currency    String        @default("EUR")
+  status      PaymentStatus @default(PENDING)
+
+  /// Vom Anbieter vergebene Kennung. Beim Mock-Anbieter ein eigener Wert.
+  providerPaymentId String? @unique
+  provider          String  @default("mock")
+  description       String?
+  failureReason     String?
+
+  paidAt     DateTime?
+  refundedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+// ===========================================================================
+// Plattform-Einstellungen
+// ===========================================================================
+
+/// Werte, die im Verwaltungsbereich aenderbar sein muessen, ohne den Code
+/// anzufassen. Etwa der Euro-Lek-Kurs oder die Moderationsschwellen.
+model PlatformSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
