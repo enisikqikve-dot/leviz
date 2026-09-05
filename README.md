@@ -238,6 +238,84 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 
 ---
 
+## Veröffentlichen
+
+LEVIZ läuft nicht als Dateisammlung auf einem Webspace: Server Components,
+Server Actions und die Anmeldung rechnen bei jedem Aufruf auf dem Server.
+Gebraucht werden ein dauerhaft laufender Node-Prozess, **PostgreSQL** (nicht
+MySQL) und ein Dateispeicher.
+
+Der Weg mit den wenigsten beweglichen Teilen: **Vercel** für die Anwendung,
+**Supabase** für die Datenbank, **Cloudflare R2** für die Bilder.
+
+### 1. Datenbank
+
+Im Supabase-Dashboard unter *Project Settings → Database → Connection string*
+beide Adressen holen. Die gepoolte (Port 6543) nimmt die Anwendung, die direkte
+(Port 5432) brauchen Migrationen und der Seed — der Pooler kann keine
+Transaktion über mehrere Anweisungen halten.
+
+```bash
+DATABASE_URL="…pooler…:6543/postgres?pgbouncer=true" npm run db:migrate
+npm run db:seed
+```
+
+### 2. Bildspeicher
+
+Auf Vercel ist das Dateisystem flüchtig: jede Veröffentlichung startet mit
+einem leeren Verzeichnis, hochgeladene Verkäuferfotos wären danach weg. Deshalb
+`STORAGE_DRIVER="s3"` mit einem R2-Bucket.
+
+In Cloudflare: R2 → Bucket anlegen → *Settings → Public access* eine Domäne
+freischalten (`…r2.dev` oder eigene) → *Manage API tokens* → Schlüsselpaar mit
+Schreibrecht.
+
+| Variable | Woher |
+|---|---|
+| `STORAGE_ENDPOINT` | `https://<konto-id>.r2.cloudflarestorage.com` |
+| `STORAGE_REGION` | `auto` |
+| `STORAGE_BUCKET` | Name des Buckets |
+| `STORAGE_ACCESS_KEY` / `STORAGE_SECRET_KEY` | aus dem API-Token |
+| `STORAGE_PUBLIC_URL` | die öffentliche Domäne des Buckets |
+
+Fehlt eine davon, startet die Anwendung mit einer Fehlermeldung, die den Namen
+nennt. Ein stiller Rückfall auf die Festplatte sähe im Betrieb aus wie ein
+Erfolg und verlöre jedes Bild.
+
+### 3. Vercel
+
+Repository verbinden, Framework wird als Next.js erkannt, dann die Variablen
+setzen. `postinstall` ruft `prisma generate` auf — ohne diesen Schritt fehlt der
+erzeugte Client, weil `lib/generated/` nicht im Repository liegt.
+
+| Variable | Wert |
+|---|---|
+| `DATABASE_URL` | gepoolte Supabase-Adresse |
+| `AUTH_SECRET` | `npx auth secret` |
+| `NEXT_PUBLIC_SITE_URL` | die echte Domäne, **ohne Schrägstrich am Ende** |
+| `STORAGE_*` | siehe oben |
+| `EMAIL_DRIVER`, `SMS_DRIVER` | `console`, bis echte Anbieter hinterlegt sind |
+
+`NEXT_PUBLIC_SITE_URL` ist nicht optional: daraus entstehen die kanonischen
+Adressen, `hreflang` und die Sitemap. Bleibt sie leer, zeigen alle drei auf
+`localhost` — Suchmaschinen finden die Seite dann nicht.
+
+`AUTH_URL` kann leer bleiben; Auth.js liest die Adresse aus der Anfrage, weil
+`trustHost` gesetzt ist.
+
+### Was vorher noch fehlt
+
+- **Missbrauchsschutz zählt je Instanz.** `lib/rate-limit` liegt im Speicher.
+  Auf Vercel läuft jede Instanz für sich, die Grenzen wirken damit schwächer als
+  lokal. Für den Livebetrieb gehört dahinter ein gemeinsamer Zähler.
+- **E-Mail und SMS gehen ins Nichts**, solange die Treiber auf `console` stehen.
+  Passwort-Zurücksetzung und Telefonanmeldung funktionieren dann nicht.
+- **RLS bei Supabase** ist nicht aktiviert. Solange nur Prisma über die
+  Postgres-Verbindung spricht, ist das keine Lücke; sobald jemand den
+  öffentlichen Schlüssel benutzt, schon.
+
+---
+
 ## Befehle
 
 | Befehl | Zweck |
