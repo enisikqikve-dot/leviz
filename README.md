@@ -491,6 +491,10 @@ Adressen, `hreflang` und die Sitemap. Bleibt sie leer, zeigen alle drei auf
 | `npm run brand:shots` | Seiten in Telefonformat aufnehmen (Chrome nötig) |
 | `npm run brand:video` | 20-Sekunden-Video aus den Aufnahmen bauen (ffmpeg nötig) |
 
+Die fertigen Videos liegen unter `public/brand/`: `leviz-reel.mp4` und
+`leviz-reel-2.mp4` sind die 20-Sekunden-Fassungen aus der Pipeline,
+`leviz-reel-3.mp4` eine längere, ausserhalb erstellte Fassung.
+
 ---
 
 ## Umgebungsvariablen
