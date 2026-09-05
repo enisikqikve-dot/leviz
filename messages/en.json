@@ -131,7 +131,8 @@
     "cookies": "Cookies",
     "imprint": "Imprint",
     "rights": "All rights reserved.",
-    "language": "Language"
+    "language": "Language",
+    "withdrawal": "Right of withdrawal"
   },
   "common": {
     "loading": "Loading…",
@@ -1035,5 +1036,292 @@
     "above": "Above the market average",
     "disclaimer": "An estimate from active listings, not an official valuation.",
     "tooFew": "Not enough comparable vehicles yet for an estimate."
+  },
+  "legal": {
+    "updated": "Last updated: {date}",
+    "reviewNote": "This text is a careful draft, not a lawyer-reviewed document. Have it checked by a lawyer in Kosovo before going live.",
+    "operatorMissing": "The operator details are still missing. Fill them in at lib/legal.ts — no payment provider will approve you without a complete imprint.",
+    "fields": {
+      "name": "Company",
+      "legalForm": "Legal form",
+      "address": "Address",
+      "registrationNumber": "Registration number",
+      "taxNumber": "Tax number",
+      "vatNumber": "VAT number",
+      "representative": "Represented by",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "terms": {
+      "title": "Terms of use",
+      "intro": "These terms govern the use of LEVIZ by buyers, private sellers and dealers.",
+      "sections": [
+        {
+          "heading": "Scope",
+          "body": [
+            "LEVIZ is a vehicle marketplace for Kosovo, Albania and North Macedonia. These terms apply to every use of the site, with or without an account.",
+            "Differing terms proposed by a user apply only if the operator has agreed to them in writing."
+          ]
+        },
+        {
+          "heading": "What LEVIZ is — and is not",
+          "body": [
+            "LEVIZ brings sellers and buyers together. The contract of sale for a vehicle is concluded solely between those two. LEVIZ is never a party to it, nor a seller, broker or escrow agent.",
+            "LEVIZ does not inspect vehicles, does not verify documents, and guarantees neither condition nor mileage, customs status or ownership. All of that comes from the seller.",
+            "Payments for a vehicle do not go through LEVIZ. Anyone asked to pay a stranger in advance should report it."
+          ]
+        },
+        {
+          "heading": "Accounts",
+          "body": [
+            "An account is required to publish listings and send messages. The details must be accurate and kept up to date.",
+            "An account is personal. Credentials must not be shared; anyone who suspects that someone else has access should change their password and contact the operator.",
+            "An account can be deleted at any time without giving reasons."
+          ]
+        },
+        {
+          "heading": "Listings",
+          "body": [
+            "By publishing a listing you confirm that you are entitled to sell the vehicle and that the details are accurate. This applies in particular to price, mileage, year, accident history, customs status and plate origin.",
+            "Photos must show the vehicle offered and must not infringe anyone else's rights. Images taken from manufacturer sites or other listings are not permitted.",
+            "Each vehicle may be listed only once at a time. A sold vehicle must be marked as sold or removed."
+          ]
+        },
+        {
+          "heading": "Prohibited conduct",
+          "body": [
+            "The following are prohibited in particular:",
+            "· listings for vehicles that do not exist or do not belong to the seller",
+            "· false statements about customs status or the origin of plates",
+            "· tampered mileage or concealed accident damage",
+            "· demands for advance payment without handover of the vehicle",
+            "· collecting other users' contact details for advertising",
+            "· automated scraping of the site without written permission"
+          ]
+        },
+        {
+          "heading": "Paid services",
+          "body": [
+            "Publishing a basic listing is free. Additional visibility and dealer packages are paid; prices and durations are shown on the pricing page and again before purchase.",
+            "All prices are in euro and include statutory VAT where applicable.",
+            "Subscriptions renew for the booked period unless cancelled beforehand. Cancellation is possible at any time under Billing in your account and takes effect at the end of the current period."
+          ]
+        },
+        {
+          "heading": "Review, suspension and removal",
+          "body": [
+            "The operator may review, reject, hide or delete listings and suspend accounts where these terms or applicable law are breached, or where there is reasonable suspicion of fraud.",
+            "No refund is owed for paid services removed because of a breach."
+          ]
+        },
+        {
+          "heading": "Liability",
+          "body": [
+            "The users who created listings and messages are solely liable for their content.",
+            "The operator is liable without limitation for intent and gross negligence and for injury to life, body or health. Otherwise liability is limited to foreseeable damage typical of this kind of contract.",
+            "Uninterrupted operation is not owed. Maintenance and faults may restrict access temporarily."
+          ]
+        },
+        {
+          "heading": "Changes to these terms",
+          "body": [
+            "The operator may amend these terms. Registered users are informed by email at least 14 days before the change takes effect. Not objecting counts as agreement; anyone who objects may close their account."
+          ]
+        },
+        {
+          "heading": "Governing law",
+          "body": [
+            "The law of the Republic of Kosovo applies. Mandatory consumer protection rules of the country in which a consumer is habitually resident remain unaffected."
+          ]
+        }
+      ]
+    },
+    "withdrawal": {
+      "title": "Right of withdrawal",
+      "intro": "For consumers who book a paid package or a featured placement.",
+      "sections": [
+        {
+          "heading": "Right of withdrawal",
+          "body": [
+            "Consumers have the right to withdraw from a paid contract within 14 days without giving reasons.",
+            "A consumer is someone entering into the contract for purposes that are mainly outside their trade or profession. This right therefore does not normally apply to dealer packages."
+          ]
+        },
+        {
+          "heading": "When the period starts",
+          "body": [
+            "The period starts on the day the contract is concluded, that is when the booking is confirmed."
+          ]
+        },
+        {
+          "heading": "Early expiry",
+          "body": [
+            "The right of withdrawal expires early once the service has been fully performed, provided the consumer expressly agreed beforehand that performance should begin immediately and acknowledged that this ends the right of withdrawal.",
+            "This concerns immediate featuring of a listing: it takes effect right after payment. If you do not want immediate performance, wait before booking.",
+            "Where a service has been performed only in part, a proportionate amount is payable."
+          ]
+        },
+        {
+          "heading": "How to withdraw",
+          "body": [
+            "A clear statement sent to the email address given in the imprint is sufficient. Using the model form below is possible but not required.",
+            "Sending the statement before the period expires is enough to meet the deadline."
+          ]
+        },
+        {
+          "heading": "Consequences",
+          "body": [
+            "The operator refunds all payments received without undue delay, and at the latest within 14 days of receiving the statement, using the same means of payment used for the booking. No fees are charged for this."
+          ]
+        },
+        {
+          "heading": "Model withdrawal form",
+          "body": [
+            "To: the address and email address given in the imprint.",
+            "I hereby withdraw from the contract I concluded for the following service: __________",
+            "Ordered on: __________ · Name: __________ · Address: __________ · Date: __________"
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy",
+      "intro": "What data LEVIZ processes, why, and what rights you have.",
+      "sections": [
+        {
+          "heading": "Controller",
+          "body": [
+            "The operator named in the imprint is responsible for the processing. For privacy questions, a message to the email address given there is enough."
+          ]
+        },
+        {
+          "heading": "What data is processed",
+          "body": [
+            "· Account data: name, email address, phone number, password — the latter only as an Argon2 hash, never in plain text",
+            "· Profile details: city, language preference, notification settings",
+            "· Listing data: vehicle details, photos, price, location",
+            "· Messages between users and enquiries about listings",
+            "· Usage data: listings viewed, saved searches, saved vehicles",
+            "· Payment data: amount, time, status and the payment provider's reference — never the card number"
+          ]
+        },
+        {
+          "heading": "Why",
+          "body": [
+            "To perform the user contract: account, listings, messages, search.",
+            "To handle paid services and to meet statutory retention obligations.",
+            "To prevent fraud and abuse: reviewing listings, limiting sign-in attempts, handling reports."
+          ]
+        },
+        {
+          "heading": "Card details",
+          "body": [
+            "LEVIZ never collects, processes or stores card numbers. They are entered only on the payment provider's page; LEVIZ receives from it only the amount, the status and a reference."
+          ]
+        },
+        {
+          "heading": "Recipients",
+          "body": [
+            "Other users see what is published in a listing, and the name shown with a message.",
+            "Service providers process data on our behalf: hosting, database, file storage, payment provider, and email and SMS delivery. They are bound by contract and may not use the data for their own purposes.",
+            "Data is disclosed to authorities only where required by law."
+          ]
+        },
+        {
+          "heading": "Retention",
+          "body": [
+            "Account data is deleted when the account is deleted. Listings and messages are removed or anonymised at the same time.",
+            "Payment records are kept for the statutory retention period, including after an account is deleted."
+          ]
+        },
+        {
+          "heading": "Your rights",
+          "body": [
+            "Access to the stored data, correction of inaccurate details, erasure, restriction of processing, objection and data portability.",
+            "Name, phone number, city and notification settings can be changed at any time under Settings.",
+            "You have the right to complain to the supervisory authority for the protection of personal data."
+          ]
+        },
+        {
+          "heading": "Security",
+          "body": [
+            "Transmission is encrypted. Passwords are stored with Argon2id and cannot be read even by the operator. Access to protected areas is checked on the server for every request."
+          ]
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Cookies",
+      "intro": "LEVIZ sets only what the site needs to work. There are no third-party advertising or analytics services.",
+      "sections": [
+        {
+          "heading": "What is stored",
+          "body": [
+            "· Sign-in: an encrypted session cookie for as long as you are signed in",
+            "· leviz.currency: the currency you chose, euro or lek",
+            "· leviz.compare: the vehicles in your comparison",
+            "· NEXT_LOCALE: the language you chose, once you switch it",
+            "· Light or dark appearance: in your browser's local storage, not as a cookie"
+          ]
+        },
+        {
+          "heading": "No tracking",
+          "body": [
+            "LEVIZ embeds no advertising networks, no analytics services and no social network buttons. There is therefore nothing to consent to and no consent banner.",
+            "The statistics in the dealer dashboard come from our own database and are not passed to third parties."
+          ]
+        },
+        {
+          "heading": "Managing cookies",
+          "body": [
+            "Cookies can be deleted or blocked in every browser's settings. Without the session cookie you cannot sign in; currency, language and comparison then fall back to the defaults."
+          ]
+        }
+      ]
+    },
+    "imprint": {
+      "title": "Legal notice",
+      "intro": "Details of the operator of this site.",
+      "sections": [
+        {
+          "heading": "Responsible for the content",
+          "body": [
+            "The authorised representative named above is responsible for the editorial content of this site.",
+            "Users who created listings, messages and reviews are liable for them. Unlawful content is removed without delay once we know of it — please use the report button on each listing."
+          ]
+        },
+        {
+          "heading": "Liability for links",
+          "body": [
+            "Linked external sites are outside our control. The respective provider is responsible for their content."
+          ]
+        },
+        {
+          "heading": "Complaints",
+          "body": [
+            "Please send complaints directly to the email address given above. We usually reply within two working days."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "intro": "How to reach us.",
+      "sections": [
+        {
+          "heading": "Before you write",
+          "body": [
+            "The fastest way to report a fraudulent or false listing is the Report button on the listing itself. Those reports go straight to moderation and are handled first.",
+            "Questions about a particular vehicle can only be answered by the seller. Use the message function in the listing — the operator knows neither its condition nor its availability."
+          ]
+        },
+        {
+          "heading": "Response time",
+          "body": [
+            "Enquiries are usually answered within two working days. Reports of possible fraud are prioritised."
+          ]
+        }
+      ]
+    }
   }
 }

@@ -246,6 +246,49 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 
 ---
 
+## Rechtliche Seiten
+
+Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:
+
+| Seite | Albanisch | Deutsch | Englisch |
+|---|---|---|---|
+| Nutzungsbedingungen | `/kushtet` | `/agb` | `/terms` |
+| Widerruf | `/terheqja` | `/widerruf` | `/withdrawal` |
+| Datenschutz | `/privatesia` | `/datenschutz` | `/privacy` |
+| Cookies | `/cookies` | `/cookies` | `/cookies` |
+| Impressum | `/impressum` | `/impressum` | `/imprint` |
+| Kontakt | `/kontakti` | `/kontakt` | `/contact` |
+
+Der gesamte Text liegt in den Sprachdateien unter `legal`; Aufzählungen
+entstehen aus Absätzen, die mit `· ` beginnen. Ein Test prüft, dass jedes
+Dokument in allen drei Sprachen **gleich viele Abschnitte** hat — eine
+fehlende Klausel in einer Sprache wäre eine andere Rechtslage für diese Leser.
+
+### Die Betreiberangaben fehlen absichtlich
+
+`lib/legal.ts` ist leer ausgeliefert. Erfundene Registernummern oder
+Anschriften wären keine Platzhalter, sondern falsche Angaben über ein
+Unternehmen — und beim Zahlungsdienstleister fallen sie ohnehin auf.
+
+Solange etwas fehlt, benennt die Impressumsseite die fehlenden Felder sichtbar
+und zeigt nur die ausgefüllten. Ein Impressum mit „Musterstraße 1" wäre
+schlimmer als gar keins: es sieht vollständig aus und ist trotzdem falsch.
+
+> Die Texte sind sorgfältige Entwürfe, **keine anwaltlich geprüften
+> Dokumente**. Vor dem Livegang von einer Juristin oder einem Juristen im
+> Kosovo prüfen lassen — die albanische Fassung zusätzlich von einer
+> Muttersprachlerin, weil es bei Rechtstexten auf die Wortwahl ankommt.
+
+### Offener Punkt: Zustimmung zur sofortigen Ausführung
+
+Die Widerrufsbelehrung nennt den Fall, dass das Widerrufsrecht vorzeitig
+erlischt, wenn der Käufer der sofortigen Ausführung ausdrücklich zustimmt. Für
+die sofortige Hervorhebung eines Inserats trifft genau das zu — **die
+Zustimmung wird im Kaufvorgang aber noch nicht abgefragt.** Ohne sie bleibt das
+Widerrufsrecht 14 Tage bestehen, auch nach erbrachter Leistung.
+
+---
+
 ## Einen echten Zahlungsanbieter anbinden
 
 Der Ablauf steht vollständig und ist anbieterunabhängig: Zahlung anlegen →

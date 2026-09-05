@@ -73,6 +73,15 @@ export const pathnames = {
   },
 
   '/pricing': { sq: '/cmimet', de: '/preise', en: '/pricing' },
+
+  // Rechtliches. Die Pfade sind uebersetzt, damit ein Besucher sieht, worauf
+  // er klickt — ein Acquirer prueft diese Seiten vor der Freischaltung.
+  '/terms': { sq: '/kushtet', de: '/agb', en: '/terms' },
+  '/withdrawal': { sq: '/terheqja', de: '/widerruf', en: '/withdrawal' },
+  '/privacy': { sq: '/privatesia', de: '/datenschutz', en: '/privacy' },
+  '/cookies': { sq: '/cookies', de: '/cookies', en: '/cookies' },
+  '/imprint': { sq: '/impressum', de: '/impressum', en: '/imprint' },
+  '/contact': { sq: '/kontakti', de: '/kontakt', en: '/contact' },
   '/dashboard/billing': {
     sq: '/paneli/pagesat',
     de: '/konto/zahlungen',

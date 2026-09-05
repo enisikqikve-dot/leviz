@@ -1,10 +1,13 @@
-import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
 
 import { buildCheckoutForm } from './redirect';
 
+/**
+ * Vitest laeuft in der jsdom-Umgebung; `document` steht global bereit. Ein
+ * frisches Element je Test haelt sie voneinander unabhaengig.
+ */
 function dokument(): Document {
-  return new JSDOM('<!doctype html><html><body></body></html>').window.document;
+  return document.implementation.createHTMLDocument('test');
 }
 
 describe('buildCheckoutForm', () => {

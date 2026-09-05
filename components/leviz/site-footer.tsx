@@ -16,31 +16,27 @@ const COLUMNS = [
   },
   {
     heading: 'company',
-    links: [
-      { href: '/about', key: 'footer.about' },
-      { href: '/careers', key: 'footer.careers' },
-      { href: '/press', key: 'footer.press' },
-      { href: '/contact', key: 'footer.contact' },
-    ],
-  },
-  {
-    heading: 'support',
-    links: [
-      { href: '/help', key: 'footer.help' },
-      { href: '/safety', key: 'footer.safety' },
-      { href: '/report', key: 'footer.report' },
-    ],
+    links: [{ href: '/contact', key: 'footer.contact' }],
   },
   {
     heading: 'legal',
     links: [
       { href: '/terms', key: 'footer.terms' },
+      { href: '/withdrawal', key: 'footer.withdrawal' },
       { href: '/privacy', key: 'footer.privacy' },
       { href: '/cookies', key: 'footer.cookies' },
       { href: '/imprint', key: 'footer.imprint' },
     ],
   },
 ] as const;
+
+/*
+ * Hier standen einmal /about, /careers, /press, /help, /safety und /report.
+ * Keine dieser Seiten existiert; alle sechs antworteten mit 404. Ein toter
+ * Verweis in der Fusszeile jeder Seite ist schlechter als gar keiner —
+ * besonders gegenueber einem Zahlungsdienstleister, der die Seite vor der
+ * Freischaltung durchklickt. Sie kommen zurueck, sobald es sie gibt.
+ */
 
 export async function SiteFooter() {
   const t = await getTranslations();

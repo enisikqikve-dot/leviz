@@ -131,7 +131,8 @@
     "cookies": "Cookies",
     "imprint": "Impressum",
     "rights": "Të gjitha të drejtat e rezervuara.",
-    "language": "Gjuha"
+    "language": "Gjuha",
+    "withdrawal": "E drejta e tërheqjes"
   },
   "common": {
     "loading": "Duke u ngarkuar…",
@@ -1035,5 +1036,292 @@
     "above": "Mbi mesataren e tregut",
     "disclaimer": "Ky është vlerësim nga shpalljet aktive, jo çmim zyrtar.",
     "tooFew": "Ende nuk ka mjaft vetura të ngjashme për një vlerësim."
+  },
+  "legal": {
+    "updated": "Përditësuar më: {date}",
+    "reviewNote": "Ky tekst është një draft i kujdesshëm, jo një dokument i verifikuar nga jurist. Lëre ta shohë një avokat në Kosovë para se faqja të dalë publike.",
+    "operatorMissing": "Të dhënat e operatorit mungojnë ende. Plotësoji te lib/legal.ts — asnjë ofrues pagesash nuk të aprovon pa impressum të plotë.",
+    "fields": {
+      "name": "Kompania",
+      "legalForm": "Forma juridike",
+      "address": "Adresa",
+      "registrationNumber": "Numri i regjistrimit",
+      "taxNumber": "Numri fiskal",
+      "vatNumber": "Numri i TVSH-së",
+      "representative": "Përfaqësuar nga",
+      "email": "Email",
+      "phone": "Telefoni"
+    },
+    "terms": {
+      "title": "Kushtet e përdorimit",
+      "intro": "Këto kushte rregullojnë përdorimin e LEVIZ nga blerësit, shitësit privatë dhe autosallonet.",
+      "sections": [
+        {
+          "heading": "Fusha e zbatimit",
+          "body": [
+            "LEVIZ është një treg veturash për Kosovën, Shqipërinë dhe Maqedoninë e Veriut. Këto kushte vlejnë për çdo përdorim të faqes, me ose pa llogari.",
+            "Kushte të ndryshme të propozuara nga një përdorues vlejnë vetëm nëse operatori i ka pranuar me shkrim."
+          ]
+        },
+        {
+          "heading": "Çfarë është LEVIZ — dhe çfarë jo",
+          "body": [
+            "LEVIZ bashkon shitësin me blerësin. Kontrata e shitjes së veturës lidhet vetëm mes tyre. LEVIZ nuk është kurrë palë në të, as shitës, as ndërmjetës, as mbajtës i parave.",
+            "LEVIZ nuk i shikon veturat, nuk i verifikon dokumentet dhe nuk garanton as gjendjen, as kilometrazhin, as statusin doganor, as pronësinë. Të gjitha këto vijnë nga shitësi.",
+            "Pagesat për një veturë nuk kalojnë përmes LEVIZ. Kush kërkohet të paguajë paraprakisht dikë që nuk e njeh, le ta raportojë."
+          ]
+        },
+        {
+          "heading": "Llogaria",
+          "body": [
+            "Për të publikuar shpallje dhe për të shkruar mesazhe duhet një llogari. Të dhënat duhet të jenë të sakta dhe të mbahen të përditësuara.",
+            "Llogaria është personale. Të dhënat e hyrjes nuk ndahen me të tjerë; kush dyshon se dikush tjetër ka qasje, e ndërron fjalëkalimin dhe njofton operatorin.",
+            "Llogaria mund të fshihet në çdo kohë, pa dhënë arsye."
+          ]
+        },
+        {
+          "heading": "Shpalljet",
+          "body": [
+            "Kush publikon një shpallje, konfirmon se ka të drejtë ta shesë veturën dhe se të dhënat janë të sakta. Kjo vlen sidomos për çmimin, kilometrazhin, vitin, aksidentet, statusin doganor dhe prejardhjen e targave.",
+            "Fotot duhet të tregojnë veturën e ofruar dhe nuk guxojnë të cenojnë të drejtat e të tjerëve. Fotot nga faqet e prodhuesve ose nga shpallje të huaja nuk lejohen.",
+            "Çdo veturë mund të jetë e shpallur vetëm një herë njëkohësisht. Vetura e shitur duhet shënuar si e shitur ose duhet hequr."
+          ]
+        },
+        {
+          "heading": "Çfarë ndalohet",
+          "body": [
+            "Ndalohen sidomos:",
+            "· shpalljet për vetura që nuk ekzistojnë ose që nuk i takojnë shitësit",
+            "· të dhëna të rreme për statusin doganor ose prejardhjen e targave",
+            "· kilometrazhi i manipuluar ose dëmet e fshehura nga aksidenti",
+            "· kërkesat për pagesë paraprake pa dorëzim të veturës",
+            "· mbledhja e kontakteve të përdoruesve të tjerë për reklama",
+            "· nxjerrja automatike e të dhënave të faqes pa leje me shkrim"
+          ]
+        },
+        {
+          "heading": "Shërbimet me pagesë",
+          "body": [
+            "Publikimi i një shpalljeje të thjeshtë është falas. Dukshmëria shtesë dhe pakot për autosallone paguhen; çmimet dhe kohëzgjatjet janë në faqen e çmimeve dhe shfaqen sërish para blerjes.",
+            "Të gjitha çmimet janë në euro dhe përfshijnë TVSH-në kur ajo zbatohet.",
+            "Abonimet vazhdojnë për periudhën e zgjedhur nëse nuk anulohen më parë. Anulimi bëhet në çdo kohë te llogaria, në Faturimi, dhe vlen nga fundi i periudhës aktuale."
+          ]
+        },
+        {
+          "heading": "Kontrolli, pezullimi dhe fshirja",
+          "body": [
+            "Operatori mund t'i kontrollojë, refuzojë, fshehë ose fshijë shpalljet dhe të pezullojë llogaritë kur shkelen këto kushte ose ligji, ose kur ka dyshim të arsyeshëm për mashtrim.",
+            "Për shërbimet me pagesë të hequra për shkak të një shkeljeje nuk kthehen paratë."
+          ]
+        },
+        {
+          "heading": "Përgjegjësia",
+          "body": [
+            "Për përmbajtjen e shpalljeve dhe mesazheve përgjigjen vetëm përdoruesit që i kanë krijuar.",
+            "Operatori përgjigjet pa kufizim për dashje dhe neglizhencë të rëndë, si dhe për cenimin e jetës, trupit ose shëndetit. Përndryshe përgjegjësia kufizohet në dëmin e parashikueshëm dhe tipik për këtë lloj kontrate.",
+            "Funksionimi pa ndërprerje nuk garantohet. Mirëmbajtja dhe defektet mund ta kufizojnë qasjen përkohësisht."
+          ]
+        },
+        {
+          "heading": "Ndryshimet e këtyre kushteve",
+          "body": [
+            "Operatori mund t'i ndryshojë këto kushte. Përdoruesit e regjistruar njoftohen me email të paktën 14 ditë para se ndryshimi të hyjë në fuqi. Mosreagimi vlen si pranim; kush nuk pajtohet, mund ta mbyllë llogarinë."
+          ]
+        },
+        {
+          "heading": "Ligji i zbatueshëm",
+          "body": [
+            "Zbatohet ligji i Republikës së Kosovës. Rregullat e detyrueshme për mbrojtjen e konsumatorit të vendit ku konsumatori banon zakonisht mbeten të paprekura."
+          ]
+        }
+      ]
+    },
+    "withdrawal": {
+      "title": "E drejta e tërheqjes",
+      "intro": "Për konsumatorët që blejnë një pako me pagesë ose një theksim të shpalljes.",
+      "sections": [
+        {
+          "heading": "E drejta e tërheqjes",
+          "body": [
+            "Konsumatorët kanë të drejtë të tërhiqen nga një kontratë me pagesë brenda 14 ditësh, pa dhënë arsye.",
+            "Konsumator është ai që e lidh kontratën për qëllime që kryesisht nuk lidhen me veprimtarinë e tij tregtare ose profesionale. Prandaj kjo e drejtë zakonisht nuk vlen për pakot e autosalloneve."
+          ]
+        },
+        {
+          "heading": "Fillimi i afatit",
+          "body": [
+            "Afati fillon ditën e lidhjes së kontratës, pra kur konfirmohet porosia."
+          ]
+        },
+        {
+          "heading": "Shuarja e parakohshme",
+          "body": [
+            "E drejta e tërheqjes shuhet më herët nëse shërbimi është kryer plotësisht dhe konsumatori ka pranuar shprehimisht më parë që ekzekutimi të fillojë menjëherë, duke konfirmuar se kështu e humb këtë të drejtë.",
+            "Kjo prek theksimin e menjëhershëm të një shpalljeje: ai vepron sapo kryhet pagesa. Kush nuk e dëshiron ekzekutimin e menjëhershëm, le të presë me porosinë.",
+            "Kur shërbimi është kryer vetëm pjesërisht, paguhet një shumë proporcionale."
+          ]
+        },
+        {
+          "heading": "Si tërhiqesh",
+          "body": [
+            "Mjafton një deklaratë e qartë dërguar në adresën e emailit të shënuar në impressum. Përdorimi i formularit më poshtë është i mundur, por jo i detyrueshëm.",
+            "Për afatin mjafton që deklarata të dërgohet para skadimit."
+          ]
+        },
+        {
+          "heading": "Pasojat",
+          "body": [
+            "Operatori i kthen të gjitha pagesat e marra pa vonesë, më së voni brenda 14 ditësh nga marrja e deklaratës, me të njëjtën mënyrë pagese të përdorur gjatë porosisë. Për këtë nuk ngarkohet asnjë tarifë."
+          ]
+        },
+        {
+          "heading": "Formulari model i tërheqjes",
+          "body": [
+            "Për: adresën dhe emailin e shënuar në impressum.",
+            "Me këtë tërhiqem nga kontrata e lidhur për shërbimin vijues: __________",
+            "Porositur më: __________ · Emri: __________ · Adresa: __________ · Data: __________"
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privatësia",
+      "intro": "Cilat të dhëna përpunon LEVIZ, për çfarë, dhe cilat të drejta ke.",
+      "sections": [
+        {
+          "heading": "Përgjegjësi",
+          "body": [
+            "Përgjegjës për përpunimin është operatori i shënuar në impressum. Për pyetje rreth privatësisë mjafton një mesazh në adresën e emailit atje."
+          ]
+        },
+        {
+          "heading": "Cilat të dhëna përpunohen",
+          "body": [
+            "· Të dhënat e llogarisë: emri, emaili, numri i telefonit, fjalëkalimi — ky i fundit vetëm si hash Argon2, kurrë i lexueshëm",
+            "· Profili: qyteti, gjuha e zgjedhur, preferencat e njoftimeve",
+            "· Të dhënat e shpalljes: detajet e veturës, fotot, çmimi, vendndodhja",
+            "· Mesazhet mes përdoruesve dhe kërkesat për shpallje",
+            "· Të dhënat e përdorimit: shpalljet e hapura, kërkimet e ruajtura, të preferuarat",
+            "· Të dhënat e pagesës: shuma, koha, statusi dhe referenca e ofruesit të pagesave — kurrë numri i kartës"
+          ]
+        },
+        {
+          "heading": "Për çfarë",
+          "body": [
+            "Për përmbushjen e kontratës së përdorimit: llogaria, shpalljet, mesazhet, kërkimi.",
+            "Për kryerjen e shërbimeve me pagesë dhe për detyrimet ligjore të ruajtjes së dokumenteve.",
+            "Për parandalimin e mashtrimit dhe keqpërdorimit: kontrolli i shpalljeve, kufizimi i përpjekjeve për hyrje, trajtimi i raportimeve."
+          ]
+        },
+        {
+          "heading": "Të dhënat e kartës",
+          "body": [
+            "LEVIZ nuk mbledh, nuk përpunon dhe nuk ruan kurrë numra kartash. Ato shkruhen vetëm në faqen e ofruesit të pagesave; LEVIZ merr prej andej vetëm shumën, statusin dhe një referencë."
+          ]
+        },
+        {
+          "heading": "Kush i sheh",
+          "body": [
+            "Përdoruesit e tjerë shohin atë që publikohet në një shpallje, si dhe emrin që shfaqet me një mesazh.",
+            "Ofruesit e shërbimeve i përpunojnë të dhënat për llogari tonë: hostimi, baza e të dhënave, ruajtja e skedarëve, ofruesi i pagesave dhe dërgimi i email-eve dhe SMS-ve. Ata janë të lidhur me kontratë dhe nuk mund t'i përdorin të dhënat për qëllimet e veta.",
+            "Të dhënat u jepen autoriteteve vetëm kur kjo kërkohet me ligj."
+          ]
+        },
+        {
+          "heading": "Sa gjatë ruhen",
+          "body": [
+            "Të dhënat e llogarisë fshihen kur fshihet llogaria. Shpalljet dhe mesazhet hiqen ose anonimizohen njëkohësisht.",
+            "Dëshmitë e pagesave ruhen për afatin ligjor, edhe pas fshirjes së llogarisë."
+          ]
+        },
+        {
+          "heading": "Të drejtat e tua",
+          "body": [
+            "Qasje në të dhënat e ruajtura, korrigjim i të dhënave të pasakta, fshirje, kufizim i përpunimit, kundërshtim dhe transferim i të dhënave.",
+            "Emrin, numrin e telefonit, qytetin dhe preferencat e njoftimeve mund t'i ndryshosh vetë në çdo kohë te Cilësimet.",
+            "Ke të drejtë të ankohesh te autoriteti mbikëqyrës për mbrojtjen e të dhënave personale."
+          ]
+        },
+        {
+          "heading": "Siguria",
+          "body": [
+            "Transmetimi është i enkriptuar. Fjalëkalimet ruhen me Argon2id dhe nuk lexohen as nga operatori. Qasja në zonat e mbrojtura kontrollohet në server për çdo kërkesë."
+          ]
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Cookies",
+      "intro": "LEVIZ vendos vetëm atë që i duhet faqes për të punuar. Nuk ka shërbime reklamimi ose analitike nga palë të treta.",
+      "sections": [
+        {
+          "heading": "Çfarë ruhet",
+          "body": [
+            "· Hyrja: një cookie i enkriptuar sesioni, për aq kohë sa je i kyçur",
+            "· leviz.currency: valuta e zgjedhur, euro ose lek",
+            "· leviz.compare: veturat në krahasimin tënd",
+            "· NEXT_LOCALE: gjuha e zgjedhur, sapo e ndërron",
+            "· Pamja e ndritshme ose e errët: në memorien lokale të shfletuesit, jo si cookie"
+          ]
+        },
+        {
+          "heading": "Pa gjurmim",
+          "body": [
+            "LEVIZ nuk përfshin rrjete reklamimi, shërbime analitike apo butona rrjetesh sociale. Prandaj nuk ka çfarë të pranohet dhe nuk ka baner pëlqimi.",
+            "Statistikat në panelin e autosallonit dalin nga baza jonë e të dhënave dhe nuk u jepen palëve të treta."
+          ]
+        },
+        {
+          "heading": "Si i menaxhon",
+          "body": [
+            "Cookies mund të fshihen ose bllokohen te cilësimet e çdo shfletuesi. Pa cookie-n e sesionit nuk mund të kyçesh; valuta, gjuha dhe krahasimi kthehen te vlerat e parazgjedhura."
+          ]
+        }
+      ]
+    },
+    "imprint": {
+      "title": "Impressum",
+      "intro": "Të dhënat e operatorit të kësaj faqeje.",
+      "sections": [
+        {
+          "heading": "Përgjegjës për përmbajtjen",
+          "body": [
+            "Personi përfaqësues i shënuar më lart është përgjegjës për përmbajtjen redaktuese të kësaj faqeje.",
+            "Për shpalljet, mesazhet dhe vlerësimet përgjigjen përdoruesit që i kanë krijuar. Përmbajtja e kundërligjshme hiqet menjëherë sapo mësohet për të — përdor butonin e raportimit te çdo shpallje."
+          ]
+        },
+        {
+          "heading": "Përgjegjësia për lidhjet",
+          "body": [
+            "Faqet e jashtme të lidhura janë jashtë kontrollit tonë. Për përmbajtjen e tyre përgjigjet ofruesi përkatës."
+          ]
+        },
+        {
+          "heading": "Ankesat",
+          "body": [
+            "Ankesat dërgoji drejtpërdrejt në adresën e emailit më lart. Zakonisht përgjigjemi brenda dy ditësh pune."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Kontakti",
+      "intro": "Si na kontakton.",
+      "sections": [
+        {
+          "heading": "Para se të shkruash",
+          "body": [
+            "Një shpallje mashtruese ose e rreme raportohet më shpejt me butonin „Raporto“ te vetë shpallja. Ato raportime shkojnë drejt te moderimi dhe trajtohen me përparësi.",
+            "Pyetjet për një veturë të caktuar i përgjigjet vetëm shitësi. Përdor mesazhet te shpallja — operatori nuk e di as gjendjen, as disponueshmërinë."
+          ]
+        },
+        {
+          "heading": "Koha e përgjigjes",
+          "body": [
+            "Kërkesat marrin përgjigje zakonisht brenda dy ditësh pune. Raportimet për mashtrim të mundshëm trajtohen me përparësi."
+          ]
+        }
+      ]
+    }
   }
 }

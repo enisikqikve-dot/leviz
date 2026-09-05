@@ -131,7 +131,8 @@
     "cookies": "Cookies",
     "imprint": "Impressum",
     "rights": "Alle Rechte vorbehalten.",
-    "language": "Sprache"
+    "language": "Sprache",
+    "withdrawal": "Widerruf"
   },
   "common": {
     "loading": "Wird geladen…",
@@ -1035,5 +1036,292 @@
     "above": "Über dem Marktmittel",
     "disclaimer": "Eine Einschätzung aus aktiven Anzeigen, kein amtlicher Wert.",
     "tooFew": "Noch zu wenige vergleichbare Fahrzeuge für eine Einschätzung."
+  },
+  "legal": {
+    "updated": "Stand: {date}",
+    "reviewNote": "Dieser Text ist ein sorgfältiger Entwurf, kein anwaltlich geprüftes Dokument. Lass ihn vor dem Livegang von einer Juristin oder einem Juristen im Kosovo prüfen.",
+    "operatorMissing": "Die Angaben zum Betreiber fehlen noch. Trag sie in lib/legal.ts ein — ohne vollständiges Impressum schaltet kein Zahlungsdienstleister frei.",
+    "fields": {
+      "name": "Unternehmen",
+      "legalForm": "Rechtsform",
+      "address": "Anschrift",
+      "registrationNumber": "Registernummer",
+      "taxNumber": "Steuernummer",
+      "vatNumber": "Mehrwertsteuernummer",
+      "representative": "Vertretungsberechtigt",
+      "email": "E-Mail",
+      "phone": "Telefon"
+    },
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "intro": "Diese Bedingungen regeln die Nutzung von LEVIZ durch Käufer, Privatverkäufer und Händler.",
+      "sections": [
+        {
+          "heading": "Geltungsbereich",
+          "body": [
+            "LEVIZ ist ein Marktplatz für Fahrzeuge in Kosovo, Albanien und Nordmazedonien. Diese Bedingungen gelten für jede Nutzung der Seite, ob mit oder ohne Konto.",
+            "Abweichende Bedingungen eines Nutzers gelten nur, wenn der Betreiber ihnen schriftlich zugestimmt hat."
+          ]
+        },
+        {
+          "heading": "Was LEVIZ ist — und was nicht",
+          "body": [
+            "LEVIZ bringt Verkäufer und Käufer zusammen. Der Kaufvertrag über ein Fahrzeug kommt ausschließlich zwischen diesen beiden zustande. LEVIZ ist niemals Vertragspartei, Verkäufer, Vermittler oder Treuhänder.",
+            "LEVIZ besichtigt keine Fahrzeuge, prüft keine Papiere und garantiert weder Zustand noch Kilometerstand, Zollstatus oder Eigentumsverhältnisse. Diese Angaben stammen vom jeweiligen Verkäufer.",
+            "Zahlungen für ein Fahrzeug laufen nicht über LEVIZ. Wer zur Vorauszahlung an einen Unbekannten aufgefordert wird, sollte das über die Meldefunktion anzeigen."
+          ]
+        },
+        {
+          "heading": "Konto",
+          "body": [
+            "Für das Einstellen von Inseraten und das Schreiben von Nachrichten ist ein Konto nötig. Die Angaben müssen zutreffen und aktuell gehalten werden.",
+            "Ein Konto ist persönlich. Zugangsdaten dürfen nicht weitergegeben werden; wer den Verdacht hat, dass jemand anderes Zugriff hat, ändert sein Passwort und meldet sich beim Betreiber.",
+            "Ein Konto lässt sich jederzeit ohne Angabe von Gründen löschen."
+          ]
+        },
+        {
+          "heading": "Inserate",
+          "body": [
+            "Wer inseriert, versichert, zum Verkauf des Fahrzeugs berechtigt zu sein und zutreffende Angaben zu machen. Das gilt besonders für Preis, Kilometerstand, Baujahr, Unfallfreiheit, Zollstatus und Kennzeichen-Herkunft.",
+            "Fotos müssen das angebotene Fahrzeug zeigen und dürfen keine fremden Rechte verletzen. Bilder von Herstellerseiten oder aus fremden Inseraten sind nicht zulässig.",
+            "Jedes Fahrzeug darf nur einmal gleichzeitig inseriert werden. Ein verkauftes Fahrzeug ist als verkauft zu kennzeichnen oder zu entfernen."
+          ]
+        },
+        {
+          "heading": "Verbotenes",
+          "body": [
+            "Untersagt sind insbesondere:",
+            "· Inserate für Fahrzeuge, die es nicht gibt oder die dem Anbieter nicht gehören",
+            "· falsche Angaben zum Zollstatus oder zur Herkunft der Kennzeichen",
+            "· manipulierte Kilometerstände oder verschwiegene Unfallschäden",
+            "· Forderungen nach Vorauszahlung ohne Übergabe des Fahrzeugs",
+            "· das Sammeln von Kontaktdaten anderer Nutzer für Werbung",
+            "· automatisiertes Auslesen der Seite ohne schriftliche Erlaubnis"
+          ]
+        },
+        {
+          "heading": "Kostenpflichtige Leistungen",
+          "body": [
+            "Das Einstellen einfacher Inserate ist kostenlos. Zusätzliche Sichtbarkeit und Händlerpakete sind kostenpflichtig; Preise und Laufzeiten stehen auf der Preisseite und werden vor dem Kauf angezeigt.",
+            "Alle Preise verstehen sich in Euro und enthalten, soweit anwendbar, die gesetzliche Mehrwertsteuer.",
+            "Abonnements verlängern sich um die gebuchte Laufzeit, solange sie nicht vorher gekündigt werden. Die Kündigung ist jederzeit im Konto unter Abrechnung möglich und wirkt zum Ende der laufenden Periode."
+          ]
+        },
+        {
+          "heading": "Prüfung, Sperrung und Löschung",
+          "body": [
+            "Der Betreiber darf Inserate prüfen, zurückweisen, verbergen oder löschen und Konten sperren, wenn diese Bedingungen oder geltendes Recht verletzt werden oder ein begründeter Verdacht auf Betrug besteht.",
+            "Für kostenpflichtige Leistungen, die wegen eines Verstoßes entfernt werden, besteht kein Anspruch auf Erstattung."
+          ]
+        },
+        {
+          "heading": "Haftung",
+          "body": [
+            "Für die Inhalte von Inseraten und Nachrichten haften ausschließlich die Nutzer, die sie erstellt haben.",
+            "Der Betreiber haftet unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei Verletzung von Leben, Körper und Gesundheit. Im Übrigen ist die Haftung auf den vorhersehbaren, vertragstypischen Schaden begrenzt.",
+            "Ein ununterbrochener Betrieb der Seite wird nicht geschuldet. Wartungsarbeiten und Störungen können den Zugang zeitweise einschränken."
+          ]
+        },
+        {
+          "heading": "Änderungen dieser Bedingungen",
+          "body": [
+            "Der Betreiber kann diese Bedingungen ändern. Registrierte Nutzer werden mindestens 14 Tage vor Wirksamkeit per E-Mail informiert. Wer nicht widerspricht, stimmt zu; wer widerspricht, kann sein Konto kündigen."
+          ]
+        },
+        {
+          "heading": "Anwendbares Recht",
+          "body": [
+            "Es gilt das Recht der Republik Kosovo. Zwingende Verbraucherschutzvorschriften des Landes, in dem ein Verbraucher seinen gewöhnlichen Aufenthalt hat, bleiben unberührt."
+          ]
+        }
+      ]
+    },
+    "withdrawal": {
+      "title": "Widerrufsbelehrung",
+      "intro": "Für Verbraucher, die ein kostenpflichtiges Paket oder eine Hervorhebung buchen.",
+      "sections": [
+        {
+          "heading": "Widerrufsrecht",
+          "body": [
+            "Verbraucher haben das Recht, binnen 14 Tagen ohne Angabe von Gründen von einem kostenpflichtigen Vertrag zurückzutreten.",
+            "Verbraucher ist, wer den Vertrag zu Zwecken schließt, die überwiegend weder der gewerblichen noch der selbständigen beruflichen Tätigkeit zuzurechnen sind. Für Händlerpakete gilt dieses Recht daher in aller Regel nicht."
+          ]
+        },
+        {
+          "heading": "Beginn der Frist",
+          "body": [
+            "Die Frist beginnt mit dem Tag des Vertragsschlusses, also mit der Bestätigung der Buchung."
+          ]
+        },
+        {
+          "heading": "Vorzeitiges Erlöschen",
+          "body": [
+            "Das Widerrufsrecht erlischt vorzeitig, wenn die Leistung vollständig erbracht wurde und der Verbraucher vor Beginn ausdrücklich zugestimmt hat, dass mit der Ausführung sofort begonnen wird, und dabei bestätigt hat, dass er damit sein Widerrufsrecht verliert.",
+            "Das betrifft die sofortige Hervorhebung eines Inserats: sie wirkt unmittelbar nach der Zahlung. Wer die sofortige Ausführung nicht wünscht, wartet mit der Buchung.",
+            "Bei einer nur teilweise erbrachten Leistung ist ein anteiliger Betrag zu zahlen."
+          ]
+        },
+        {
+          "heading": "Ausübung des Widerrufs",
+          "body": [
+            "Für den Widerruf genügt eine eindeutige Erklärung an die im Impressum genannte E-Mail-Adresse. Die Verwendung des unten stehenden Musters ist möglich, aber nicht vorgeschrieben.",
+            "Zur Wahrung der Frist reicht es, die Erklärung vor Ablauf abzusenden."
+          ]
+        },
+        {
+          "heading": "Folgen des Widerrufs",
+          "body": [
+            "Der Betreiber erstattet alle erhaltenen Zahlungen unverzüglich, spätestens binnen 14 Tagen nach Eingang der Erklärung, über dasselbe Zahlungsmittel, das bei der Buchung verwendet wurde. Dafür fallen keine Entgelte an."
+          ]
+        },
+        {
+          "heading": "Muster-Widerrufsformular",
+          "body": [
+            "An: die im Impressum genannte Anschrift und E-Mail-Adresse.",
+            "Hiermit widerrufe ich den von mir abgeschlossenen Vertrag über die folgende Leistung: __________",
+            "Bestellt am: __________ · Name: __________ · Anschrift: __________ · Datum: __________"
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "intro": "Welche Daten LEVIZ verarbeitet, wozu, und welche Rechte du hast.",
+      "sections": [
+        {
+          "heading": "Verantwortlicher",
+          "body": [
+            "Verantwortlich für die Verarbeitung ist der im Impressum genannte Betreiber. Für Fragen zum Datenschutz genügt eine Nachricht an die dort angegebene E-Mail-Adresse."
+          ]
+        },
+        {
+          "heading": "Welche Daten verarbeitet werden",
+          "body": [
+            "· Kontodaten: Name, E-Mail-Adresse, Telefonnummer, Passwort — letzteres nur als Argon2-Hash, nie im Klartext",
+            "· Profilangaben: Wohnort, Spracheinstellung, Benachrichtigungswünsche",
+            "· Inseratsdaten: Fahrzeugangaben, Fotos, Preis, Standort",
+            "· Nachrichten zwischen Nutzern und Anfragen zu Inseraten",
+            "· Nutzungsdaten: aufgerufene Inserate, gespeicherte Suchen, Merkliste",
+            "· Zahlungsdaten: Betrag, Zeitpunkt, Status und die Kennung des Zahlungsdienstleisters — niemals die Kartennummer"
+          ]
+        },
+        {
+          "heading": "Wozu",
+          "body": [
+            "Zur Erfüllung des Nutzungsvertrags: Konto, Inserate, Nachrichten, Suche.",
+            "Zur Abwicklung kostenpflichtiger Leistungen und zur Erfüllung steuerlicher Aufbewahrungspflichten.",
+            "Zur Verhinderung von Betrug und Missbrauch: Prüfung von Inseraten, Begrenzung von Anmeldeversuchen, Bearbeitung von Meldungen."
+          ]
+        },
+        {
+          "heading": "Kartendaten",
+          "body": [
+            "Kartennummern werden von LEVIZ niemals erhoben, verarbeitet oder gespeichert. Die Eingabe erfolgt ausschließlich auf der Seite des Zahlungsdienstleisters; LEVIZ erhält von dort nur Betrag, Status und eine Kennung."
+          ]
+        },
+        {
+          "heading": "Empfänger",
+          "body": [
+            "Andere Nutzer sehen, was in einem Inserat veröffentlicht wird, sowie den bei einer Nachricht angezeigten Namen.",
+            "Dienstleister verarbeiten Daten in unserem Auftrag: Hosting, Datenbank, Dateispeicher, Zahlungsdienstleister sowie E-Mail- und SMS-Versand. Sie sind vertraglich gebunden und dürfen die Daten nicht für eigene Zwecke nutzen.",
+            "Eine Weitergabe an Behörden erfolgt nur, soweit gesetzlich vorgeschrieben."
+          ]
+        },
+        {
+          "heading": "Speicherdauer",
+          "body": [
+            "Kontodaten werden gelöscht, wenn das Konto gelöscht wird. Inserate und Nachrichten werden dabei entfernt oder anonymisiert.",
+            "Zahlungsbelege werden für die gesetzliche Aufbewahrungsfrist behalten, auch nach einer Kontolöschung."
+          ]
+        },
+        {
+          "heading": "Deine Rechte",
+          "body": [
+            "Auskunft über die gespeicherten Daten, Berichtigung unrichtiger Angaben, Löschung, Einschränkung der Verarbeitung, Widerspruch und Datenübertragbarkeit.",
+            "Name, Telefonnummer, Wohnort und Benachrichtigungswünsche lassen sich jederzeit selbst unter Einstellungen ändern.",
+            "Es besteht ein Beschwerderecht bei der Aufsichtsbehörde für den Schutz personenbezogener Daten."
+          ]
+        },
+        {
+          "heading": "Sicherheit",
+          "body": [
+            "Die Übertragung erfolgt verschlüsselt. Passwörter werden mit Argon2id gespeichert und sind auch für den Betreiber nicht lesbar. Der Zugriff auf geschützte Bereiche wird bei jeder Anfrage serverseitig geprüft."
+          ]
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Cookies",
+      "intro": "LEVIZ setzt nur, was für den Betrieb nötig ist. Es gibt keine Werbe- und keine Analysedienste von Dritten.",
+      "sections": [
+        {
+          "heading": "Was gespeichert wird",
+          "body": [
+            "· Anmeldung: ein verschlüsseltes Sitzungs-Cookie, solange du angemeldet bist",
+            "· leviz.currency: die gewählte Währung, Euro oder Lek",
+            "· leviz.compare: die Fahrzeuge in deinem Vergleich",
+            "· NEXT_LOCALE: die gewählte Sprache, sobald du sie umstellst",
+            "· Darstellung hell oder dunkel: im lokalen Speicher deines Browsers, nicht als Cookie"
+          ]
+        },
+        {
+          "heading": "Keine Verfolgung",
+          "body": [
+            "LEVIZ bindet keine Werbenetzwerke, keine Analysedienste und keine Schaltflächen sozialer Netzwerke ein. Es gibt daher nichts einzuwilligen und keinen Zustimmungsbanner.",
+            "Die Statistiken im Händler-Dashboard entstehen aus der eigenen Datenbank und werden nicht an Dritte übermittelt."
+          ]
+        },
+        {
+          "heading": "Verwalten",
+          "body": [
+            "Cookies lassen sich in den Einstellungen jedes Browsers löschen oder blockieren. Ohne das Sitzungs-Cookie ist keine Anmeldung möglich; Währung, Sprache und Vergleich fallen dann auf die Vorgaben zurück."
+          ]
+        }
+      ]
+    },
+    "imprint": {
+      "title": "Impressum",
+      "intro": "Angaben zum Betreiber dieser Seite.",
+      "sections": [
+        {
+          "heading": "Verantwortlich für den Inhalt",
+          "body": [
+            "Die oben genannte vertretungsberechtigte Person ist für die redaktionellen Inhalte dieser Seite verantwortlich.",
+            "Für Inserate, Nachrichten und Bewertungen haften die Nutzer, die sie erstellt haben. Rechtswidrige Inhalte werden nach Kenntnis unverzüglich entfernt — nutze dafür die Meldefunktion auf jedem Inserat."
+          ]
+        },
+        {
+          "heading": "Haftung für Verweise",
+          "body": [
+            "Verlinkte fremde Seiten liegen außerhalb unseres Einflussbereichs. Für ihre Inhalte ist der jeweilige Anbieter verantwortlich."
+          ]
+        },
+        {
+          "heading": "Beschwerden",
+          "body": [
+            "Beschwerden richtest du direkt an die oben genannte E-Mail-Adresse. Wir antworten in der Regel innerhalb von zwei Werktagen."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "title": "Kontakt",
+      "intro": "So erreichst du uns.",
+      "sections": [
+        {
+          "heading": "Bevor du schreibst",
+          "body": [
+            "Ein betrügerisches oder falsches Inserat meldest du am schnellsten über die Schaltfläche „Melden“ auf dem Inserat selbst. Diese Meldungen landen direkt bei der Moderation und werden vorgezogen.",
+            "Fragen zu einem bestimmten Fahrzeug beantwortet nur der Verkäufer. Nutze dafür die Nachrichtenfunktion im Inserat — der Betreiber kennt weder Zustand noch Verfügbarkeit."
+          ]
+        },
+        {
+          "heading": "Antwortzeit",
+          "body": [
+            "Anfragen werden in der Regel innerhalb von zwei Werktagen beantwortet. Meldungen zu möglichem Betrug werden vorgezogen."
+          ]
+        }
+      ]
+    }
   }
 }
