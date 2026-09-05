@@ -39,17 +39,20 @@ export type LegalEntity = {
 };
 
 export const legalEntity: LegalEntity = {
-  name: '',
+  name: 'Leviz',
+  // Noch offen: Rechtsform, Registernummer und vertretungsberechtigte Person.
+  // Ohne diese drei schaltet kein Zahlungsdienstleister frei; die
+  // Impressumsseite weist so lange sichtbar darauf hin.
   legalForm: '',
-  street: '',
-  postalCode: '',
-  city: '',
+  street: 'Xhorxh Bush',
+  postalCode: '60000',
+  city: 'Gjilan',
   country: 'Kosova',
   registrationNumber: '',
   taxNumber: '',
   vatNumber: '',
   representative: '',
-  email: '',
+  email: 'info@levizz.com',
   phone: '',
 };
 

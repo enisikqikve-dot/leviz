@@ -25,7 +25,9 @@ export function SiteJsonLd({ locale }: { locale: Locale }) {
         name: siteConfig.name,
         url: siteConfig.url,
         logo: `${siteConfig.url}/brand/leviz-avatar-cobalt.png`,
-        email: siteConfig.supportEmail,
+        // Nur angeben, wenn es eine gibt: ein leeres Feld in strukturierten
+        // Daten ist ein Fehler, eine erfundene Adresse wäre schlimmer.
+        ...(siteConfig.supportEmail ? { email: siteConfig.supportEmail } : {}),
       },
       {
         '@type': 'WebSite',
