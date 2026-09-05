@@ -221,6 +221,7 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 | `npm run db:migrate` | Migration erzeugen und anwenden |
 | `npm run db:seed` | Beispieldaten einspielen |
 | `npm run db:studio` | Prisma Studio öffnen |
+| `npm run admin:create` | Verwalterkonto anlegen oder hochstufen |
 | `npm run db:reset` | Datenbank zurücksetzen und neu befüllen |
 | `npm run brand:avatar` | Profilbilder für soziale Netzwerke erzeugen |
 | `npm run brand:social` | Beitragsbilder für soziale Netzwerke erzeugen |
@@ -412,6 +413,25 @@ nicht mit der Sprachwahl verschieben.
 | Nutzer | Suche, Sperren und Entsperren |
 | Marken | Bestand je Marke, Kennzeichnung als beliebt |
 | Einstellungen | Wechselkurs, Laufzeit, Preisuntergrenze, Trefferzahl, Umkreis |
+
+### Eigenes Verwalterkonto anlegen
+
+Die vier Demo-Konten gehören zu den Beispieldaten. Ein echtes Verwalterkonto
+entsteht mit:
+
+```bash
+npm run admin:create -- deine@adresse.tld "Dein Name"
+```
+
+Das Passwort wird verdeckt abgefragt, nicht als Argument übergeben — sonst
+stünde es im Terminalverlauf und in der Prozessliste. Es gelten dieselben
+Regeln wie bei der Registrierung, und in die Datenbank wandert nur der
+Argon2-Hash. Absichtlich steht das Skript getrennt vom Seed: der Seed liegt im
+Repository, ein Passwort hat dort nichts zu suchen.
+
+Eine bereits vorhandene Adresse wird auf `SUPER_ADMIN` gehoben und behält ihre
+Inserate und Nachrichten. Da `npm run db:seed` die Nutzertabelle leert, muss
+das Skript nach jedem Seed-Lauf erneut laufen.
 
 ### Autorisierung entscheidet die Datenbank
 
