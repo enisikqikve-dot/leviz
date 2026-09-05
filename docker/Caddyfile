@@ -1,0 +1,19 @@
+# Webserver vor LEVIZ.
+#
+# Caddy besorgt das TLS-Zertifikat bei Let's Encrypt selbst und erneuert es,
+# solange die Domäne auf diesen Server zeigt und Port 80 und 443 offen sind.
+# Deshalb steht hier keine Zeile über Zertifikate.
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Die Sicherheitskopfzeilen setzt die Anwendung selbst (next.config.ts).
+	# Sie hier zu wiederholen führte nur dazu, dass zwei Stellen auseinander-
+	# laufen und niemand weiß, welche gilt.
+	reverse_proxy app:3000
+
+	log {
+		output stdout
+		format console
+	}
+}

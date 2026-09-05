@@ -4,6 +4,14 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./lib/i18n/request.ts');
 
 const nextConfig: NextConfig = {
+  /**
+   * Legt neben dem Build einen eigenständigen Server samt der tatsächlich
+   * benötigten Abhängigkeiten ab. Ohne das müsste das Docker-Abbild den
+   * gesamten node_modules-Ordner mitschleppen — mehrere hundert Megabyte,
+   * von denen im Betrieb ein Bruchteil gebraucht wird.
+   */
+  output: 'standalone',
+
   images: {
     // Seed-Inserate nutzen frei lizenzierte Fahrzeugfotos.
     remotePatterns: [

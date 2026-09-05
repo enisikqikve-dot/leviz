@@ -1,0 +1,87 @@
+# LEVIZ auf einem einzelnen Server.
+#
+# Drei Dienste: die Anwendung, ihre Datenbank und ein Webserver, der das
+# TLS-Zertifikat selbst besorgt und erneuert. Starten mit:
+#
+#   docker compose up -d --build
+#
+# Die Werte kommen aus einer Datei .env neben dieser hier. Sie enthaelt
+# Geheimnisse und gehoert nicht ins Repository -- .gitignore schliesst sie aus.
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-leviz}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-leviz}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    # Kein Port nach aussen: die Datenbank ist nur aus dem internen Netz
+    # erreichbar. Ein offener Port 5432 im Internet wird binnen Stunden
+    # durchprobiert.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-leviz} -d ${POSTGRES_DB:-leviz}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      args:
+        # Steckt im Build, nicht im Start: daraus entstehen kanonische
+        # Adressen, hreflang und die Sitemap.
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL fehlt in .env}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-leviz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-leviz}?schema=public
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET fehlt in .env}
+      AUTH_TRUST_HOST: 'true'
+
+      # Auf einem einzelnen Server reicht die Festplatte fuer die Fotos.
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+
+      EMAIL_DRIVER: ${EMAIL_DRIVER:-console}
+      EMAIL_FROM: ${EMAIL_FROM:-LEVIZ <no-reply@localhost>}
+      SMTP_URL: ${SMTP_URL:-}
+      SMS_DRIVER: ${SMS_DRIVER:-console}
+      AI_DRIVER: ${AI_DRIVER:-local}
+
+      PAYMENTS_DRIVER: ${PAYMENTS_DRIVER:-mock}
+      PAYTEN_GATEWAY_URL: ${PAYTEN_GATEWAY_URL:-}
+      PAYTEN_CLIENT_ID: ${PAYTEN_CLIENT_ID:-}
+      PAYTEN_STORE_KEY: ${PAYTEN_STORE_KEY:-}
+      PAYTEN_STORE_TYPE: ${PAYTEN_STORE_TYPE:-}
+    volumes:
+      # Ohne diesen Speicher waeren die Fotos der Verkaeufer nach jedem
+      # Neustart des Behaelters verschwunden.
+      - uploads:/app/public/uploads
+
+  web:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?SITE_DOMAIN fehlt in .env}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Hier liegen die Zertifikate. Ohne dauerhaften Speicher holt Caddy nach
+      # jedem Neustart ein neues und laeuft in die Ausstellungsgrenze.
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  db-data:
+  uploads:
+  caddy-data:
+  caddy-config:

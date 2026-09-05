@@ -377,6 +377,84 @@ Seite des Anbieters, sonst greift PCI-DSS mit voller Härte.
 
 ---
 
+## Auf einem eigenen Server (Docker)
+
+Für einen VPS mit Ubuntu. Drei Behälter: die Anwendung, PostgreSQL und ein
+Webserver, der sein TLS-Zertifikat selbst besorgt und erneuert.
+
+### Einmalig auf dem Server
+
+```bash
+curl -fsSL https://get.docker.com | sh
+git clone https://github.com/enisikqikve-dot/leviz.git
+cd leviz
+cp docker/env.example .env
+nano .env
+```
+
+In der `.env` mindestens ausfüllen: `SITE_DOMAIN`, `NEXT_PUBLIC_SITE_URL`,
+`POSTGRES_PASSWORD` und `AUTH_SECRET` (`openssl rand -base64 32`).
+
+**Die Domäne muss vorher per DNS auf den Server zeigen.** Sonst bekommt Caddy
+kein Zertifikat, und der Start endet in einer Schleife aus Fehlversuchen.
+
+### Starten
+
+```bash
+docker compose up -d --build
+```
+
+Der erste Lauf dauert einige Minuten. Beim Start wendet der Behälter die
+Migrationen selbst an (`prisma migrate deploy`) — schlägt das fehl, startet
+der Server bewusst gar nicht erst: eine Anwendung gegen ein veraltetes Schema
+richtet mehr Schaden an als eine, die steht.
+
+### Katalog einspielen
+
+Einmalig, danach ist die Plattform benutzbar:
+
+```bash
+docker compose exec app node -e "process.exit(0)" &&   docker compose run --rm app npx tsx prisma/seed.ts --catalog
+```
+
+**Nicht `db:seed`** — der legt 242 erfundene Fahrzeuge an und bricht gegen eine
+entfernte Datenbank ohnehin ab.
+
+### Verwalterkonto anlegen
+
+```bash
+docker compose run --rm app npx tsx scripts/create-admin.ts deine@adresse.tld "Dein Name"
+```
+
+### Aktualisieren
+
+```bash
+git pull && docker compose up -d --build
+```
+
+### Was du selbst im Blick behalten musst
+
+Ein eigener Server heißt, dass niemand sonst sichert. **Richte eine tägliche
+Sicherung der Datenbank ein**, bevor das erste echte Inserat entsteht:
+
+```bash
+docker compose exec -T db pg_dump -U leviz leviz | gzip > leviz-$(date +%F).sql.gz
+```
+
+Dazu gehören die hochgeladenen Fotos — sie liegen im Docker-Speicher
+`uploads`, nicht in der Datenbank.
+
+Und: Systemaktualisierungen (`apt upgrade`), ein aktives `ufw` mit nur den
+Ports 22, 80 und 443, sowie regelmässige `docker compose pull` für die
+Basis-Abbilder.
+
+> **Ungetestet gebaut.** Auf diesem Entwicklungsrechner ist Docker nicht
+> installiert; das Abbild wurde nie gebaut. Geprüft ist nur, dass Next.js die
+> eigenständige Ausgabe erzeugt, auf der es aufsetzt. Rechne beim ersten
+> `docker compose up --build` mit Nacharbeit.
+
+---
+
 ## Veröffentlichen
 
 LEVIZ läuft nicht als Dateisammlung auf einem Webspace: Server Components,

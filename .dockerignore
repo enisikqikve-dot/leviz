@@ -1,0 +1,31 @@
+# Was nicht ins Abbild gehoert.
+#
+# Jede Zeile hier spart Bauzeit und verhindert, dass Dateien vom Entwickler-
+# rechner im Behaelter landen -- allen voran .env mit den Geheimnissen.
+
+node_modules
+.next
+.git
+.github
+
+# Geheimnisse. Die Werte kommen zur Laufzeit aus docker-compose.yml.
+.env
+.env.*
+!.env.example
+
+# Lokale Entwicklungsdatenbank und Arbeitsordner
+.postgres
+.chrome-capture
+.video-work
+test-results
+playwright-report
+coverage
+
+# Erzeugter Prisma-Client: entsteht im Abbild neu
+lib/generated
+
+# Hochgeladene Bilder der Entwicklung
+public/uploads
+
+# Nur fuer Menschen
+README.md
