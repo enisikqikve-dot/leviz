@@ -193,6 +193,42 @@ aus, während Prisma als Eigentümer der Tabellen weiterarbeitet.
 npx auth secret
 ```
 
+### Anmeldung über GitHub
+
+Der Knopf „Mit GitHub anmelden" erscheint nur, wenn beide Werte gesetzt sind —
+ohne sie wird der Anbieter überall ausgeblendet, auch serverseitig.
+
+1. https://github.com/settings/developers → **OAuth Apps** → **New OAuth App**
+2. Ausfüllen:
+
+   | Feld | Wert |
+   |---|---|
+   | Application name | `LEVIZ` |
+   | Homepage URL | `http://localhost:3000` |
+   | Authorization callback URL | `http://localhost:3000/api/auth/callback/github` |
+
+3. **Generate a new client secret**, dann beides in die `.env`:
+
+   ```
+   AUTH_GITHUB_ID="Ov23li..."
+   AUTH_GITHUB_SECRET="..."
+   ```
+
+4. Entwicklungsserver neu starten — Umgebungsvariablen werden nur beim Start
+   gelesen.
+
+Für die Produktion braucht es eine zweite OAuth-App mit der echten Domäne; eine
+App kann nur eine Callback-Adresse führen.
+
+**Konten werden nicht automatisch verschmolzen.** Wer sich mit E-Mail und
+Passwort registriert hat und später den GitHub-Knopf drückt, bekommt eine
+Erklärung statt einer Anmeldung. Auth.js böte dafür
+`allowDangerousEmailAccountLinking`, doch die Option setzt voraus, dass die
+Adresse des bestehenden Kontos bestätigt ist — bei LEVIZ ist sie das nicht.
+Sonst könnte sich jemand mit einer fremden Adresse registrieren und käme an
+das Konto, sobald deren echter Inhaber sich über GitHub anmeldet. Sobald die
+Registrierung die Adresse bestätigt, lässt sich das gefahrlos umstellen.
+
 ### Ohne Zugangsschlüssel arbeiten
 
 E-Mails und SMS werden ins Terminal geschrieben, solange `EMAIL_DRIVER` und

@@ -121,9 +121,35 @@ export const authConfig = {
       },
     }),
 
+    /**
+     * Bewusst ohne `allowDangerousEmailAccountLinking`: die Option wuerde ein
+     * GitHub-Konto automatisch mit einem gleichnamigen Passwortkonto
+     * verschmelzen. Das setzt voraus, dass die Adresse des Passwortkontos
+     * bestaetigt ist — bei LEVIZ ist sie das nicht, die Registrierung
+     * verschickt bisher nur eine Willkommensmail. Jemand koennte sich also mit
+     * einer fremden Adresse registrieren und bekaeme Zugriff, sobald deren
+     * echter Inhaber sich ueber GitHub anmeldet. Stattdessen erklaert die
+     * Anmeldeseite den Fall (features/auth/oauth-error.ts).
+     */
     ...(githubConfigured ? [GitHub] : []),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      // Die beiden Credentials-Anbieter pruefen den Sperrstatus selbst. Bei
+      // OAuth gibt es keine solche Stelle: ohne diese Pruefung bekaeme ein
+      // gesperrtes Konto ueber GitHub ein gueltiges Token und stuende danach
+      // vor dem Anmeldeformular, weil die Waechter es wieder abweisen.
+      if (account?.type !== 'oauth' || !user?.id) return true;
+
+      const record = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { status: true },
+      });
+
+      // Kein Datensatz heisst: das Konto entsteht gerade erst.
+      return !record || record.status === 'ACTIVE';
+    },
+
     async jwt({ token, user, trigger }) {
       if (user?.id) {
         token.id = user.id;
@@ -158,6 +184,20 @@ export const authConfig = {
         session.user.dealerId = token.dealerId;
       }
       return session;
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      // Registrierung und Seed legen zu jedem Konto ein Profil an. Bei OAuth
+      // erzeugt der Adapter nur den Nutzer selbst; ohne diese Zeilen gaebe es
+      // Konten ohne Wohnort und ohne Benachrichtigungseinstellungen.
+      if (!user.id) return;
+
+      await prisma.profile.upsert({
+        where: { userId: user.id },
+        create: { userId: user.id },
+        update: {},
+      });
     },
   },
   trustHost: true,

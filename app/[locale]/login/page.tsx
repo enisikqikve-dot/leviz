@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { LoginForm } from '@/features/auth/components/login-form';
+import { authErrorKey } from '@/features/auth/oauth-error';
 import { getSessionUser } from '@/lib/auth/guards';
 import { Link } from '@/lib/i18n/navigation';
 
@@ -19,8 +20,10 @@ export async function generateMetadata({
 
 export default async function LoginPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -31,6 +34,10 @@ export default async function LoginPage({
   const t = await getTranslations('auth');
   const githubEnabled =
     Boolean(process.env.AUTH_GITHUB_ID) && Boolean(process.env.AUTH_GITHUB_SECRET);
+
+  // Auth.js leitet gescheiterte OAuth-Anmeldungen hierher zurueck und haengt
+  // den Grund als Parameter an. Ohne diese Zeilen bliebe er unsichtbar.
+  const errorKey = authErrorKey((await searchParams).error);
 
   return (
     <AuthShell
@@ -45,6 +52,15 @@ export default async function LoginPage({
         </>
       }
     >
+      {errorKey ? (
+        <p
+          role="alert"
+          className="border-destructive/40 bg-destructive/10 text-destructive mb-6 rounded-lg border px-4 py-3 text-sm"
+        >
+          {t(errorKey)}
+        </p>
+      ) : null}
+
       <LoginForm githubEnabled={githubEnabled} />
     </AuthShell>
   );
