@@ -48,7 +48,7 @@ export function FilterPanel({
   };
 
   return (
-    <div className="flex h-full flex-col" data-pending={isPending ? '' : undefined}>
+    <div className="flex h-full min-h-0 flex-col" data-pending={isPending ? '' : undefined}>
       <div className="flex items-center justify-between gap-2 pb-2">
         <h2 className="text-sm font-semibold">{t('filters')}</h2>
         {activeCount > 0 ? (
@@ -63,7 +63,13 @@ export function FilterPanel({
         ) : null}
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      {/*
+        `min-h-0` ist der entscheidende Teil: ein Flex-Element weigert sich
+        von sich aus, kleiner als sein Inhalt zu werden. Ohne das waechst diese
+        Liste ueber den Rahmen hinaus, statt darin zu scrollen — auf dem
+        Desktop ueber die Fusszeile, in der Schublade unerreichbar abgeschnitten.
+      */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <BasicFilters params={params} data={data} update={update} />
         <LocationFilters params={params} data={data} update={update} />
         <AdvancedFilters params={params} data={data} update={update} />

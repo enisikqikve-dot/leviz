@@ -86,8 +86,16 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
       </div>
 
       <div className="mt-6 lg:grid lg:grid-cols-[17rem_1fr] lg:items-start lg:gap-8">
-        {/* Auf dem Desktop dauerhaft sichtbar, auf Mobilgeraeten in der Schublade. */}
-        <aside className="bg-card text-card-foreground sticky top-20 hidden max-h-[calc(100dvh-6rem)] rounded-xl border p-4 lg:block">
+        {/*
+          Auf dem Desktop dauerhaft sichtbar, auf Mobilgeraeten in der Schublade.
+
+          `flex flex-col` ist hier keine Formsache: die Leiste begrenzt ihre
+          Hoehe, und nur als Flex-Spalte bekommt die Filterliste darin eine
+          Hoehe zum Scrollen. Als `block` wuchs sie ueber die Karte hinaus und
+          malte sich ueber die Fusszeile. `overflow-hidden` haelt zusaetzlich
+          alles innerhalb der abgerundeten Kante.
+        */}
+        <aside className="bg-card text-card-foreground sticky top-20 hidden max-h-[calc(100dvh-6rem)] flex-col overflow-hidden rounded-xl border p-4 lg:flex">
           <FilterPanel params={query} data={filterData} />
         </aside>
 
