@@ -1,5 +1,6 @@
 import { getPathname } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
+import { serializeJsonLd } from '@/lib/seo/json-ld';
 import { siteConfig } from '@/lib/site';
 
 /**
@@ -48,9 +49,9 @@ export function SiteJsonLd({ locale }: { locale: Locale }) {
   return (
     <script
       type="application/ld+json"
-      // Der Inhalt stammt vollständig aus eigenen Konstanten, nicht aus
-      // Nutzereingaben.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      // Hier stammt alles aus eigenen Konstanten. Trotzdem derselbe Weg wie
+      // auf der Fahrzeugseite: eine Ausnahme wird sonst irgendwann kopiert.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
     />
   );
 }

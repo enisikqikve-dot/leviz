@@ -1,5 +1,6 @@
 import type { VehicleDetail } from '@/features/vehicles/queries';
 import { kwToHp } from '@/features/vehicles/format';
+import { serializeJsonLd } from '@/lib/seo/json-ld';
 import { siteConfig } from '@/lib/site';
 
 /** Übersetzung der internen Werte in die Begriffe von schema.org. */
@@ -89,8 +90,9 @@ export function VehicleJsonLd({
   return (
     <script
       type="application/ld+json"
-      // Der Inhalt stammt aus der eigenen Datenbank und wird als JSON serialisiert.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      // Titel, Beschreibung, Farbe und Verkaeufername stammen aus dem
+      // Inserat, also aus fremder Eingabe. serializeJsonLd maskiert `<`.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
     />
   );
 }
