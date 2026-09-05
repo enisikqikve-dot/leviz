@@ -63,3 +63,6 @@ next-env.d.ts
 # Ergebnisse der End-zu-End-Tests
 /test-results/
 /playwright-report/
+
+# Versehentlich im Projektordner gelandete Downloads
+/Download.*
