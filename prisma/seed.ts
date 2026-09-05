@@ -4,6 +4,7 @@ import { hashPassword } from '../lib/auth/password.js';
 import { prisma } from '../lib/db/index.js';
 import { BRANDS } from './seed/brands.js';
 import { COUNTRIES } from './seed/geo.js';
+import { mayWriteDemoContent } from './seed/guard.js';
 import { createRandom } from './seed/random.js';
 
 /** Fester Startwert: derselbe Aufruf erzeugt immer dieselben Daten. */
@@ -46,6 +47,40 @@ async function clearDatabase() {
     prisma.account.deleteMany(),
     prisma.profile.deleteMany(),
     prisma.user.deleteMany(),
+    prisma.vehicleVariant.deleteMany(),
+    prisma.model.deleteMany(),
+    prisma.brand.deleteMany(),
+    prisma.feature.deleteMany(),
+    prisma.city.deleteMany(),
+    prisma.country.deleteMany(),
+    prisma.package.deleteMany(),
+    prisma.platformSetting.deleteMany(),
+  ]);
+}
+
+/** Was am Katalog hängt und ihn nicht neu aufbauen lässt. */
+async function countExistingContent() {
+  const [vehicles, dealers, payments, subscriptions] = await Promise.all([
+    prisma.vehicle.count(),
+    prisma.dealer.count(),
+    prisma.payment.count(),
+    prisma.subscription.count(),
+  ]);
+
+  return {
+    vehicles,
+    dealers,
+    payments: payments + subscriptions,
+    total: vehicles + dealers + payments + subscriptions,
+  };
+}
+
+/**
+ * Leert nur die Nachschlagewerke — Marken, Modelle, Städte, Pakete. Nutzer und
+ * ihre Inhalte bleiben unberührt.
+ */
+async function clearCatalog() {
+  await prisma.$transaction([
     prisma.vehicleVariant.deleteMany(),
     prisma.model.deleteMany(),
     prisma.brand.deleteMany(),
@@ -842,18 +877,72 @@ async function seedInteractions(users: SeededUser[], demoUsers: Map<string, Seed
   log('Merkliste / Gespräche / Bewertungen', `${favorites} / ${conversations} / ${reviews}`);
 }
 
+/**
+ * Zwei Betriebsarten.
+ *
+ * Ohne Argument entsteht die vollständige Entwicklungsumgebung: Katalog plus
+ * erfundene Fahrzeuge, Autohäuser und deren Nachrichten.
+ *
+ * Mit `--catalog` nur der Katalog — Länder, Städte, Marken, Modelle,
+ * Ausstattung, Pakete, Grundeinstellungen. Das sind keine erfundenen Angebote,
+ * sondern Nachschlagewerke, die jede Installation braucht. Eine echte
+ * Installation startet damit und ohne ein einziges Inserat.
+ */
 async function main() {
   const started = Date.now();
-  console.log('\n  LEVIZ — Beispieldaten\n');
+  const catalogOnly = process.argv.includes('--catalog');
 
-  await clearDatabase();
-  log('Datenbank geleert');
+  console.log(`\n  LEVIZ — ${catalogOnly ? 'Katalog' : 'Beispieldaten'}\n`);
+
+  if (!catalogOnly) {
+    // Erfundene Inserate gehören nicht in eine echte Datenbank, und der Seed
+    // löscht vorher alles Vorhandene. Beides wäre im Betrieb ein Schaden.
+    const permission = mayWriteDemoContent(process.env);
+    if (!permission.allowed) {
+      console.error(`\n  Abgebrochen.\n\n  ${permission.reason}\n`);
+      process.exit(1);
+    }
+  }
+
+  if (catalogOnly) {
+    // Der Katalog wird angelegt, nicht abgeglichen: seedBrands und die
+    // übrigen benutzen `create`. Deshalb ist dieser Weg für eine frische
+    // Installation gedacht. Stehen schon Inserate darin, würde das Leeren des
+    // Katalogs sie mitreissen — dann lieber abbrechen.
+    const belegt = await countExistingContent();
+
+    if (belegt.total > 0) {
+      console.error(
+        `\n  Abgebrochen. Die Datenbank enthält bereits Inhalte:\n` +
+          `    Fahrzeuge:    ${belegt.vehicles}\n` +
+          `    Autohäuser:   ${belegt.dealers}\n` +
+          `    Zahlungen:    ${belegt.payments}\n\n` +
+          '  "db:catalog" richtet eine frische Installation ein und würde den\n' +
+          '  Katalog neu aufbauen, an dem diese Einträge hängen.\n\n' +
+          '  Erfundene Inhalte vorher entfernen:\n' +
+          '    npm run db:clear -- --ja\n',
+      );
+      process.exit(1);
+    }
+
+    await clearCatalog();
+    log('Katalog geleert');
+  } else {
+    await clearDatabase();
+    log('Datenbank geleert');
+  }
 
   const { countryIds, cityIds } = await seedGeography();
   const { brandIds, modelIds } = await seedBrands();
   const featureIds = await seedFeatures();
   await seedPackages();
   await seedSettings();
+
+  if (catalogOnly) {
+    console.log(`\n  Fertig in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+    console.log('\n  Katalog steht. Inserate legen echte Nutzer selbst an.\n');
+    return;
+  }
 
   const { demoUsers, users } = await seedUsers(cityIds);
   const dealers = await seedDealers(cityIds, demoUsers);

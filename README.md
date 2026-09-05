@@ -108,6 +108,14 @@ dem Markt in Kosovo und Albanien entspricht:
 | Händler | 20, davon 18 verifiziert |
 | Nutzer | 54 inklusive vier Demo-Konten |
 
+> **Diese Daten sind erfunden.** Die 242 Fahrzeuge, 20 Autohäuser und 74
+> Nutzer stammen aus dem Seed und existieren nicht. Sie gehören in die
+> Entwicklung, nie in eine erreichbare Installation — sonst sehen Besucher
+> Angebote, die niemand verkauft, und Händler, die niemand anrufen kann.
+> Deshalb bricht `db:seed` ab, wenn `DATABASE_URL` nicht auf den eigenen
+> Rechner zeigt, und eine echte Installation startet mit `db:catalog` und
+> ohne ein einziges Inserat.
+
 **Demo-Konten** (nur Entwicklung), Passwort für alle `Leviz2026!`:
 `admin@leviz.dev` · `dealer@leviz.dev` · `seller@leviz.dev` · `buyer@leviz.dev`
 
@@ -257,8 +265,16 @@ Transaktion über mehrere Anweisungen halten.
 
 ```bash
 DATABASE_URL="…pooler…:6543/postgres?pgbouncer=true" npm run db:migrate
-npm run db:seed
+npm run db:catalog
 ```
+
+**Nicht `db:seed`.** Der legt 242 erfundene Fahrzeuge und 20 erfundene
+Autohäuser an — Angebote, die niemand verkauft, und Händler, die niemand
+anrufen kann. `db:catalog` spielt nur die Nachschlagewerke ein: Länder, Städte,
+Marken, Modelle, Ausstattung, Pakete. Inserate legen echte Nutzer selbst an.
+
+Falls die Verwechslung doch passiert: `db:seed` bricht von sich aus ab, sobald
+`DATABASE_URL` nicht auf den eigenen Rechner zeigt.
 
 ### 2. Bildspeicher
 
@@ -333,7 +349,9 @@ Adressen, `hreflang` und die Sitemap. Bleibt sie leer, zeigen alle drei auf
 | `npm run db:stop` | Lokale Datenbank stoppen |
 | `npm run db:status` | Läuft die Datenbank? |
 | `npm run db:migrate` | Migration erzeugen und anwenden |
-| `npm run db:seed` | Beispieldaten einspielen |
+| `npm run db:seed` | Beispieldaten einspielen (nur lokal) |
+| `npm run db:catalog` | Nur den Katalog einspielen (echte Installation) |
+| `npm run db:clear` | Erfundene Inhalte entfernen, Katalog behalten |
 | `npm run db:studio` | Prisma Studio öffnen |
 | `npm run admin:create` | Verwalterkonto anlegen oder hochstufen |
 | `npm run db:reset` | Datenbank zurücksetzen und neu befüllen |
