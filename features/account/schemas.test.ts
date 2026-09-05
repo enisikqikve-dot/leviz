@@ -26,6 +26,19 @@ describe('profileSchema', () => {
     expect(result.phone).toBe('+38344123456');
   });
 
+  it('vertraegt seine eigene Ausgabe', () => {
+    // Derselbe Fall wie bei den Fehlermeldungen: das Formular schickt sein
+    // bereits geprueftes Ergebnis an den Server. Ohne diesen Fall koennte
+    // niemand sein Profil speichern, der keine Telefonnummer hinterlegt.
+    for (const phone of ['', '044 123 456']) {
+      const einmal = profileSchema.parse({ ...gueltigesProfil, phone });
+      const zweimal = profileSchema.safeParse(einmal);
+
+      expect(zweimal.success, 'Telefon ' + JSON.stringify(phone)).toBe(true);
+      if (zweimal.success) expect(zweimal.data).toEqual(einmal);
+    }
+  });
+
   it('weist eine unbrauchbare Nummer zurueck', () => {
     const result = profileSchema.safeParse({ ...gueltigesProfil, phone: 'ruf mich an' });
     expect(result.success).toBe(false);

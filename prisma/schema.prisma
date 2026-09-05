@@ -166,6 +166,26 @@ enum ReportStatus {
   DISMISSED
 }
 
+/// Worum es bei einer Meldung ueber die Seite selbst geht.
+enum BugReportKind {
+  /// Etwas funktioniert nicht.
+  BUG
+  /// Etwas wird falsch dargestellt.
+  DISPLAY
+  /// Ein Text oder eine Uebersetzung stimmt nicht.
+  CONTENT
+  /// Verbesserungsvorschlag.
+  IDEA
+  OTHER
+}
+
+enum BugReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
 enum ModerationAction {
   APPROVED
   HIDDEN
@@ -269,6 +289,9 @@ model User {
   sellerThreads  Conversation[] @relation("ConversationSeller")
   inquiries      ListingInquiry[]
   listingViews   ListingView[]
+
+  bugReports        BugReport[] @relation("BugReporter")
+  bugReportsHandled BugReport[] @relation("BugHandler")
 
   reportsFiled    Report[] @relation("ReportReporter")
   reportsHandled  Report[] @relation("ReportHandler")
@@ -1016,6 +1039,40 @@ model Report {
 
   @@index([status, createdAt])
   @@index([vehicleId, status])
+}
+
+/// Meldung ueber die Seite selbst -- ein Fehler, eine falsche Darstellung
+/// oder ein Vorschlag. Nicht zu verwechseln mit Report: dort geht es um ein
+/// einzelnes Inserat, hier um LEVIZ.
+model BugReport {
+  id String @id @default(cuid())
+
+  kind    BugReportKind @default(BUG)
+  message String
+
+  /// Wo es passiert ist. Kommt aus dem Browser und ist damit nur ein Hinweis,
+  /// kein Beweis -- aber der wichtigste Hinweis, um es nachzustellen.
+  pageUrl   String?
+  /// Browserkennung aus dem Anfragekopf. Ohne sie ist "geht nicht" wertlos.
+  userAgent String?
+  locale    String?
+
+  /// Freiwillig. Ohne Adresse laesst sich nicht zurueckfragen.
+  email String?
+
+  reporterId String?
+  status     BugReportStatus @default(OPEN)
+
+  handledById String?
+  handledAt   DateTime?
+  note        String?
+
+  createdAt DateTime @default(now())
+
+  reporter  User? @relation(name: "BugReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  handledBy User? @relation(name: "BugHandler", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
 }
 
 // ===========================================================================

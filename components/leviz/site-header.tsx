@@ -9,7 +9,7 @@ import { ThemeToggle } from '@/components/leviz/theme-toggle';
 import { UserMenu } from '@/components/leviz/user-menu';
 import { getCompareIds } from '@/features/compare/server';
 import { countUnreadConversations } from '@/features/messages/queries';
-import { getSessionUser } from '@/lib/auth/guards';
+import { getSessionUser, isAdmin } from '@/lib/auth/guards';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Currency } from '@/lib/currency';
@@ -103,7 +103,7 @@ export async function SiteHeader({ currency }: { currency: Currency }) {
                     {t('sell')}
                   </Link>
                 </Button>
-                <UserMenu name={user.name ?? user.email ?? 'LEVIZ'} />
+                <UserMenu name={user.name ?? user.email ?? 'LEVIZ'} isAdmin={isAdmin(user)} />
               </>
             ) : (
               <>
@@ -127,7 +127,7 @@ export async function SiteHeader({ currency }: { currency: Currency }) {
           {/* Auf kleinen Bildschirmen liegt das Konto in der Schublade. */}
           {user ? (
             <div className="lg:hidden">
-              <UserMenu name={user.name ?? user.email ?? 'LEVIZ'} />
+              <UserMenu name={user.name ?? user.email ?? 'LEVIZ'} isAdmin={isAdmin(user)} />
             </div>
           ) : null}
 

@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Car, CreditCard, Flag, LayoutDashboard, Package, Settings, Store, Tags, Users,
+  Bug, Car, CreditCard, Flag, LayoutDashboard, Package, Settings, Store, Tags, Users,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -12,6 +12,7 @@ const ITEMS = [
   { href: '/admin', key: 'dashboard', icon: LayoutDashboard },
   { href: '/admin/vehicles', key: 'vehicles', icon: Car },
   { href: '/admin/reports', key: 'reports', icon: Flag },
+  { href: '/admin/bugs', key: 'bugs', icon: Bug },
   { href: '/admin/dealers', key: 'dealers', icon: Store },
   { href: '/admin/users', key: 'users', icon: Users },
   { href: '/admin/brands', key: 'brands', icon: Tags },
@@ -20,7 +21,13 @@ const ITEMS = [
   { href: '/admin/settings', key: 'settings', icon: Settings },
 ] as const;
 
-export function AdminNav({ openReports }: { openReports: number }) {
+export function AdminNav({
+  openReports,
+  openBugs,
+}: {
+  openReports: number;
+  openBugs: number;
+}) {
   const t = useTranslations('admin.nav');
   const pathname = usePathname();
 
@@ -42,9 +49,9 @@ export function AdminNav({ openReports }: { openReports: number }) {
           >
             <Icon className="size-4" aria-hidden />
             {t(key)}
-            {key === 'reports' && openReports > 0 ? (
+            {badgeFor(key, openReports, openBugs) ? (
               <span className="bg-destructive text-destructive-foreground ms-auto inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold">
-                {openReports}
+                {badgeFor(key, openReports, openBugs)}
               </span>
             ) : null}
           </Link>
@@ -52,4 +59,11 @@ export function AdminNav({ openReports }: { openReports: number }) {
       })}
     </nav>
   );
+}
+
+/** Zahl neben einem Eintrag, oder 0 fuer keine. */
+function badgeFor(key: string, openReports: number, openBugs: number): number {
+  if (key === 'reports') return openReports;
+  if (key === 'bugs') return openBugs;
+  return 0;
 }

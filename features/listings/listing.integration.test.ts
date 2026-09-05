@@ -13,18 +13,43 @@ import { VALID_LISTING } from './fixtures';
  * sofort auf — genau die Fehlerklasse, die der Typprüfer nicht sieht.
  */
 let createdId: string | null = null;
+let sellerId: string | null = null;
 let hasData = false;
+
+/**
+ * Der Test bringt seinen eigenen Verkaeufer mit, statt einen aus dem Seed zu
+ * suchen. Sonst haengt er daran, dass jemand vorher Beispieldaten eingespielt
+ * hat -- und faellt genau dann durch, wenn die Datenbank sauber ist.
+ *
+ * Der Katalog wird weiterhin vorausgesetzt: Marken, Modelle und Staedte sind
+ * Nachschlagewerke, die jede Installation hat.
+ */
+const TEST_EMAIL = 'listing-integration@leviz.invalid';
 
 beforeAll(async () => {
   try {
     hasData = (await prisma.brand.count()) > 0;
   } catch {
     hasData = false;
+    return;
   }
+
+  if (!hasData) return;
+
+  const seller = await prisma.user.upsert({
+    where: { email: TEST_EMAIL },
+    update: {},
+    create: { email: TEST_EMAIL, name: 'Integrationstest', role: 'PRIVATE_SELLER' },
+    select: { id: true },
+  });
+
+  sellerId = seller.id;
 });
 
 afterAll(async () => {
   if (createdId) await prisma.vehicle.delete({ where: { id: createdId } }).catch(() => {});
+  // Nach dem Fahrzeug, sonst haelt der Fremdschluessel das Konto fest.
+  if (sellerId) await prisma.user.delete({ where: { id: sellerId } }).catch(() => {});
 });
 
 describe('Inserat in der Datenbank', () => {
@@ -33,7 +58,7 @@ describe('Inserat in der Datenbank', () => {
 
     const data = listingSchema.parse(VALID_LISTING);
 
-    const [model, city, country, seller, features] = await Promise.all([
+    const [model, city, country, features] = await Promise.all([
       prisma.model.findFirstOrThrow({
         where: { slug: data.modelSlug, brand: { slug: data.brandSlug } },
         select: { id: true, name: true, brandId: true, brand: { select: { name: true } } },
@@ -44,10 +69,6 @@ describe('Inserat in der Datenbank', () => {
       }),
       prisma.country.findUniqueOrThrow({
         where: { code: data.importedFromCode! },
-        select: { id: true },
-      }),
-      prisma.user.findFirstOrThrow({
-        where: { email: 'seller@leviz.dev' },
         select: { id: true },
       }),
       prisma.feature.findMany({
@@ -65,7 +86,7 @@ describe('Inserat in der Datenbank', () => {
           year: data.registrationYear, city: city.name, publicCode,
         }),
         publicCode,
-        sellerId: seller.id,
+        sellerId: sellerId!,
         sellerType: 'PRIVATE',
         status: 'DRAFT',
         category: data.category,

@@ -132,7 +132,8 @@
     "imprint": "Impressum",
     "rights": "Të gjitha të drejtat e rezervuara.",
     "language": "Gjuha",
-    "withdrawal": "E drejta e tërheqjes"
+    "withdrawal": "E drejta e tërheqjes",
+    "reportBug": "Raporto një gabim"
   },
   "common": {
     "loading": "Duke u ngarkuar…",
@@ -794,7 +795,8 @@
       "brands": "Markat",
       "settings": "Cilësimet",
       "packages": "Pakot",
-      "payments": "Pagesat"
+      "payments": "Pagesat",
+      "bugs": "Gabimet"
     },
     "stats": {
       "totalUsers": "Përdorues",
@@ -945,6 +947,30 @@
       "refunded": "Të kthyera",
       "latest": "Pagesat e fundit",
       "unknownSubject": "Pa përcaktim"
+    },
+    "bugs": {
+      "title": "Raportimet e gabimeve",
+      "subtitle": "Çfarë raportojnë përdoruesit për vetë faqen.",
+      "empty": "Asnjë raportim ende.",
+      "onPage": "Faqja:",
+      "from": "Nga:",
+      "browser": "Shfletuesi:",
+      "handledBy": "Trajtuar nga:",
+      "anonymous": "pa emër",
+      "saved": "U ruajt",
+      "notePlaceholder": "Shënim i brendshëm — çfarë ishte shkaku, çfarë u bë",
+      "status": {
+        "OPEN": "E hapur",
+        "REVIEWING": "Në shqyrtim",
+        "RESOLVED": "E rregulluar",
+        "DISMISSED": "E mbyllur"
+      },
+      "setStatus": {
+        "OPEN": "Rihape",
+        "REVIEWING": "Merre në shqyrtim",
+        "RESOLVED": "Shëno si të rregulluar",
+        "DISMISSED": "Mbyll"
+      }
     }
   },
   "pricing": {
@@ -1323,5 +1349,31 @@
         }
       ]
     }
+  },
+  "feedback": {
+    "title": "Raporto një gabim",
+    "intro": "Diçka nuk punon, duket gabim ose të pengon? Na trego dhe do ta rregullojmë.",
+    "notForListings": "Për një shpallje mashtruese përdor butonin „Raporto\" te vetë shpallja — <link>gjeje te kërkimi</link>. Këtu bëhet fjalë për vetë faqen.",
+    "kind": "Për çfarë bëhet fjalë",
+    "kinds": {
+      "BUG": "Diçka nuk punon",
+      "DISPLAY": "Diçka duket gabim",
+      "CONTENT": "Tekst ose përkthim i gabuar",
+      "IDEA": "Propozim për përmirësim",
+      "OTHER": "Tjetër"
+    },
+    "message": "Çfarë ndodhi",
+    "messageHint": "Sa më konkret, aq më shpejt e gjejmë: çfarë bëre, çfarë prisje, çfarë ndodhi në vend të saj.",
+    "messagePlaceholder": "Shtypa „Ruaj\" te cilësimet dhe faqja mbeti bosh…",
+    "pageUrl": "Në cilën faqe",
+    "pageUrlHint": "Plotësohet vetë nga faqja ku ishe. Mund ta ndryshosh.",
+    "email": "Email-i yt",
+    "emailHint": "Vullnetar. Pa të nuk mund të të pyesim më shumë.",
+    "signedInAs": "Do të përgjigjemi te {email}.",
+    "submit": "Dërgo raportimin",
+    "thanksTitle": "Faleminderit",
+    "thanksBody": "Raportimi arriti te ne. Nëse le një email, të shkruajmë kur ta rregullojmë.",
+    "reportAnother": "Raporto diçka tjetër",
+    "errorTooManyReports": "Shumë raportime brenda pak kohe. Provo përsëri më vonë."
   }
 }

@@ -92,4 +92,7 @@ export const RATE_LIMITS = {
   // Gebremst wird hier nicht der Anmeldeversuch, sondern das Durchprobieren
   // des alten Passworts an einem offenen Browser.
   passwordChange: { limit: 6, windowMs: 15 * 60_000 },
+  // Fehlermeldungen sind ohne Anmeldung moeglich; die Grenze haelt
+  // Formular-Spam heraus, ohne einen ehrlichen Melder auszubremsen.
+  bugReport: { limit: 10, windowMs: 60 * 60_000 },
 } as const;

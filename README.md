@@ -754,6 +754,35 @@ prozentuale Steigerung bilden.
 Monate ohne Einnahmen erscheinen im Diagramm als Null, nicht als Lücke, damit
 kein Verlauf entsteht, den es nicht gab.
 
+### Fehlermeldungen von Nutzern
+
+`/report-bug` (`/raporto-gabim`, `/fehler-melden`) nimmt Meldungen über die
+Seite selbst entgegen — nicht zu verwechseln mit dem Melden eines einzelnen
+Inserats, das auf dem Inserat sitzt.
+
+**Die Meldungen landen in der Datenbank und im Verwaltungsbereich unter
+`/admin/bugs`, nicht per E-Mail.** In der Navigation steht die Zahl der offenen
+Meldungen als Zeichen daneben, wie bei den Inseratsmeldungen. Jede lässt sich
+auf *in Prüfung*, *behoben* oder *geschlossen* setzen, mit interner Notiz; wer
+sie abgeschlossen hat und wann, wird festgehalten.
+
+**Ohne Anmeldung möglich.** Wer über einen kaputten Anmeldevorgang stolpert,
+kann sich nicht anmelden, um genau das zu melden — die wichtigste Meldung ginge
+sonst verloren. Der Preis ist eine Begrenzung von zehn Meldungen je Stunde und
+Absender.
+
+Mitgeschickt wird der Zusammenhang, ohne den sich nichts nachstellen lässt:
+die Seite, auf der es passiert ist (vorausgefüllt, aber sichtbar und änderbar),
+die Browserkennung aus dem Anfragekopf und die Sprache. Angemeldete Melder
+werden erkannt, ohne etwas eintragen zu müssen.
+
+### Wie Verwalter in den Verwaltungsbereich kommen
+
+Über das Kontomenü in der Kopfzeile, sichtbar nur für `ADMIN` und
+`SUPER_ADMIN`. Nicht in der öffentlichen Navigation: ein Eintrag, der für alle
+anderen mit 403 endet, ist keine Navigation. Der Wächter im Layout entscheidet
+unabhängig davon — das Ausblenden ist Bequemlichkeit, kein Schutz.
+
 ### Autorisierung entscheidet die Datenbank
 
 Rolle und Sperrstatus stehen zwar im Sitzungstoken, werden dort aber nur beim

@@ -132,7 +132,8 @@
     "imprint": "Impressum",
     "rights": "Alle Rechte vorbehalten.",
     "language": "Sprache",
-    "withdrawal": "Widerruf"
+    "withdrawal": "Widerruf",
+    "reportBug": "Fehler melden"
   },
   "common": {
     "loading": "Wird geladen…",
@@ -794,7 +795,8 @@
       "brands": "Marken",
       "settings": "Einstellungen",
       "packages": "Pakete",
-      "payments": "Zahlungen"
+      "payments": "Zahlungen",
+      "bugs": "Fehler"
     },
     "stats": {
       "totalUsers": "Nutzer",
@@ -945,6 +947,30 @@
       "refunded": "Erstattet",
       "latest": "Letzte Zahlungen",
       "unknownSubject": "Ohne Bezug"
+    },
+    "bugs": {
+      "title": "Fehlermeldungen",
+      "subtitle": "Was Nutzer über die Seite selbst melden.",
+      "empty": "Noch keine Meldungen.",
+      "onPage": "Seite:",
+      "from": "Von:",
+      "browser": "Browser:",
+      "handledBy": "Bearbeitet von:",
+      "anonymous": "ohne Namen",
+      "saved": "Gespeichert",
+      "notePlaceholder": "Interne Notiz — was die Ursache war, was getan wurde",
+      "status": {
+        "OPEN": "Offen",
+        "REVIEWING": "In Prüfung",
+        "RESOLVED": "Behoben",
+        "DISMISSED": "Geschlossen"
+      },
+      "setStatus": {
+        "OPEN": "Wieder öffnen",
+        "REVIEWING": "In Prüfung nehmen",
+        "RESOLVED": "Als behoben markieren",
+        "DISMISSED": "Schließen"
+      }
     }
   },
   "pricing": {
@@ -1323,5 +1349,31 @@
         }
       ]
     }
+  },
+  "feedback": {
+    "title": "Fehler melden",
+    "intro": "Etwas funktioniert nicht, sieht falsch aus oder steht dir im Weg? Schreib es uns, dann bringen wir es in Ordnung.",
+    "notForListings": "Ein betrügerisches Inserat meldest du mit der Schaltfläche „Melden\" auf dem Inserat selbst — <link>über die Suche zu finden</link>. Hier geht es um die Seite.",
+    "kind": "Worum geht es",
+    "kinds": {
+      "BUG": "Etwas funktioniert nicht",
+      "DISPLAY": "Etwas wird falsch dargestellt",
+      "CONTENT": "Text oder Übersetzung stimmt nicht",
+      "IDEA": "Verbesserungsvorschlag",
+      "OTHER": "Sonstiges"
+    },
+    "message": "Was ist passiert",
+    "messageHint": "Je genauer, desto schneller finden wir es: was du getan hast, was du erwartet hast, was stattdessen geschah.",
+    "messagePlaceholder": "Ich habe in den Einstellungen auf „Speichern\" gedrückt und die Seite blieb leer…",
+    "pageUrl": "Auf welcher Seite",
+    "pageUrlHint": "Wird aus der Seite ausgefüllt, von der du kamst. Du kannst es ändern.",
+    "email": "Deine E-Mail",
+    "emailHint": "Freiwillig. Ohne sie können wir nicht zurückfragen.",
+    "signedInAs": "Wir antworten an {email}.",
+    "submit": "Meldung senden",
+    "thanksTitle": "Danke",
+    "thanksBody": "Deine Meldung ist angekommen. Wenn du eine E-Mail hinterlassen hast, schreiben wir dir, sobald es behoben ist.",
+    "reportAnother": "Noch etwas melden",
+    "errorTooManyReports": "Zu viele Meldungen in kurzer Zeit. Bitte versuche es später erneut."
   }
 }

@@ -13,8 +13,12 @@ import { locales } from '@/lib/i18n/routing';
 const optionalPhoneSchema = z
   .string()
   .trim()
+  // `nullish`, weil das Formular sein eigenes Ergebnis an den Server schickt:
+  // dort ist aus dem leeren Feld schon `null` geworden. Ohne diese Zeile
+  // scheitert das Speichern bei jedem, der keine Nummer hinterlegt.
+  .nullish()
   .transform((value, ctx) => {
-    if (value === '') return null;
+    if (!value) return null;
 
     const normalized = normalizePhone(value);
     if (!normalized) {

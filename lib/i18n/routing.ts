@@ -82,6 +82,10 @@ export const pathnames = {
   '/cookies': { sq: '/cookies', de: '/cookies', en: '/cookies' },
   '/imprint': { sq: '/impressum', de: '/impressum', en: '/imprint' },
   '/contact': { sq: '/kontakti', de: '/kontakt', en: '/contact' },
+
+  // Fehlermeldungen ueber die Seite selbst -- nicht zu verwechseln mit dem
+  // Melden eines einzelnen Inserats, das auf dem Inserat sitzt.
+  '/report-bug': { sq: '/raporto-gabim', de: '/fehler-melden', en: '/report-bug' },
   '/dashboard/billing': {
     sq: '/paneli/pagesat',
     de: '/konto/zahlungen',
@@ -113,6 +117,7 @@ export const pathnames = {
   '/admin/vehicles': '/admin/vehicles',
   '/admin/dealers': '/admin/dealers',
   '/admin/reports': '/admin/reports',
+  '/admin/bugs': '/admin/bugs',
   '/admin/brands': '/admin/brands',
   '/admin/models': '/admin/models',
   '/admin/categories': '/admin/categories',

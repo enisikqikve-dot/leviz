@@ -16,7 +16,10 @@ const COLUMNS = [
   },
   {
     heading: 'company',
-    links: [{ href: '/contact', key: 'footer.contact' }],
+    links: [
+      { href: '/contact', key: 'footer.contact' },
+      { href: '/report-bug', key: 'footer.reportBug' },
+    ],
   },
   {
     heading: 'legal',

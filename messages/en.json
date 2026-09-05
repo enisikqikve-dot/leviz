@@ -132,7 +132,8 @@
     "imprint": "Imprint",
     "rights": "All rights reserved.",
     "language": "Language",
-    "withdrawal": "Right of withdrawal"
+    "withdrawal": "Right of withdrawal",
+    "reportBug": "Report a bug"
   },
   "common": {
     "loading": "Loading…",
@@ -794,7 +795,8 @@
       "brands": "Makes",
       "settings": "Settings",
       "packages": "Packages",
-      "payments": "Payments"
+      "payments": "Payments",
+      "bugs": "Bugs"
     },
     "stats": {
       "totalUsers": "Users",
@@ -945,6 +947,30 @@
       "refunded": "Refunded",
       "latest": "Latest payments",
       "unknownSubject": "Unassigned"
+    },
+    "bugs": {
+      "title": "Bug reports",
+      "subtitle": "What users report about the site itself.",
+      "empty": "No reports yet.",
+      "onPage": "Page:",
+      "from": "From:",
+      "browser": "Browser:",
+      "handledBy": "Handled by:",
+      "anonymous": "no name",
+      "saved": "Saved",
+      "notePlaceholder": "Internal note — what caused it, what was done",
+      "status": {
+        "OPEN": "Open",
+        "REVIEWING": "Reviewing",
+        "RESOLVED": "Fixed",
+        "DISMISSED": "Closed"
+      },
+      "setStatus": {
+        "OPEN": "Reopen",
+        "REVIEWING": "Start reviewing",
+        "RESOLVED": "Mark as fixed",
+        "DISMISSED": "Close"
+      }
     }
   },
   "pricing": {
@@ -1323,5 +1349,31 @@
         }
       ]
     }
+  },
+  "feedback": {
+    "title": "Report a bug",
+    "intro": "Something not working, looking wrong, or getting in your way? Tell us and we will fix it.",
+    "notForListings": "To report a fraudulent listing, use the Report button on the listing itself — <link>find it in search</link>. This page is about the site.",
+    "kind": "What is it about",
+    "kinds": {
+      "BUG": "Something does not work",
+      "DISPLAY": "Something looks wrong",
+      "CONTENT": "Wrong text or translation",
+      "IDEA": "Suggestion",
+      "OTHER": "Something else"
+    },
+    "message": "What happened",
+    "messageHint": "The more specific, the faster we find it: what you did, what you expected, what happened instead.",
+    "messagePlaceholder": "I pressed Save in settings and the page stayed empty…",
+    "pageUrl": "Which page",
+    "pageUrlHint": "Filled in from the page you came from. You can change it.",
+    "email": "Your email",
+    "emailHint": "Optional. Without it we cannot ask you follow-up questions.",
+    "signedInAs": "We will reply to {email}.",
+    "submit": "Send report",
+    "thanksTitle": "Thank you",
+    "thanksBody": "Your report reached us. If you left an email, we will write once it is fixed.",
+    "reportAnother": "Report something else",
+    "errorTooManyReports": "Too many reports in a short time. Please try again later."
   }
 }

@@ -1,6 +1,8 @@
 'use client';
 
-import { Car, Heart, LayoutDashboard, LogOut, MessageSquare, Settings } from 'lucide-react';
+import {
+  Car, Heart, LayoutDashboard, LogOut, MessageSquare, Settings, ShieldCheck,
+} from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -19,9 +21,16 @@ const LINKS = [
   { href: '/dashboard/settings', key: 'settings', icon: Settings },
 ] as const;
 
-/** Konto-Menü in der Kopfzeile, sobald jemand angemeldet ist. */
-export function UserMenu({ name }: { name: string }) {
+/**
+ * Konto-Menü in der Kopfzeile, sobald jemand angemeldet ist.
+ *
+ * Der Zugang zur Verwaltung steht hier und nicht in der öffentlichen
+ * Navigation: er geht nur Verwalter etwas an, und eine Schaltfläche, die für
+ * alle anderen mit 403 endet, ist keine Navigation.
+ */
+export function UserMenu({ name, isAdmin }: { name: string; isAdmin: boolean }) {
   const t = useTranslations('nav');
+  const ta = useTranslations('admin');
   const td = useTranslations('dashboard');
   const [isPending, startTransition] = useTransition();
 
@@ -45,6 +54,18 @@ export function UserMenu({ name }: { name: string }) {
       <DropdownMenuContent align="end" className="min-w-52">
         <p className="text-muted-foreground truncate px-2 py-1.5 text-xs">{name}</p>
         <DropdownMenuSeparator />
+
+        {isAdmin ? (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="cursor-pointer font-medium">
+                <ShieldCheck className="size-4" aria-hidden />
+                {ta('title')}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
 
         {LINKS.map(({ href, key, icon: Icon }) => (
           <DropdownMenuItem key={href} asChild>
