@@ -41,7 +41,10 @@ export function EntityCard({
     .join(', ');
 
   const allRows: [string, string][] = [
-    [labels.name, [entity.name, entity.legalForm].filter(Boolean).join(' ')],
+    [labels.name, entity.name],
+    // Eigene Zeile statt an den Namen gehängt: „Leviz Biznes individual"
+    // liest sich wie ein Firmenname, ist aber Name plus Rechtsform.
+    [labels.legalForm, entity.legalForm],
     [labels.address, address],
     [labels.representative, entity.representative],
     [labels.registrationNumber, entity.registrationNumber],

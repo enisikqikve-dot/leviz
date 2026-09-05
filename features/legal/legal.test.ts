@@ -105,9 +105,20 @@ describe('Betreiberangaben', () => {
     expect(missing).not.toContain('taxNumber');
   });
 
-  it('haelt die ausgelieferte Vorlage fuer unvollstaendig', () => {
+  it('meldet eine leere Vorlage als unvollstaendig', () => {
     // Solange niemand echte Daten eingetragen hat, muss die Seite das sagen
     // statt ein vollstaendiges Impressum vorzutaeuschen.
-    expect(isLegalEntityComplete()).toBe(false);
+    const leer = Object.fromEntries(
+      Object.keys(vollstaendig).map((key) => [key, '']),
+    ) as LegalEntity;
+
+    expect(isLegalEntityComplete(leer)).toBe(false);
+    expect(missingLegalFields(leer)).toContain('name');
+  });
+
+  it('die hinterlegten Angaben sind vollstaendig', () => {
+    // Faengt ab, dass jemand das Impressum spaeter versehentlich leert. Ohne
+    // vollstaendige Angaben schaltet kein Zahlungsdienstleister frei.
+    expect(missingLegalFields()).toEqual([]);
   });
 });
