@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { startFeatureCheckoutAction } from '@/features/packages/actions';
+import { goToCheckout } from '@/features/packages/redirect';
 import { useRouter } from '@/lib/i18n/navigation';
 
 export type FeatureOption = {
@@ -56,7 +57,7 @@ export function FeatureListing({
       }
 
       if (result.data.kind === 'external') {
-        window.location.href = result.data.url;
+        goToCheckout(result.data);
         return;
       }
 

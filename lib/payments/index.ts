@@ -17,6 +17,12 @@ export type CheckoutRequest = {
   amountCents: number;
   currency: string;
   description: string;
+  /** Wohin die Bezahlseite nach Erfolg zurueckschickt. Vollstaendige Adresse. */
+  successUrl: string;
+  /** Wohin bei Abbruch oder Fehlschlag. */
+  cancelUrl: string;
+  /** Sprache der Bezahlseite, damit sie nicht auf Englisch erscheint. */
+  locale: string;
 };
 
 export type CheckoutSession = {
@@ -25,6 +31,18 @@ export type CheckoutSession = {
   /** Adresse der Bezahlseite. Beim Mock-Anbieter eine eigene Seite. */
   url: string;
   provider: string;
+  /**
+   * Wie der Browser dorthin gelangt.
+   *
+   * Gehostete Bezahlseiten europaeischer Banken erwarten fast immer ein
+   * abgeschicktes Formular statt eines Aufrufs: die Felder enthalten Betrag,
+   * Rueckkehradressen und eine Pruefsumme und haben in einer Adresszeile
+   * nichts verloren. `GET` bleibt die Vorgabe, weil der Mock-Anbieter und
+   * Anbieter mit Sitzungsadresse damit auskommen.
+   */
+  method?: 'GET' | 'POST';
+  /** Formularfelder fuer `POST`. Werden unveraendert uebermittelt. */
+  fields?: Record<string, string>;
 };
 
 export type PaymentEvent = {
@@ -112,16 +130,28 @@ class MockPaymentProvider implements PaymentProvider {
 }
 
 /**
- * Platzhalter fuer Stripe. Die Erfuellung haengt bereits an `parseWebhook`;
- * anzubinden sind hier nur der Aufruf der Checkout-Session und die
- * Signaturpruefung nach Stripes Verfahren.
+ * Platzhalter fuer einen echten Anbieter.
+ *
+ * Anzubinden sind genau zwei Methoden. Alles andere — Zahlung anlegen,
+ * Weiterleitung, Erfuellung erst nach Rueckruf, Idempotenz — steht bereits und
+ * bleibt unveraendert.
+ *
+ * `createCheckout` meldet die Zahlung beim Anbieter an und liefert entweder
+ * eine Sitzungsadresse (`method: 'GET'`) oder die Formularfelder der
+ * gehosteten Bezahlseite (`method: 'POST'`). Banken im Westbalkan verlangen
+ * ueblicherweise das Formular, mit einer Pruefsumme ueber die Felder.
+ *
+ * `parseWebhook` prueft die Signatur des Rueckrufs nach dem Verfahren des
+ * Anbieters und gibt `null` zurueck, sobald etwas nicht stimmt — die Route
+ * antwortet dann mit 400 und aendert nichts.
  */
-class StripePaymentProvider implements PaymentProvider {
-  readonly name = 'stripe';
+class UnconfiguredPaymentProvider implements PaymentProvider {
+  constructor(readonly name: string) {}
 
   async createCheckout(): Promise<CheckoutSession> {
     throw new Error(
-      'Stripe ist nicht angebunden. PAYMENTS_DRIVER=mock setzen oder den Anbieter in lib/payments ergaenzen.',
+      `Der Zahlungsanbieter "${this.name}" ist nicht angebunden. ` +
+        'PAYMENTS_DRIVER=mock setzen oder den Anbieter in lib/payments ergaenzen.',
     );
   }
 
@@ -135,15 +165,12 @@ let provider: PaymentProvider | undefined;
 export function getPaymentProvider(): PaymentProvider {
   if (provider) return provider;
 
-  switch (process.env.PAYMENTS_DRIVER ?? 'mock') {
-    case 'stripe':
-      provider = new StripePaymentProvider();
-      return provider;
-    case 'mock':
-    default:
-      provider = new MockPaymentProvider();
-      return provider;
-  }
+  const driver = process.env.PAYMENTS_DRIVER ?? 'mock';
+
+  // Ein unbekannter Name faellt nicht still auf den Mock zurueck: sonst
+  // liefe im Betrieb eine Scheinzahlung durch, die niemand bemerkt.
+  provider = driver === 'mock' ? new MockPaymentProvider() : new UnconfiguredPaymentProvider(driver);
+  return provider;
 }
 
 /** Nur fuer Tests: erzwingt beim naechsten Zugriff eine neue Auswahl. */

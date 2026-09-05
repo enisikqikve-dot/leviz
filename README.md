@@ -246,6 +246,45 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 
 ---
 
+## Einen echten Zahlungsanbieter anbinden
+
+Der Ablauf steht vollständig und ist anbieterunabhängig: Zahlung anlegen →
+Nutzer auf die Bezahlseite → Erfüllung **erst** nach signiertem Rückruf. Der
+Mock-Anbieter durchläuft genau diese Schritte, nur liegt seine Bezahlseite in
+der eigenen Anwendung.
+
+Anzubinden sind zwei Methoden in `lib/payments/index.ts`:
+
+**`createCheckout`** meldet die Zahlung beim Anbieter an. Zwei Rückgabeformen:
+
+| Fall | Rückgabe |
+|---|---|
+| Anbieter vergibt eine Sitzungsadresse | `{ url, method: 'GET' }` |
+| Gehostete Bankseite erwartet ein Formular | `{ url, method: 'POST', fields }` |
+
+Banken im Westbalkan verlangen üblicherweise das Formular — Betrag,
+Rückkehradressen und eine Prüfsumme über die Felder. Deshalb gehen diese Werte
+im Rumpf mit, nicht in der Adresszeile: dort landeten sie im Browserverlauf, im
+Verweis-Kopf der Folgeseite und in den Protokollen jedes Servers dazwischen.
+`features/packages/redirect.ts` baut und verschickt dieses Formular.
+
+**`parseWebhook`** prüft die Signatur des Rückrufs und gibt `null` zurück,
+sobald etwas nicht stimmt. Die Route antwortet dann mit 400 und ändert nichts.
+Das ist die einzige Stelle, an der eine Zahlung als bezahlt gilt.
+
+Alles Übrige bleibt unverändert: `features/packages/actions.ts` unterscheidet
+bereits zwischen eigener und fremder Bezahlseite, und `applyPaymentEvent` ist
+idempotent — ein doppelt zugestellter Rückruf bucht nicht zweimal.
+
+Ein unbekannter Wert in `PAYMENTS_DRIVER` fällt **nicht** still auf den Mock
+zurück, sondern wirft. Sonst liefe im Betrieb eine Scheinzahlung durch, die
+niemand bemerkt.
+
+**Kartennummern dürfen nie durch LEVIZ laufen.** Die Eingabe gehört auf die
+Seite des Anbieters, sonst greift PCI-DSS mit voller Härte.
+
+---
+
 ## Veröffentlichen
 
 LEVIZ läuft nicht als Dateisammlung auf einem Webspace: Server Components,

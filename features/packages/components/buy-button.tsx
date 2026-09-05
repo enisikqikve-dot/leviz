@@ -9,6 +9,7 @@ import {
   startFeatureCheckoutAction,
   startPackageCheckoutAction,
 } from '@/features/packages/actions';
+import { goToCheckout } from '@/features/packages/redirect';
 import { useRouter } from '@/lib/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -57,7 +58,7 @@ export function BuyButton({
           }
 
           if (result.data.kind === 'external') {
-            window.location.href = result.data.url;
+            goToCheckout(result.data);
             return;
           }
 

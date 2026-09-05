@@ -20,6 +20,9 @@ describe('Bezahlvorgang starten', () => {
       amountCents: 999,
       currency: 'EUR',
       description: 'Pako: Premium',
+      successUrl: 'https://leviz.example/paneli/faturimi',
+      cancelUrl: 'https://leviz.example/cmimet',
+      locale: 'sq',
     });
 
     expect(session.provider).toBe('mock');
@@ -108,7 +111,13 @@ describe('Anbieterauswahl', () => {
     expect(provider.name).toBe('stripe');
     await expect(
       provider.createCheckout({
-        paymentId: 'p', amountCents: 1, currency: 'EUR', description: '',
+        paymentId: 'p',
+        amountCents: 1,
+        currency: 'EUR',
+        description: '',
+        successUrl: 'https://leviz.example/paneli/faturimi',
+        cancelUrl: 'https://leviz.example/cmimet',
+        locale: 'sq',
       }),
     ).rejects.toThrow(/nicht angebunden/);
   });

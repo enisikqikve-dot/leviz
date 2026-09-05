@@ -2,9 +2,13 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { getLocale } from 'next-intl/server';
+
 import { fail, ok, type ActionResult } from '@/lib/action-result';
 import { requireUser } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
+import { getPathname } from '@/lib/i18n/navigation';
+import type { Locale } from '@/lib/i18n/routing';
 import { getPaymentProvider, signWebhookPayload } from '@/lib/payments';
 import { siteConfig } from '@/lib/site';
 
@@ -17,7 +21,13 @@ import { siteConfig } from '@/lib/site';
  */
 export type CheckoutTarget =
   | { kind: 'internal'; paymentId: string }
-  | { kind: 'external'; url: string };
+  /**
+   * `fields` gesetzt heisst: die Bezahlseite erwartet ein abgeschicktes
+   * Formular, keinen blossen Aufruf. So arbeiten die gehosteten Seiten der
+   * Banken — Betrag, Rueckkehradressen und Pruefsumme gehoeren nicht in eine
+   * Adresszeile, wo sie im Verlauf und in Serverprotokollen landen.
+   */
+  | { kind: 'external'; url: string; fields?: Record<string, string> };
 
 /**
  * Startet eine Zahlung.
@@ -53,11 +63,20 @@ async function startCheckout(
     select: { id: true },
   });
 
+  // Die Rueckkehradressen entstehen hier, weil nur der Server die eigene
+  // Domäne kennt und die Pfade je Sprache verschieden heissen.
+  const locale = await getLocale();
+  const absolute = (href: '/dashboard/billing' | '/pricing') =>
+    `${siteConfig.url}${getPathname({ href, locale: locale as Locale })}`;
+
   const session = await getPaymentProvider().createCheckout({
     paymentId: payment.id,
     amountCents: pkg.priceCents,
     currency: 'EUR',
     description,
+    successUrl: absolute('/dashboard/billing'),
+    cancelUrl: absolute('/pricing'),
+    locale,
   });
 
   await prisma.payment.update({
@@ -68,7 +87,7 @@ async function startCheckout(
   return ok(
     session.url.startsWith('/')
       ? { kind: 'internal', paymentId: payment.id }
-      : { kind: 'external', url: session.url },
+      : { kind: 'external', url: session.url, fields: session.fields },
   );
 }
 
