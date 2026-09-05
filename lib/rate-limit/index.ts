@@ -89,4 +89,7 @@ export const RATE_LIMITS = {
   // Textvorschläge sind heute billig, kosten aber Geld, sobald ein
   // Sprachmodell dahintersteht. Die Grenze gilt deshalb von Anfang an.
   aiDescribe: { limit: 20, windowMs: 60 * 60_000 },
+  // Gebremst wird hier nicht der Anmeldeversuch, sondern das Durchprobieren
+  // des alten Passworts an einem offenen Browser.
+  passwordChange: { limit: 6, windowMs: 15 * 60_000 },
 } as const;

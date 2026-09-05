@@ -450,6 +450,36 @@ nicht mit der Sprachwahl verschieben.
 | Marken | Bestand je Marke, Kennzeichnung als beliebt |
 | Einstellungen | Wechselkurs, Laufzeit, Preisuntergrenze, Trefferzahl, Umkreis |
 
+## Einstellungen
+
+`/dashboard/settings` (`/paneli/cilesimet`, `/konto/einstellungen`) mit drei
+Bereichen, jeder für sich speicherbar:
+
+| Bereich | Inhalt |
+|---|---|
+| Profil | Name, Telefon, Wohnort, Sprache der E-Mails |
+| Benachrichtigungen | E-Mail und SMS getrennt schaltbar |
+| Passwort | Ändern nach Eingabe des alten Passworts |
+
+Die E-Mail-Adresse steht nur zur Anzeige. Sie zu ändern hieße, sie danach zu
+bestätigen — und diese Bestätigung gibt es in LEVIZ noch nicht.
+
+Konten aus GitHub oder Telefonanmeldung haben nie ein Passwort gesetzt; dort
+steht statt des Formulars ein Hinweis. Der Wechsel ist auf sechs Versuche je
+Viertelstunde begrenzt, gezählt nach Konto: gebremst wird nicht der
+Anmeldeversuch, sondern das Durchprobieren des alten Passworts an einem offen
+stehenden Browser.
+
+**Sitzungen lassen sich nicht zurückrufen.** Sie liegen als JWT im Cookie, ein
+bereits angemeldetes Gerät bleibt deshalb bis zum Ablauf des Tokens angemeldet
+— auch nach einer Passwortänderung.
+
+Die Aktionen geben Übersetzungsschlüssel zurück statt fertiger Sätze. Der
+Server kennt die Anzeigesprache nicht zuverlässig; sonst stünde eine deutsche
+Meldung auf einer albanischen Seite.
+
+---
+
 ### Eigenes Verwalterkonto anlegen
 
 Die vier Demo-Konten gehören zu den Beispieldaten. Ein echtes Verwalterkonto

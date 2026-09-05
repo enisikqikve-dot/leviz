@@ -214,6 +214,48 @@
       "SUPER_ADMIN": "Hauptadministrator"
     }
   },
+  "account": {
+    "title": "Einstellungen",
+    "subtitle": "Kontodaten, Benachrichtigungen und Passwort.",
+    "backToDashboard": "Zurück zum Konto",
+    "save": "Speichern",
+    "saved": "Änderungen gespeichert",
+    "profileTitle": "Profil",
+    "profileDescription": "Name und Kontakt, die Interessenten sehen.",
+    "name": "Name",
+    "phone": "Telefon",
+    "phoneHint": "Freiwillig. Leer lassen, wenn du nicht angerufen werden möchtest.",
+    "city": "Stadt",
+    "cityNone": "Keine Stadt",
+    "language": "Sprache",
+    "languageHint": "Sprache der E-Mails, die LEVIZ dir schickt.",
+    "email": "E-Mail",
+    "emailHint": "Die E-Mail-Adresse lässt sich noch nicht ändern.",
+    "languages": {
+      "sq": "Albanisch",
+      "de": "Deutsch",
+      "en": "Englisch"
+    },
+    "notifyTitle": "Benachrichtigungen",
+    "notifyDescription": "Wie wir dich erreichen sollen.",
+    "notifyByEmail": "Benachrichtigungen per E-Mail",
+    "notifyByEmailHint": "Neue Nachrichten, Anfragen zu deinen Inseraten und gespeicherte Suchen.",
+    "notifyBySms": "Benachrichtigungen per SMS",
+    "notifyBySmsHint": "Nur für Dringendes. Setzt eine Telefonnummer voraus.",
+    "passwordTitle": "Passwort",
+    "passwordDescription": "Ändere das Passwort deines Kontos.",
+    "passwordNone": "Dieses Konto meldet sich per Telefon oder GitHub an und hat kein Passwort.",
+    "currentPassword": "Aktuelles Passwort",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort wiederholen",
+    "passwordHint": "Mindestens 8 Zeichen, mit Buchstabe und Ziffer.",
+    "changePassword": "Passwort ändern",
+    "passwordChanged": "Passwort geändert",
+    "errorCurrentPassword": "Das aktuelle Passwort stimmt nicht",
+    "errorPhoneTaken": "Diese Telefonnummer gehört bereits zu einem Konto",
+    "errorNoPassword": "Für dieses Konto ist kein Passwort hinterlegt",
+    "errorTooManyAttempts": "Zu viele Versuche. Bitte versuche es später erneut."
+  },
   "vehicles": {
     "fuel": {
       "PETROL": "Benzin",

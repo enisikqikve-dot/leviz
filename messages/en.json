@@ -214,6 +214,48 @@
       "SUPER_ADMIN": "Super administrator"
     }
   },
+  "account": {
+    "title": "Settings",
+    "subtitle": "Account details, notifications and password.",
+    "backToDashboard": "Back to my account",
+    "save": "Save",
+    "saved": "Changes saved",
+    "profileTitle": "Profile",
+    "profileDescription": "The name and contact details buyers see.",
+    "name": "Name",
+    "phone": "Phone",
+    "phoneHint": "Optional. Leave empty if you do not want to be called.",
+    "city": "City",
+    "cityNone": "No city",
+    "language": "Language",
+    "languageHint": "Language of the emails LEVIZ sends you.",
+    "email": "Email",
+    "emailHint": "The email address cannot be changed yet.",
+    "languages": {
+      "sq": "Albanian",
+      "de": "German",
+      "en": "English"
+    },
+    "notifyTitle": "Notifications",
+    "notifyDescription": "How we should reach you.",
+    "notifyByEmail": "Email notifications",
+    "notifyByEmailHint": "New messages, enquiries about your listings and saved searches.",
+    "notifyBySms": "SMS notifications",
+    "notifyBySmsHint": "Urgent matters only. Requires a phone number.",
+    "passwordTitle": "Password",
+    "passwordDescription": "Change your account password.",
+    "passwordNone": "This account signs in by phone or GitHub and has no password.",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Repeat password",
+    "passwordHint": "At least 8 characters, with a letter and a digit.",
+    "changePassword": "Change password",
+    "passwordChanged": "Password changed",
+    "errorCurrentPassword": "Your current password is not correct",
+    "errorPhoneTaken": "This phone number belongs to another account",
+    "errorNoPassword": "No password is stored for this account",
+    "errorTooManyAttempts": "Too many attempts. Please try again later."
+  },
   "vehicles": {
     "fuel": {
       "PETROL": "Petrol",

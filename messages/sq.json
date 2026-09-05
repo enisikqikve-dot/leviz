@@ -214,6 +214,48 @@
       "SUPER_ADMIN": "Administrator kryesor"
     }
   },
+  "account": {
+    "title": "Cilësimet",
+    "subtitle": "Të dhënat e llogarisë, njoftimet dhe fjalëkalimi.",
+    "backToDashboard": "Kthehu te paneli",
+    "save": "Ruaj",
+    "saved": "Ndryshimet u ruajtën",
+    "profileTitle": "Profili",
+    "profileDescription": "Emri dhe kontakti që shohin blerësit e interesuar.",
+    "name": "Emri",
+    "phone": "Telefoni",
+    "phoneHint": "Vullnetare. Lëre bosh nëse nuk dëshiron të kontaktohesh me telefon.",
+    "city": "Qyteti",
+    "cityNone": "Pa qytet",
+    "language": "Gjuha",
+    "languageHint": "Gjuha e e-maileve që të dërgon LEVIZ.",
+    "email": "Email",
+    "emailHint": "Adresa e-mail nuk mund të ndryshohet ende.",
+    "languages": {
+      "sq": "Shqip",
+      "de": "Gjermanisht",
+      "en": "Anglisht"
+    },
+    "notifyTitle": "Njoftimet",
+    "notifyDescription": "Si dëshiron të të njoftojmë.",
+    "notifyByEmail": "Njoftime me email",
+    "notifyByEmailHint": "Mesazhe të reja, pyetje për shpalljet e tua dhe kërkime të ruajtura.",
+    "notifyBySms": "Njoftime me SMS",
+    "notifyBySmsHint": "Vetëm për gjëra urgjente. Kërkon një numër telefoni.",
+    "passwordTitle": "Fjalëkalimi",
+    "passwordDescription": "Ndrysho fjalëkalimin e llogarisë tënde.",
+    "passwordNone": "Kjo llogari hyn me telefon ose GitHub dhe nuk ka fjalëkalim.",
+    "currentPassword": "Fjalëkalimi aktual",
+    "newPassword": "Fjalëkalimi i ri",
+    "confirmPassword": "Përsërit fjalëkalimin",
+    "passwordHint": "Të paktën 8 shenja, me një shkronjë dhe një shifër.",
+    "changePassword": "Ndrysho fjalëkalimin",
+    "passwordChanged": "Fjalëkalimi u ndryshua",
+    "errorCurrentPassword": "Fjalëkalimi aktual nuk është i saktë",
+    "errorPhoneTaken": "Ky numër telefoni i përket një llogarie tjetër",
+    "errorNoPassword": "Për këtë llogari nuk ka fjalëkalim të ruajtur",
+    "errorTooManyAttempts": "Shumë përpjekje. Provo përsëri më vonë."
+  },
   "vehicles": {
     "fuel": {
       "PETROL": "Benzinë",
