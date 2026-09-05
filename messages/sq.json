@@ -932,7 +932,18 @@
       "subtitle": "Të gjitha pagesat, më të rejat në krye.",
       "empty": "Ende asnjë pagesë.",
       "total": "Gjithsej të arkëtuara",
-      "pending": "Në pritje"
+      "pending": "Në pritje",
+      "thisMonth": "Këtë muaj",
+      "versusLastMonth": "Muaji i kaluar: {amount}",
+      "noComparison": "Muaji i kaluar pa të ardhura — nuk ka krahasim në përqindje.",
+      "payments": "Pagesa këtë muaj",
+      "average": "Mesatarisht {amount} për pagesë",
+      "noPaymentsThisMonth": "Asnjë pagesë këtë muaj.",
+      "trend": "Të ardhurat sipas muajve",
+      "whatFor": "Për çfarë paguhet",
+      "refunded": "Të kthyera",
+      "latest": "Pagesat e fundit",
+      "unknownSubject": "Pa përcaktim"
     }
   },
   "pricing": {

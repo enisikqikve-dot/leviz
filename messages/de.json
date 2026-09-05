@@ -932,7 +932,18 @@
       "subtitle": "Alle Zahlungen, neueste zuerst.",
       "empty": "Noch keine Zahlungen.",
       "total": "Eingenommen",
-      "pending": "Offen"
+      "pending": "Offen",
+      "thisMonth": "Diesen Monat",
+      "versusLastMonth": "Vormonat: {amount}",
+      "noComparison": "Vormonat ohne Einnahmen — kein Prozentvergleich möglich.",
+      "payments": "Zahlungen diesen Monat",
+      "average": "Im Schnitt {amount} je Zahlung",
+      "noPaymentsThisMonth": "Diesen Monat noch keine Zahlung.",
+      "trend": "Einnahmen nach Monaten",
+      "whatFor": "Wofür gezahlt wird",
+      "refunded": "Erstattet",
+      "latest": "Letzte Zahlungen",
+      "unknownSubject": "Ohne Bezug"
     }
   },
   "pricing": {

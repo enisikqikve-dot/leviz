@@ -595,6 +595,30 @@ Eine bereits vorhandene Adresse wird auf `SUPER_ADMIN` gehoben und behält ihre
 Inserate und Nachrichten. Da `npm run db:seed` die Nutzertabelle leert, muss
 das Skript nach jedem Seed-Lauf erneut laufen.
 
+### Einnahmen und Monatsvergleich
+
+Die Zahlungsseite im Verwaltungsbereich zeigt den laufenden Monat gegen den
+Vormonat: Betrag, Unterschied in Euro und Prozent, Anzahl der Zahlungen,
+Durchschnitt je Zahlung, offene Beträge, ein Zwölf-Monats-Verlauf und die
+Aufschlüsselung, wofür bezahlt wurde.
+
+Drei Rechenregeln stecken in `features/admin/revenue.ts` und sind dort ohne
+Datenbank geprüft:
+
+**Nur eingegangenes Geld zählt.** Offene und fehlgeschlagene Zahlungen bleiben
+aus der Summe heraus; offene erscheinen als eigene Kennzahl.
+
+**Erstattungen werden nicht verrechnet, sondern getrennt ausgewiesen.** Eine
+Erstattung fällt oft in einen anderen Monat als die Zahlung. Stilles Verrechnen
+liesse einen Monat schrumpfen, dessen Zahlen längst berichtet wurden.
+
+**War der Vormonat null, gibt es keinen Prozentwert.** Statt „+100 %" steht
+dort, dass ein Vergleich nicht möglich ist — aus null heraus lässt sich keine
+prozentuale Steigerung bilden.
+
+Monate ohne Einnahmen erscheinen im Diagramm als Null, nicht als Lücke, damit
+kein Verlauf entsteht, den es nicht gab.
+
 ### Autorisierung entscheidet die Datenbank
 
 Rolle und Sperrstatus stehen zwar im Sitzungstoken, werden dort aber nur beim

@@ -932,7 +932,18 @@
       "subtitle": "All payments, newest first.",
       "empty": "No payments yet.",
       "total": "Collected",
-      "pending": "Pending"
+      "pending": "Pending",
+      "thisMonth": "This month",
+      "versusLastMonth": "Last month: {amount}",
+      "noComparison": "No revenue last month — a percentage comparison is not possible.",
+      "payments": "Payments this month",
+      "average": "{amount} per payment on average",
+      "noPaymentsThisMonth": "No payments this month yet.",
+      "trend": "Revenue by month",
+      "whatFor": "What people pay for",
+      "refunded": "Refunded",
+      "latest": "Latest payments",
+      "unknownSubject": "Unassigned"
     }
   },
   "pricing": {
