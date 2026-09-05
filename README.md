@@ -289,6 +289,55 @@ Widerrufsrecht 14 Tage bestehen, auch nach erbrachter Leistung.
 
 ---
 
+## Payten (Nestpay)
+
+Die gehostete Bezahlseite vieler Banken im Westbalkan. `PAYMENTS_DRIVER="payten"`
+schaltet sie ein; die vier Werte kommen aus dem Händlervertrag:
+
+| Variable | Woher |
+|---|---|
+| `PAYTEN_GATEWAY_URL` | Adresse der Bezahlseite, z. B. `https://<bank>/fim/est3Dgate` |
+| `PAYTEN_CLIENT_ID` | Händlernummer (`clientid`) |
+| `PAYTEN_STORE_KEY` | Ladenschlüssel — **ein Geheimnis** |
+| `PAYTEN_STORE_TYPE` | leer lassen für `3d_pay_hosting` |
+
+### Warum die Prüfsumme hier alles trägt
+
+Payten schickt das Ergebnis **nicht von Server zu Server**, sondern lässt den
+Browser des Käufers ein Formular an unsere Rückkehradresse abschicken. Der
+Absender ist damit vollständig unvertrauenswürdig: jeder könnte dieselbe
+Anfrage von Hand stellen und eine bezahlte Buchung behaupten.
+
+Die einzige Absicherung ist die Prüfsumme über *alle* übermittelten Felder,
+gebildet mit dem Ladenschlüssel, den nur die Bank und wir kennen. Deshalb liegt
+sie als reine Funktion in `lib/payments/payten.ts` mit 29 Tests — darunter der
+Fall einer erfundenen Prüfsumme und der eines nachträglich veränderten Betrags.
+
+Drei Feinheiten, an denen die Berechnung sonst scheitert:
+
+**Sortierung ohne Rücksicht auf Groß- und Kleinschreibung.** Die Bank mischt
+die Schreibweisen, `oid` steht neben `Response`.
+
+**Maskierung von `|` und `\`.** Ein Trennzeichen im Wert verschöbe sonst die
+Feldgrenzen, und `{a: "x|y"}` ergäbe dieselbe Summe wie `{a: "x", b: "y"}`.
+
+**`hash` und `encoding` bleiben aussen vor.** Das eine ist das Ergebnis selbst,
+das andere nimmt die Bank aus der Berechnung.
+
+### Was die Bank noch bestätigen muss
+
+Der Ablauf folgt der Nestpay-Spezifikation, aber drei Dinge unterscheiden sich
+je Bank. Klär sie, bevor echtes Geld fliesst:
+
+- die **Gateway-Adresse** und ob sie `3d_pay_hosting` oder `pay_hosting` nutzt
+- die **Hash-Version** — hier ist `ver3` gesetzt, ältere Installationen kennen `ver2`
+- ob es zusätzlich einen **Server-zu-Server-Rückruf** gibt; `parseWebhook` kann ihn
+
+**Vor dem Livegang in der Testumgebung der Bank durchspielen.** Eine Prüfsumme,
+die um ein Feld danebenliegt, fällt erst dort auf.
+
+---
+
 ## Einen echten Zahlungsanbieter anbinden
 
 Der Ablauf steht vollständig und ist anbieterunabhängig: Zahlung anlegen →

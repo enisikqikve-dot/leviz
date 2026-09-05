@@ -1,4 +1,12 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+
+import { siteConfig } from '@/lib/site';
+
+import {
+  buildCheckoutFields,
+  parseResult,
+  type PaytenSettings,
+} from './payten';
 
 /**
  * Zahlungsabwicklung hinter einer Schnittstelle.
@@ -130,6 +138,90 @@ class MockPaymentProvider implements PaymentProvider {
 }
 
 /**
+ * Payten / Nestpay — die Bezahlseite vieler Banken im Westbalkan.
+ *
+ * Der Kaeufer wird mit einem abgeschickten Formular dorthin gebracht; die
+ * Bank meldet das Ergebnis ueber den Browser zurueck an die Rueckkehradresse.
+ * Die Pruefsumme in lib/payments/payten.ts ist die einzige Absicherung dieser
+ * Rueckmeldung — die Route selbst kann dem Absender nicht trauen.
+ */
+class PaytenPaymentProvider implements PaymentProvider {
+  readonly name = 'payten';
+
+  constructor(private readonly settings: PaytenSettings) {}
+
+  async createCheckout(request: CheckoutRequest): Promise<CheckoutSession> {
+    const fields = buildCheckoutFields(this.settings, {
+      paymentId: request.paymentId,
+      amountCents: request.amountCents,
+      currency: request.currency,
+      // Beide Adressen zeigen auf die eigene Rueckkehrroute: die Bank schickt
+      // ihre Antwort dorthin, und erst danach geht es zur Zielseite weiter.
+      successUrl: paytenReturnUrl(request.successUrl),
+      cancelUrl: paytenReturnUrl(request.cancelUrl),
+      locale: request.locale,
+      rnd: randomBytes(12).toString('hex'),
+    });
+
+    return {
+      providerPaymentId: `payten_${request.paymentId}`,
+      url: this.settings.gatewayUrl,
+      provider: this.name,
+      method: 'POST',
+      fields,
+    };
+  }
+
+  /**
+   * Fuer Banken, die zusaetzlich eine Meldung von Server zu Server schicken.
+   * Die Nutzlast ist dort formularkodiert, nicht JSON.
+   */
+  parseWebhook(payload: string): PaymentEvent | null {
+    const fields = Object.fromEntries(new URLSearchParams(payload));
+    return parseResult(fields, this.settings.storeKey);
+  }
+}
+
+/** Haengt die Zieladresse an die eigene Rueckkehrroute an. */
+function paytenReturnUrl(target: string): string {
+  const base = new URL('/api/payments/payten/return', siteConfig.url);
+  base.searchParams.set('next', target);
+  return base.toString();
+}
+
+/**
+ * Liest die Payten-Einstellungen. Fehlt eine, wird nicht gestartet: eine
+ * halb konfigurierte Bezahlseite nimmt Geld an, das nirgends ankommt.
+ */
+export function readPaytenSettings(
+  env: Record<string, string | undefined>,
+): { ok: true; settings: PaytenSettings } | { ok: false; missing: string[] } {
+  const required = {
+    PAYTEN_GATEWAY_URL: env.PAYTEN_GATEWAY_URL,
+    PAYTEN_CLIENT_ID: env.PAYTEN_CLIENT_ID,
+    PAYTEN_STORE_KEY: env.PAYTEN_STORE_KEY,
+  };
+
+  const missing = Object.entries(required)
+    .filter(([, value]) => !value)
+    .map(([name]) => name);
+
+  if (missing.length > 0) return { ok: false, missing };
+
+  return {
+    ok: true,
+    settings: {
+      gatewayUrl: required.PAYTEN_GATEWAY_URL!,
+      clientId: required.PAYTEN_CLIENT_ID!,
+      storeKey: required.PAYTEN_STORE_KEY!,
+      // Die Bank nennt den fuer dich gueltigen Wert; 3d_pay_hosting ist der
+      // haeufigste.
+      storeType: env.PAYTEN_STORE_TYPE || '3d_pay_hosting',
+    },
+  };
+}
+
+/**
  * Platzhalter fuer einen echten Anbieter.
  *
  * Anzubinden sind genau zwei Methoden. Alles andere — Zahlung anlegen,
@@ -167,9 +259,27 @@ export function getPaymentProvider(): PaymentProvider {
 
   const driver = process.env.PAYMENTS_DRIVER ?? 'mock';
 
-  // Ein unbekannter Name faellt nicht still auf den Mock zurueck: sonst
-  // liefe im Betrieb eine Scheinzahlung durch, die niemand bemerkt.
-  provider = driver === 'mock' ? new MockPaymentProvider() : new UnconfiguredPaymentProvider(driver);
+  if (driver === 'mock') {
+    provider = new MockPaymentProvider();
+    return provider;
+  }
+
+  if (driver === 'payten') {
+    const result = readPaytenSettings(process.env);
+
+    // Lautstark scheitern statt still auf den Mock zurueckzufallen: sonst
+    // liefe im Betrieb eine Scheinzahlung durch, die niemand bemerkt.
+    if (!result.ok) {
+      throw new Error(
+        `PAYMENTS_DRIVER="payten", aber es fehlen: ${result.missing.join(', ')}`,
+      );
+    }
+
+    provider = new PaytenPaymentProvider(result.settings);
+    return provider;
+  }
+
+  provider = new UnconfiguredPaymentProvider(driver);
   return provider;
 }
 
