@@ -17,6 +17,16 @@ import { siteConfig } from '@/lib/site';
  * Ergebnislisten und alles hinter der Anmeldung bleiben draußen.
  */
 
+/**
+ * Bei jedem Abruf frisch, nicht beim Bauen erzeugt.
+ *
+ * Zwei Gründe. Sachlich: eine Sitemap, die den Bestand vom Zeitpunkt der
+ * Veröffentlichung zeigt, ist am nächsten Tag falsch — neue Inserate fehlen,
+ * verkaufte stehen noch drin. Praktisch: beim Bauen im Container gibt es keine
+ * Datenbank, die man dafür befragen könnte.
+ */
+export const dynamic = 'force-dynamic';
+
 type Href = Parameters<typeof getPathname>[0]['href'];
 
 const url = (href: Href, locale: (typeof routing.locales)[number]) =>
