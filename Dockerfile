@@ -36,6 +36,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl \
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Den Prisma-Client hier erzeugen, nicht aus der ersten Stufe uebernehmen.
+#
+# lib/generated/ steht in .gitignore und .dockerignore -- es kommt also weder
+# aus dem Repository noch aus dem Bau-Kontext. Die erste Stufe erzeugt es zwar
+# beim Installieren (postinstall), aber dort bleibt es liegen: kopiert wird von
+# dort nur node_modules. Ohne diese Zeile findet der Next-Build den Import in
+# lib/db/index.ts nicht und bricht mit "module not found" ab.
+RUN npx prisma generate
+
 # Diese Adresse steckt im Build: aus ihr entstehen kanonische Adressen,
 # hreflang und die Sitemap. Sie muss beim Bauen bekannt sein, nicht erst beim
 # Start -- deshalb ein Build-Argument.
@@ -72,6 +81,11 @@ COPY --from=build --chown=leviz:leviz /app/public ./public
 COPY --from=build --chown=leviz:leviz /app/prisma ./prisma
 COPY --from=build --chown=leviz:leviz /app/node_modules/prisma ./node_modules/prisma
 COPY --from=build --chown=leviz:leviz /app/node_modules/@prisma ./node_modules/@prisma
+
+# Der erzeugte Prisma-Client. Die eigenstaendige Ausgabe zieht ihn ueblicherweise
+# selbst mit; ausdruecklich kopiert kostet er nichts und erspart im Zweifel
+# einen Fehlschlag erst zur Laufzeit.
+COPY --from=build --chown=leviz:leviz /app/lib/generated ./lib/generated
 
 COPY --chown=leviz:leviz docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
