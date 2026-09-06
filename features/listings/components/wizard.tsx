@@ -124,23 +124,33 @@ export function ListingWizard({
   return (
     <div className="lg:grid lg:grid-cols-[1fr_18rem] lg:items-start lg:gap-8">
       <div className="min-w-0">
-        {/* Schritte als benannte Punkte: bereits erreichte lassen sich direkt
-            anspringen, spätere bleiben gesperrt. */}
+        {/*
+          Jeder Schritt ist jederzeit anspringbar.
+
+          Vorher waren spätere gesperrt: man musste sich der Reihe nach
+          durcharbeiten. Das passt nicht dazu, wie jemand ein Inserat
+          tatsächlich anlegt — die Fotos hat er auf dem Telefon und will sie
+          zuerst hochladen, den Preis kennt er sofort, den Kilometerstand muss
+          er erst am Auto nachsehen.
+
+          Verloren geht dabei nichts: „Weiter" prüft weiterhin den aktuellen
+          Schritt, und vor dem Veröffentlichen prüft der Server das gesamte
+          Formular. Wer etwas überspringt, kommt also nicht mit einem
+          unvollständigen Inserat durch — er sieht rechts im Gütepunktestand,
+          was noch fehlt.
+        */}
         <ol className="flex flex-wrap gap-1.5" aria-label={t('title')}>
           {STEPS.map((id, index) => (
             <li key={id}>
               <button
                 type="button"
-                onClick={() => { if (index <= stepIndex) setStepIndex(index); }}
-                disabled={index > stepIndex}
+                onClick={() => setStepIndex(index)}
                 aria-current={index === stepIndex ? 'step' : undefined}
                 className={cn(
                   'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                   index === stepIndex
                     ? 'bg-primary text-primary-foreground'
-                    : index < stepIndex
-                      ? 'bg-muted text-foreground hover:bg-border'
-                      : 'text-muted-foreground cursor-not-allowed',
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 {t(`steps.${id}`)}
