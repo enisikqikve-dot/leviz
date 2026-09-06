@@ -78,7 +78,10 @@ services:
 
       EMAIL_DRIVER: ${EMAIL_DRIVER:-console}
       EMAIL_FROM: ${EMAIL_FROM:-LEVIZ <no-reply@localhost>}
-      SMTP_URL: ${SMTP_URL:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMS_DRIVER: ${SMS_DRIVER:-console}
       AI_DRIVER: ${AI_DRIVER:-local}
 

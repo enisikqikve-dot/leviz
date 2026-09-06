@@ -246,6 +246,47 @@ der Einmalcode steht im Terminal des Entwicklungsservers.
 
 ---
 
+## Passwort vergessen: die Mail wirklich verschicken
+
+Der Ablauf steht vollständig: Formular unter `/harrova-fjalekalimin`, ein Token
+mit einer Stunde Gültigkeit in `PasswordResetToken`, die Zurücksetzungsseite und
+die Mail in drei Sprachen. Was fehlt, ist nur der Versandweg.
+
+**Mit `EMAIL_DRIVER="console"` funktioniert die Zurücksetzung nur scheinbar.**
+Der Link landet im Protokoll des Servers statt im Postfach des Nutzers. Wer
+sein Passwort vergisst, kommt nicht zurück — und im Fehlerprotokoll steht
+nichts, weil technisch nichts schiefging.
+
+### Einrichten mit dem eigenen Postfach
+
+Am besten dem der eigenen Domäne: SPF und DKIM zeigen bereits dorthin, die Mail
+landet also im Posteingang statt im Spam. Ein fremder Versender müsste dafür
+erst freigeschaltet werden.
+
+| Variable | Bei Hostinger |
+|---|---|
+| `EMAIL_DRIVER` | `smtp` |
+| `SMTP_HOST` | `smtp.hostinger.com` |
+| `SMTP_PORT` | `465` (leer lassen genügt) |
+| `SMTP_USER` | die volle Adresse, z. B. `info@levizz.com` |
+| `SMTP_PASSWORD` | das Passwort **des Postfachs** |
+| `EMAIL_FROM` | `LEVIZ <info@levizz.com>` |
+
+Port 465 verschlüsselt ab dem ersten Byte, Port 587 erst nach STARTTLS — der
+Code leitet das aus dem Port ab, mehr ist nicht einzustellen.
+
+**Der Absender muss zum Postfach passen.** Ein `EMAIL_FROM`, das auf eine
+fremde Domäne zeigt, wird vom Mailserver abgelehnt oder landet im Spam.
+
+### Halb eingerichtet ist schlimmer als gar nicht
+
+`EMAIL_DRIVER="smtp"` ohne vollständige Zugangsdaten lässt die Anwendung mit
+einer Meldung abbrechen, die den fehlenden Namen nennt. Der bequeme Weg wäre,
+still auf das Terminal zurückzufallen — dann liefe der Betrieb scheinbar
+normal, und niemand bekäme je eine Mail.
+
+---
+
 ## Rechtliche Seiten
 
 Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:
