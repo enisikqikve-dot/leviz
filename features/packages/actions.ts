@@ -10,6 +10,10 @@ import { prisma } from '@/lib/db';
 import { getPathname } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
 import { getPaymentProvider, signWebhookPayload } from '@/lib/payments';
+import { checkVoucher } from '@/features/vouchers/discount';
+import { findVoucherByCode, hasRedeemed } from '@/features/vouchers/queries';
+
+import { applyPaymentEvent } from './fulfilment';
 import { siteConfig } from '@/lib/site';
 
 /**
@@ -20,6 +24,11 @@ import { siteConfig } from '@/lib/site';
  * Ein echter Anbieter schickt eine vollstaendige, fremde Adresse.
  */
 export type CheckoutTarget =
+  /**
+   * Ein Gutschein ueber den vollen Preis. Es gibt nichts zu bezahlen, das
+   * Paket ist bereits gewaehrt -- der Browser muss zu keinem Anbieter.
+   */
+  | { kind: 'granted'; paymentId: string }
   | { kind: 'internal'; paymentId: string }
   /**
    * `fields` gesetzt heisst: die Bezahlseite erwartet ein abgeschicktes
@@ -36,11 +45,51 @@ export type CheckoutTarget =
  * koennte der Browser den Preis bestimmen. Gewaehrt wird erst nach dem
  * signierten Rueckruf des Anbieters.
  */
+type GeprueftrGutschein = {
+  voucherId: string;
+  code: string;
+  discountCents: number;
+  finalCents: number;
+  maxRedemptions: number;
+};
+
+/** `null` ohne Code, sonst der geprueftre Rabatt oder ein Fehlerschluessel. */
+async function pruefeGutschein(
+  code: string | null,
+  userId: string,
+  packageId: string,
+  priceCents: number,
+): Promise<GeprueftrGutschein | { error: string } | null> {
+  if (!code) return null;
+
+  const voucher = await findVoucherByCode(code);
+  // Unbekannt und abgelaufen bekommen dieselbe Antwort: sonst liesse sich
+  // hierueber die Codeliste durchprobieren.
+  if (!voucher) return { error: 'errorVoucher.unknown' };
+
+  const geprueft = checkVoucher(voucher, priceCents, {
+    now: new Date(),
+    packageId,
+    alreadyRedeemed: await hasRedeemed(voucher.id, userId),
+  });
+
+  if (!geprueft.ok) return { error: `errorVoucher.${geprueft.reason}` };
+
+  return {
+    voucherId: voucher.id,
+    code: voucher.code,
+    discountCents: geprueft.discountCents,
+    finalCents: geprueft.finalCents,
+    maxRedemptions: voucher.maxRedemptions,
+  };
+}
+
 async function startCheckout(
   userId: string,
   packageId: string,
   vehicleId: string | null,
   description: string,
+  code: string | null,
 ): Promise<ActionResult<CheckoutTarget>> {
   const pkg = await prisma.package.findFirst({
     where: { id: packageId, active: true },
@@ -49,19 +98,76 @@ async function startCheckout(
   if (!pkg) return fail('Kjo pako nuk u gjet');
   if (pkg.priceCents <= 0) return fail('Kjo pako nuk kërkon pagesë');
 
-  const payment = await prisma.payment.create({
-    data: {
-      userId,
-      packageId: pkg.id,
-      vehicleId,
-      amountCents: pkg.priceCents,
-      currency: 'EUR',
-      status: 'PENDING',
-      description,
-      provider: getPaymentProvider().name,
-    },
-    select: { id: true },
+  // Der Gutschein wird geprueft, bevor irgendetwas entsteht. Der Rabatt kommt
+  // dabei aus der Datenbank und nie aus dem Formular -- sonst bestimmte der
+  // Browser den Preis.
+  const rabatt = await pruefeGutschein(code, userId, pkg.id, pkg.priceCents);
+  if (rabatt && 'error' in rabatt) return fail(rabatt.error);
+
+  const betrag = rabatt ? rabatt.finalCents : pkg.priceCents;
+  const kostenlos = betrag === 0;
+
+  /*
+   * Zahlung und Einloesung entstehen gemeinsam oder gar nicht.
+   *
+   * Ohne diese Klammer bliebe bei einem Fehler entweder ein verbrauchter Code
+   * ohne Zahlung zurueck oder eine Zahlung mit einem Rabatt, den niemand
+   * verbucht hat. Das Hochzaehlen laeuft ueber eine Bedingung auf den bereits
+   * gezaehlten Einloesungen: zwei gleichzeitige Kaeufe koennen den letzten
+   * freien Platz sonst beide bekommen.
+   */
+  const payment = await prisma.$transaction(async (tx) => {
+    const erzeugt = await tx.payment.create({
+      data: {
+        userId,
+        packageId: pkg.id,
+        vehicleId,
+        amountCents: betrag,
+        currency: 'EUR',
+        status: 'PENDING',
+        description,
+        provider: kostenlos ? 'voucher' : getPaymentProvider().name,
+      },
+      select: { id: true },
+    });
+
+    if (rabatt) {
+      const reserviert = await tx.voucherCode.updateMany({
+        where: {
+          id: rabatt.voucherId,
+          active: true,
+          redeemedCount: { lt: rabatt.maxRedemptions },
+        },
+        data: { redeemedCount: { increment: 1 } },
+      });
+
+      if (reserviert.count !== 1) throw new Error('voucher-exhausted');
+
+      await tx.voucherRedemption.create({
+        data: {
+          voucherId: rabatt.voucherId,
+          userId,
+          paymentId: erzeugt.id,
+          amountOffCents: rabatt.discountCents,
+        },
+      });
+    }
+
+    return erzeugt;
   });
+
+  // Nichts zu bezahlen: das Paket wird sofort gewaehrt, ueber denselben Weg
+  // wie nach einer echten Zahlung. Eine Buchung ueber null Euro bleibt dabei
+  // stehen, damit die Gewaehrung nicht an der Buchhaltung vorbeilaeuft.
+  if (kostenlos) {
+    await applyPaymentEvent({
+      paymentId: payment.id,
+      providerPaymentId: `voucher:${rabatt?.code ?? ''}`,
+      status: 'SUCCEEDED',
+    });
+
+    return ok({ kind: 'granted', paymentId: payment.id });
+  }
 
   // Die Rueckkehradressen entstehen hier, weil nur der Server die eigene
   // Domäne kennt und die Pfade je Sprache verschieden heissen.
@@ -71,7 +177,7 @@ async function startCheckout(
 
   const session = await getPaymentProvider().createCheckout({
     paymentId: payment.id,
-    amountCents: pkg.priceCents,
+    amountCents: betrag,
     currency: 'EUR',
     description,
     successUrl: absolute('/dashboard/billing'),
@@ -94,6 +200,7 @@ async function startCheckout(
 /** Bucht ein Paket fuer das eigene Konto. */
 export async function startPackageCheckoutAction(
   packageId: string,
+  code: string | null = null,
 ): Promise<ActionResult<CheckoutTarget>> {
   const user = await requireUser();
 
@@ -102,13 +209,14 @@ export async function startPackageCheckoutAction(
     select: { nameSq: true },
   });
 
-  return startCheckout(user.id, packageId, null, `Pako: ${pkg?.nameSq ?? packageId}`);
+  return startCheckout(user.id, packageId, null, `Pako: ${pkg?.nameSq ?? packageId}`, code);
 }
 
 /** Bucht eine Hervorhebung fuer ein eigenes Inserat. */
 export async function startFeatureCheckoutAction(
   vehicleId: string,
   packageId: string,
+  code: string | null = null,
 ): Promise<ActionResult<CheckoutTarget>> {
   const user = await requireUser();
 
@@ -130,7 +238,7 @@ export async function startFeatureCheckoutAction(
   });
   if (!pkg || pkg.featuredDays <= 0) return fail('Kjo pako nuk ofron theksim');
 
-  return startCheckout(user.id, packageId, vehicle.id, `Theksim: ${vehicle.title}`);
+  return startCheckout(user.id, packageId, vehicle.id, `Theksim: ${vehicle.title}`, code);
 }
 
 /**

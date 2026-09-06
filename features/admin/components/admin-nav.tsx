@@ -2,7 +2,7 @@
 
 import {
   BadgeCheck, Bug, Car, CreditCard, Flag, LayoutDashboard, Package, Settings, Store,
-  Tags, Users,
+  Tags, TicketPercent, Users,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -20,6 +20,7 @@ const ITEMS = [
   { href: '/admin/brands', key: 'brands', icon: Tags },
   { href: '/admin/packages', key: 'packages', icon: Package },
   { href: '/admin/payments', key: 'payments', icon: CreditCard },
+  { href: '/admin/vouchers', key: 'vouchers', icon: TicketPercent },
   { href: '/admin/settings', key: 'settings', icon: Settings },
 ] as const;
 

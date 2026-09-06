@@ -305,6 +305,9 @@ model User {
   verificationRequests VerificationRequest[] @relation("VerificationSubject")
   verificationsHandled VerificationRequest[] @relation("VerificationReviewer")
 
+  vouchersCreated   VoucherCode[]       @relation("VoucherCreator")
+  voucherRedemptions VoucherRedemption[]
+
   reportsFiled    Report[] @relation("ReportReporter")
   reportsHandled  Report[] @relation("ReportHandler")
   vehiclesModerated Vehicle[] @relation("VehicleModerator")
@@ -1118,6 +1121,79 @@ model VerificationDocument {
   @@index([requestId])
 }
 
+enum VoucherKind {
+  /// Anteil vom Preis, 1 bis 100. 100 heisst kostenlos.
+  PERCENT
+  /// Fester Betrag in Cent. Nie mehr als der Preis.
+  AMOUNT
+}
+
+/// Ein Gutscheincode.
+///
+/// Die Rechnung selbst steht als reine Funktion in features/vouchers/discount.ts
+/// und wird dort geprueft. Hier liegen nur die Bedingungen.
+model VoucherCode {
+  id String @id @default(cuid())
+
+  /// Immer in Grossbuchstaben. Der Vergleich laeuft ueber diesen Wert, damit
+  /// "leviz10" und "LEVIZ10" derselbe Code sind.
+  code String @unique
+
+  /// Wofuer der Code gedacht war. Nur fuer die Verwaltung sichtbar.
+  label String?
+
+  kind VoucherKind
+
+  /// Bei PERCENT gesetzt, sonst leer.
+  percentOff Int?
+  /// Bei AMOUNT gesetzt, sonst leer. In Cent.
+  amountOffCents Int?
+
+  /// Leer heisst: gilt fuer jedes Paket.
+  packageId String?
+
+  /// Wie oft der Code insgesamt eingeloest werden darf.
+  maxRedemptions Int @default(1)
+  redeemedCount  Int @default(0)
+
+  validFrom  DateTime  @default(now())
+  validUntil DateTime?
+  active     Boolean   @default(true)
+
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  package     Package?            @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  createdBy   User?               @relation(name: "VoucherCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  redemptions VoucherRedemption[]
+
+  @@index([active, validUntil])
+  @@index([createdAt])
+}
+
+/// Eine Einloesung. Haelt fest, wer wann wie viel gespart hat.
+model VoucherRedemption {
+  id        String @id @default(cuid())
+  voucherId String
+  userId    String
+
+  /// Bei einem vollstaendigen Rabatt entsteht trotzdem eine Zahlung ueber
+  /// null Euro -- sonst liefe die Gewaehrung an der Buchhaltung vorbei.
+  paymentId String? @unique
+
+  amountOffCents Int
+  redeemedAt     DateTime @default(now())
+
+  voucher VoucherCode @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment Payment?    @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  /// Ein Code, ein Konto: sonst loest derselbe Nutzer ihn beliebig oft ein.
+  @@unique([voucherId, userId])
+  @@index([voucherId])
+}
+
 model BugReport {
   id String @id @default(cuid())
 
@@ -1191,6 +1267,7 @@ model Package {
 
   subscriptions Subscription[]
   payments      Payment[]
+  vouchers      VoucherCode[]
 
   @@index([active, sortOrder])
 }
@@ -1246,6 +1323,8 @@ model Payment {
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   package Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
   vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  voucherRedemption VoucherRedemption?
 
   @@index([userId, createdAt])
   @@index([status, createdAt])

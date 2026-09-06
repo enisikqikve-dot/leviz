@@ -32,6 +32,31 @@ function periodDays(interval: 'ONE_TIME' | 'MONTHLY' | 'YEARLY'): number {
   }
 }
 
+/**
+ * Gibt einen fuer eine gescheiterte Zahlung reservierten Gutschein wieder frei.
+ *
+ * Reserviert wird beim Start der Zahlung, sonst koennten zwei Kaeufer
+ * denselben letzten freien Platz bekommen. Bleibt die Zahlung dann aus, waere
+ * der Code ohne die Freigabe verbraucht -- der Kunde haette nichts bekommen
+ * und koennte es kein zweites Mal versuchen.
+ */
+async function gutscheinFreigeben(paymentId: string): Promise<void> {
+  const einloesung = await prisma.voucherRedemption.findUnique({
+    where: { paymentId },
+    select: { id: true, voucherId: true },
+  });
+
+  if (!einloesung) return;
+
+  await prisma.$transaction([
+    prisma.voucherRedemption.delete({ where: { id: einloesung.id } }),
+    prisma.voucherCode.update({
+      where: { id: einloesung.voucherId },
+      data: { redeemedCount: { decrement: 1 } },
+    }),
+  ]);
+}
+
 export async function applyPaymentEvent(event: PaymentEvent): Promise<FulfilmentResult> {
   const payment = await prisma.payment.findUnique({
     where: { id: event.paymentId },
@@ -66,6 +91,9 @@ export async function applyPaymentEvent(event: PaymentEvent): Promise<Fulfilment
         providerPaymentId: event.providerPaymentId,
       },
     });
+
+    await gutscheinFreigeben(payment.id);
+
     return { applied: true, kind: 'failure' };
   }
 

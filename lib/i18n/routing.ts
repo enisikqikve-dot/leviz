@@ -130,6 +130,7 @@ export const pathnames = {
   '/admin/categories': '/admin/categories',
   '/admin/packages': '/admin/packages',
   '/admin/payments': '/admin/payments',
+  '/admin/vouchers': '/admin/vouchers',
   '/admin/settings': '/admin/settings',
 } as const;
 

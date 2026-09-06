@@ -143,7 +143,13 @@ export default async function PricingPage({ params }: PageProps) {
                           {isCurrent ? t('currentPackage') : t('free')}
                         </Button>
                       ) : user ? (
-                        <BuyButton label={t('choose')} packageId={pkg.id} />
+                        <BuyButton
+                          label={t('choose')}
+                          packageId={pkg.id}
+                          locale={locale as Locale}
+                          currency={currency}
+                          eurToAll={eurToAll}
+                        />
                       ) : (
                         <Button asChild variant="outline" className="w-full">
                           <Link href="/login">{t('loginToBuy')}</Link>
