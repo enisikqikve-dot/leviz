@@ -5,6 +5,7 @@ import { CheckCircle2, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +31,14 @@ export function ForgotPasswordForm() {
     const result = await requestPasswordResetAction(values);
 
     if (!result.ok) {
-      setError('email', { message: result.fieldErrors?.email?.[0] ?? result.error });
+      const schluessel = result.fieldErrors?.email?.[0] ?? result.error;
+      const text = t.has(schluessel) ? t(schluessel) : schluessel;
+
+      // Beides: unter dem Feld und als Hinweis. Wer den Knopf drueckt und
+      // keine Reaktion sieht, haelt die Seite fuer kaputt -- und genau hier
+      // steht jemand, der ohnehin schon nicht mehr in sein Konto kommt.
+      setError('email', { message: text });
+      toast.error(text);
       return;
     }
 

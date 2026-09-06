@@ -45,7 +45,9 @@ export default defineConfig({
     command: `npx next build && npx next start -p ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
-    timeout: 300_000,
+    // Der Bau dauert laenger, seit die Anwendung gewachsen ist. Fuenf Minuten
+    // reichten nicht mehr, und der Abbruch sah aus wie ein Testfehler.
+    timeout: 600_000,
     stdout: 'ignore',
     stderr: 'pipe',
   },

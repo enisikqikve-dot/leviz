@@ -72,7 +72,7 @@ export async function registerAction(
 ): Promise<ActionResult<{ email: string }>> {
   const ip = await getRequestIp();
   if (await limited('register', ip)) {
-    return fail('Zu viele Versuche. Bitte versuche es später erneut.');
+    return fail('errorTooMany');
   }
 
   const parsed = registerSchema.safeParse(input);
@@ -122,12 +122,21 @@ export async function registerAction(
   });
 
   const template = welcomeEmail(locale, name);
-  await sendEmail({
-    to: email,
-    subject: template.subject,
-    text: template.text,
-    replyTo: EMAIL_FROM,
-  });
+
+  // Das Konto steht bereits. Scheitert der Versand -- falsches Postfach,
+  // gesperrter Port --, waere es das Schlechteste, die Registrierung mit
+  // einem Fehler zu beenden: der Nutzer haette ein Konto, wuesste es nicht
+  // und legte ein zweites an. Der Gruss ist die Zugabe, nicht der Zweck.
+  try {
+    await sendEmail({
+      to: email,
+      subject: template.subject,
+      text: template.text,
+      replyTo: EMAIL_FROM,
+    });
+  } catch (fehler) {
+    console.error('  LEVIZ: Willkommensmail nicht zustellbar —', fehler);
+  }
 
   return ok({ email });
 }
@@ -139,7 +148,7 @@ export async function requestPasswordResetAction(
 ): Promise<ActionResult> {
   const ip = await getRequestIp();
   if (await limited('passwordReset', ip)) {
-    return fail('Zu viele Versuche. Bitte versuche es später erneut.');
+    return fail('errorTooMany');
   }
 
   const parsed = forgotPasswordSchema.safeParse(input);
@@ -178,11 +187,29 @@ export async function requestPasswordResetAction(
     `${siteConfig.url}${prefix}${path}?token=${token}`,
   );
 
-  await sendEmail({
-    to: parsed.data.email,
-    subject: template.subject,
-    text: template.text,
-  });
+  /*
+   * Hier ist der Versand der ganze Zweck, also darf ein Fehlschlag nicht
+   * verschwiegen werden -- aber auch nicht unbehandelt durchschlagen.
+   *
+   * Genau das ist passiert: bei halb eingerichtetem Postfach warf der
+   * Anbieter, die Aktion brach ab, und im Formular geschah sichtbar nichts.
+   * Wer dort steht, kommt ohnehin nicht mehr in sein Konto und haelt die
+   * Seite dann fuer kaputt.
+   *
+   * Die Meldung bleibt bewusst allgemein: sie verraet nicht, ob es zu dieser
+   * Adresse ein Konto gibt. Die Ursache steht im Protokoll, wo der Betreiber
+   * sie braucht.
+   */
+  try {
+    await sendEmail({
+      to: parsed.data.email,
+      subject: template.subject,
+      text: template.text,
+    });
+  } catch (fehler) {
+    console.error('  LEVIZ: Zuruecksetz-Mail nicht zustellbar —', fehler);
+    return fail('errorMailUnavailable');
+  }
 
   return ok();
 }
@@ -199,7 +226,7 @@ export async function resetPasswordAction(input: unknown): Promise<ActionResult>
   });
 
   if (!record || record.usedAt || record.expiresAt < new Date()) {
-    return fail('Dieser Link ist ungültig oder abgelaufen');
+    return fail('errorLinkInvalid');
   }
 
   const passwordHash = await hashPassword(parsed.data.password);
@@ -231,7 +258,7 @@ export async function requestPhoneCodeAction(
 ): Promise<ActionResult<{ phone: string }>> {
   const ip = await getRequestIp();
   if (await limited('phoneCode', ip)) {
-    return fail('Zu viele Versuche. Bitte versuche es später erneut.');
+    return fail('errorTooMany');
   }
 
   const parsed = phoneCodeRequestSchema.safeParse(input);

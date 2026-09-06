@@ -125,3 +125,21 @@ test.describe('Missbrauchsschutz', () => {
     await expect(page).toHaveURL(/\/(hyr|login)/);
   });
 });
+
+test.describe('Passwort vergessen', () => {
+  test('der Knopf tut sichtbar etwas', async ({ page }) => {
+    // Wer hier steht, kommt ohnehin nicht mehr in sein Konto. Passiert auf
+    // den Knopf hin nichts Sichtbares, haelt er die Seite fuer kaputt.
+    await page.goto('/harrova-fjalekalimin');
+
+    await page.getByLabel(/^Email$/i).fill('nuk-ekziston@leviz.invalid');
+    await page.getByRole('button', { name: /Dërgo lidhjen/i }).click();
+
+    // Die Bestaetigung ist bewusst neutral: sie verraet nicht, ob es zu
+    // dieser Adresse ein Konto gibt.
+    await expect(page.getByText(/lidhja është dërguar/i).first()).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByRole('button', { name: /Dërgo lidhjen/i })).toHaveCount(0);
+  });
+});

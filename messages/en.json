@@ -204,7 +204,10 @@
     "contactName": "Contact person",
     "submitRegisterDealer": "Create business account",
     "errorCompanyName": "Please enter the company name",
-    "errorRegistrationNumber": "Please enter the business number"
+    "errorRegistrationNumber": "Please enter the business number",
+    "errorTooMany": "Too many attempts. Please try again later.",
+    "errorLinkInvalid": "This link is invalid or has expired. Request a new one.",
+    "errorMailUnavailable": "The email could not be sent. Please try again later or contact us."
   },
   "dashboard": {
     "title": "My account",

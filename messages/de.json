@@ -204,7 +204,10 @@
     "contactName": "Ansprechpartner",
     "submitRegisterDealer": "Händlerkonto anlegen",
     "errorCompanyName": "Bitte den Firmennamen eintragen",
-    "errorRegistrationNumber": "Bitte die Betriebsnummer eintragen"
+    "errorRegistrationNumber": "Bitte die Betriebsnummer eintragen",
+    "errorTooMany": "Zu viele Versuche. Bitte versuche es später erneut.",
+    "errorLinkInvalid": "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an.",
+    "errorMailUnavailable": "Die Mail konnte nicht verschickt werden. Versuch es später noch einmal oder schreib uns über die Kontaktseite."
   },
   "dashboard": {
     "title": "Mein Konto",

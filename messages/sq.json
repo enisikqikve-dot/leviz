@@ -204,7 +204,10 @@
     "contactName": "Personi kontaktues",
     "submitRegisterDealer": "Krijo llogari biznesi",
     "errorCompanyName": "Shkruaj emrin e biznesit",
-    "errorRegistrationNumber": "Shkruaj numrin e biznesit"
+    "errorRegistrationNumber": "Shkruaj numrin e biznesit",
+    "errorTooMany": "Shumë përpjekje. Provo përsëri pas pak.",
+    "errorLinkInvalid": "Kjo lidhje nuk vlen ose ka skaduar. Kërko një të re.",
+    "errorMailUnavailable": "Dërgimi i emailit nuk funksionoi. Provo më vonë ose na shkruaj te kontakti."
   },
   "dashboard": {
     "title": "Paneli im",

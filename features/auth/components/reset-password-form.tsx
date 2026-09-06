@@ -33,7 +33,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     if (!result.ok) {
       const fieldError = result.fieldErrors?.password?.[0];
       if (fieldError) setError('password', { message: fieldError });
-      else toast.error(result.error);
+      else toast.error(t.has(result.error) ? t(result.error) : result.error);
       return;
     }
 
