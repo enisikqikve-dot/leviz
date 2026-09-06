@@ -72,6 +72,12 @@ services:
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET fehlt in .env}
       AUTH_TRUST_HOST: 'true'
+      # Ohne diese Angabe leitet Auth.js die Adresse selbst her und landet
+      # hinter dem Webserver bei der Bindeadresse des Containers: nach dem
+      # Abmelden fuehrte die Weiterleitung auf 0.0.0.0:3000 statt auf die
+      # Domaene. Dieselbe Adresse wie NEXT_PUBLIC_SITE_URL, damit beide nicht
+      # auseinanderlaufen koennen.
+      AUTH_URL: ${NEXT_PUBLIC_SITE_URL}
 
       # Auf einem einzelnen Server reicht die Festplatte fuer die Fotos.
       STORAGE_DRIVER: ${STORAGE_DRIVER:-local}

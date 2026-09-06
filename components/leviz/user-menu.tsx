@@ -11,7 +11,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Link } from '@/lib/i18n/navigation';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 
 const LINKS = [
   { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard },
@@ -33,6 +33,7 @@ export function UserMenu({ name, isAdmin }: { name: string; isAdmin: boolean }) 
   const ta = useTranslations('admin');
   const td = useTranslations('dashboard');
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const initials = name
     .split(' ')
@@ -79,7 +80,15 @@ export function UserMenu({ name, isAdmin }: { name: string; isAdmin: boolean }) 
         <DropdownMenuSeparator />
         <DropdownMenuItem
           disabled={isPending}
-          onSelect={() => startTransition(() => void signOut({ redirectTo: '/' }))}
+          onSelect={() =>
+            startTransition(async () => {
+              // Siehe logout-button.tsx: die Weiterleitung macht der Browser,
+              // nicht der Server.
+              await signOut({ redirect: false });
+              router.push('/');
+              router.refresh();
+            })
+          }
           className="cursor-pointer"
         >
           <LogOut className="size-4" aria-hidden />
