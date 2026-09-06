@@ -87,10 +87,24 @@ export async function SiteHeader({ currency }: { currency: Currency }) {
             ))}
           </div>
 
-          <div className="hidden items-center gap-0.5 sm:flex">
-            <CurrencySwitcher current={currency} />
+          {/*
+            Die Sprachwahl steht auf jedem Bildschirm in der Kopfzeile, auch
+            auf dem Telefon. Sie in der Schublade zu verstecken hiesse: wer die
+            Seite in der falschen Sprache aufruft, muss erst ein Menue oeffnen,
+            das er in dieser Sprache nicht lesen kann.
+
+            Waehrung und Darstellung bleiben der breiteren Ansicht vorbehalten
+            und stehen auf dem Telefon in der Schublade — sie sind seltener
+            gebraucht und blockieren nicht das Verstaendnis.
+          */}
+          <div className="flex items-center gap-0.5">
+            <div className="hidden sm:flex">
+              <CurrencySwitcher current={currency} />
+            </div>
             <LocaleSwitcher />
-            <ThemeToggle />
+            <div className="hidden sm:flex">
+              <ThemeToggle />
+            </div>
           </div>
 
           <div className="ms-1 hidden items-center gap-2 lg:flex">
