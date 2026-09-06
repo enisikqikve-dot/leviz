@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
-  setDealerVerificationAction, suspendUserAction,
+  setDealerVerificationAction, setUserVerificationAction, suspendUserAction,
   toggleBrandPopularAction, unsuspendUserAction,
 } from '@/features/admin/actions';
 import { useRouter } from '@/lib/i18n/navigation';
@@ -53,6 +53,43 @@ export function DealerVerifyButton({
         <BadgeCheck className="size-4" aria-hidden />
       )}
       {verified ? t('revoke') : t('verify')}
+    </Button>
+  );
+}
+
+/**
+ * Erkennt eine Person mit einem Klick als geprüft an.
+ *
+ * Steht neben dem Weg über eingereichte Papiere, nicht an seiner Stelle: für
+ * jemanden, dessen Unterlagen längst auf dem Tisch lagen, wäre es sinnlos,
+ * ihn um einen Upload zu bitten.
+ */
+export function UserVerifyButton({
+  userId,
+  verified,
+}: {
+  userId: string;
+  verified: boolean;
+}) {
+  const t = useTranslations('admin.users');
+  const { run, isPending } = useRunner();
+
+  return (
+    <Button
+      variant={verified ? 'outline' : 'default'}
+      className="h-9"
+      disabled={isPending}
+      title={verified ? t('revokeVerification') : t('verifyNow')}
+      onClick={() => run(() => setUserVerificationAction(userId, !verified))}
+    >
+      {isPending ? (
+        <Loader2 className="size-4 animate-spin" aria-hidden />
+      ) : verified ? (
+        <ShieldOff className="size-4" aria-hidden />
+      ) : (
+        <BadgeCheck className="size-4" aria-hidden />
+      )}
+      {verified ? t('revokeVerification') : t('verifyNow')}
     </Button>
   );
 }

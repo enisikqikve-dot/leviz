@@ -92,7 +92,7 @@ export function listUsersForAdmin(query?: string, take = 100) {
     take,
     select: {
       id: true, name: true, email: true, phone: true, role: true, status: true,
-      createdAt: true, suspendedReason: true,
+      createdAt: true, suspendedReason: true, verification: true,
       _count: { select: { vehicles: true } },
     },
   });
@@ -133,6 +133,8 @@ export async function getUserForAdmin(id: string) {
       status: true,
       locale: true,
       trustScore: true,
+      verification: true,
+      verifiedAt: true,
       createdAt: true,
       lastSeenAt: true,
       suspendedAt: true,

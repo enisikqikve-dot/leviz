@@ -838,7 +838,10 @@
       "suspendReason": "Arsyeja e pezullimit",
       "confirmSuspend": "Ta pezullojmë këtë përdorues?",
       "cannotSuspendSelf": "Nuk mund të pezulloni veten",
-      "cannotSuspendAdmin": "Administratorët nuk mund të pezullohen"
+      "cannotSuspendAdmin": "Administratorët nuk mund të pezullohen",
+      "verifyNow": "Njih si i verifikuar",
+      "revokeVerification": "Hiq verifikimin",
+      "verified": "I verifikuar"
     },
     "vehicles": {
       "title": "Veturat",
@@ -1015,7 +1018,9 @@
         "ACTIVE": "Aktive",
         "SUSPENDED": "E pezulluar",
         "DELETED": "E fshirë"
-      }
+      },
+      "verification": "Verifikimi",
+      "verifiedManually": "I verifikuar"
     },
     "verifications": {
       "title": "Verifikimet",

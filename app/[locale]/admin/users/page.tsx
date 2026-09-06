@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
+import { BadgeCheck } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
-import { UserSuspendButton } from '@/features/admin/components/row-actions';
+import { UserSuspendButton, UserVerifyButton } from '@/features/admin/components/row-actions';
 import { Link } from '@/lib/i18n/navigation';
 import { listUsersForAdmin } from '@/features/admin/queries';
 import { formatPhone } from '@/features/auth/phone';
@@ -77,6 +78,15 @@ export default async function AdminUsersPage({
                   >
                     {td(`roles.${user.role}`)}
                   </span>
+                  {user.verification === 'VERIFIED' ? (
+                    <span
+                      title={t('verified')}
+                      className="text-primary inline-flex items-center gap-1 text-xs font-medium"
+                    >
+                      <BadgeCheck className="size-4" aria-hidden />
+                      {t('verified')}
+                    </span>
+                  ) : null}
                   {user.status === 'SUSPENDED' ? (
                     <span className="bg-destructive/10 text-destructive rounded-md px-2 py-0.5 text-xs font-medium">
                       {t('suspend')}
@@ -95,11 +105,17 @@ export default async function AdminUsersPage({
                 </p>
               </div>
 
-              <UserSuspendButton
-                userId={user.id}
-                suspended={user.status === 'SUSPENDED'}
-                disabled={isAdmin || user.id === admin.id}
-              />
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <UserVerifyButton
+                  userId={user.id}
+                  verified={user.verification === 'VERIFIED'}
+                />
+                <UserSuspendButton
+                  userId={user.id}
+                  suspended={user.status === 'SUSPENDED'}
+                  disabled={isAdmin || user.id === admin.id}
+                />
+              </div>
             </li>
           );
         })}

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { ResetPasswordButton } from '@/features/admin/components/reset-password-button';
-import { UserSuspendButton } from '@/features/admin/components/row-actions';
+import { UserSuspendButton, UserVerifyButton } from '@/features/admin/components/row-actions';
 import { getUserForAdmin, listPaymentsForUser } from '@/features/admin/queries';
 import { formatPhone } from '@/features/auth/phone';
 import { isFeaturePayment, paymentSubject } from '@/features/packages/label';
@@ -65,6 +65,12 @@ export default async function AdminUserPage({
     [t('joined'), date(user.createdAt)],
     [t('lastSeen'), date(user.lastSeenAt)],
     [t('trust'), String(user.trustScore)],
+    [
+      t('verification'),
+      user.verification === 'VERIFIED'
+        ? `${t('verifiedManually')} · ${date(user.verifiedAt)}`
+        : '—',
+    ],
   ];
 
   const counts: [string, number][] = [
@@ -119,6 +125,7 @@ export default async function AdminUserPage({
       </dl>
 
       <div className="mt-4 flex flex-wrap gap-2">
+        <UserVerifyButton userId={user.id} verified={user.verification === 'VERIFIED'} />
         <ResetPasswordButton userId={user.id} hasEmail={Boolean(user.email)} />
         <UserSuspendButton
           userId={user.id}

@@ -139,6 +139,101 @@ export async function resolveReportAction(input: unknown): Promise<ActionResult>
   return ok();
 }
 
+/**
+ * Erkennt eine Person mit einem Klick als geprüft an — oder nimmt es zurück.
+ *
+ * Der Weg über eingereichte Papiere bleibt der Regelfall. Dieser hier ist für
+ * die Fälle daneben: jemand, den man persönlich kennt, ein Händler, dessen
+ * Papiere im Büro auf dem Tisch lagen, ein Antrag, der in der Prüfung stecken
+ * blieb. Ohne ihn müsste der Verwalter jemanden bitten, Unterlagen
+ * hochzuladen, die er längst gesehen hat.
+ *
+ * Festgehalten wird es trotzdem: es entsteht ein Eintrag in der Prüfliste mit
+ * dem Vermerk, dass die Verwaltung selbst entschieden hat, und mit dem Namen
+ * dessen, der geklickt hat. Eine Anerkennung ohne Spur wäre in einem
+ * Marktplatz das Gegenteil von Vertrauen.
+ */
+export async function setUserVerificationAction(
+  userId: string,
+  verified: boolean,
+): Promise<ActionResult> {
+  const admin = await requireAdmin();
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      verification: true,
+      dealer: { select: { id: true, companyName: true } },
+    },
+  });
+  if (!user) return fail('Ky përdorues nuk u gjet');
+
+  const jetzt = new Date();
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: user.id },
+      data: {
+        verification: verified ? 'VERIFIED' : 'UNVERIFIED',
+        verifiedAt: verified ? jetzt : null,
+      },
+    }),
+
+    // Ein Händlerkonto traegt das Abzeichen an der Firma, nicht an der Person.
+    // Beides auseinanderlaufen zu lassen hiesse, dass ein geprüfter Inhaber
+    // ein ungeprüftes Autohaus fuehrt.
+    ...(user.dealer
+      ? [
+          prisma.dealer.update({
+            where: { id: user.dealer.id },
+            data: {
+              verification: verified ? 'VERIFIED' : 'UNVERIFIED',
+              verifiedAt: verified ? jetzt : null,
+            },
+          }),
+        ]
+      : []),
+
+    ...(verified
+      ? [
+          prisma.verificationRequest.create({
+            data: {
+              userId: user.id,
+              kind: user.dealer ? 'DEALER' : 'PERSON',
+              status: 'VERIFIED',
+              // Es liegen keine eingereichten Angaben vor -- das steht hier
+              // ausdruecklich, statt erfundene Felder zu fuellen.
+              legalName: user.name ?? user.email ?? '—',
+              addressLine: '—',
+              city: '—',
+              companyName: user.dealer?.companyName ?? null,
+              note: `Njohur manualisht nga ${admin.name ?? admin.email ?? 'administrata'}`,
+              reviewedById: admin.id,
+              reviewedAt: jetzt,
+              // Es gab nie Belege, also gibt es auch nichts zu loeschen.
+              documentsPurgedAt: jetzt,
+            },
+          }),
+          prisma.notification.create({
+            data: {
+              userId: user.id,
+              type: 'IDENTITY_VERIFIED',
+              title: 'Identiteti u verifikua',
+              body: user.dealer?.companyName ?? null,
+            },
+          }),
+        ]
+      : []),
+  ]);
+
+  revalidatePath('/admin/users');
+  revalidatePath('/admin/verifications');
+  return ok();
+}
+
 /** Setzt die Verifizierung eines Händlers. */
 export async function setDealerVerificationAction(
   dealerId: string,

@@ -838,7 +838,10 @@
       "suspendReason": "Reason for suspension",
       "confirmSuspend": "Suspend this user?",
       "cannotSuspendSelf": "You cannot suspend yourself",
-      "cannotSuspendAdmin": "Administrators cannot be suspended"
+      "cannotSuspendAdmin": "Administrators cannot be suspended",
+      "verifyNow": "Mark as verified",
+      "revokeVerification": "Remove verification",
+      "verified": "Verified"
     },
     "vehicles": {
       "title": "Vehicles",
@@ -1015,7 +1018,9 @@
         "ACTIVE": "Active",
         "SUSPENDED": "Suspended",
         "DELETED": "Deleted"
-      }
+      },
+      "verification": "Verification",
+      "verifiedManually": "Verified"
     },
     "verifications": {
       "title": "Verifications",

@@ -838,7 +838,10 @@
       "suspendReason": "Grund der Sperre",
       "confirmSuspend": "Diesen Nutzer sperren?",
       "cannotSuspendSelf": "Du kannst dich nicht selbst sperren",
-      "cannotSuspendAdmin": "Administratoren können nicht gesperrt werden"
+      "cannotSuspendAdmin": "Administratoren können nicht gesperrt werden",
+      "verifyNow": "Als geprüft anerkennen",
+      "revokeVerification": "Anerkennung zurücknehmen",
+      "verified": "Geprüft"
     },
     "vehicles": {
       "title": "Fahrzeuge",
@@ -1015,7 +1018,9 @@
         "ACTIVE": "Aktiv",
         "SUSPENDED": "Gesperrt",
         "DELETED": "Gelöscht"
-      }
+      },
+      "verification": "Prüfung",
+      "verifiedManually": "Geprüft"
     },
     "verifications": {
       "title": "Prüfungen",

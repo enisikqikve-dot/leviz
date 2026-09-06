@@ -141,4 +141,36 @@ test.describe('Ausweisprüfung', () => {
     // Und er kann es erneut versuchen.
     await expect(page.getByRole('button', { name: /Dërgo për verifikim/i })).toBeVisible();
   });
+  test('der Verwalter erkennt jemanden mit einem Klick an', async ({ page, context }) => {
+    test.setTimeout(120_000);
+
+    const kennung = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const email = `handverifiziert-${kennung}@leviz.invalid`;
+
+    // Ein frisches Konto, damit der Test wiederholbar bleibt.
+    await page.goto('/regjistrohu');
+    await page.getByLabel(/Emri dhe mbiemri/i).fill(`Hand ${kennung}`);
+    await page.getByLabel(/^Email$/i).fill(email);
+    await page.getByLabel(/^Fjalëkalimi$/i).fill(DEMO_PASSWORD);
+    await page.getByLabel(/Përsërit fjalëkalimin/i).fill(DEMO_PASSWORD);
+    await page.getByRole('checkbox').check();
+    await page.getByRole('button', { name: /^Krijo llogari$/i }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/Përshëndetje/i, {
+      timeout: 30_000,
+    });
+
+    await context.clearCookies();
+    await login(page, ACCOUNTS.admin);
+
+    // Ueber die Suche, damit genau eine Zeile uebrig bleibt.
+    await page.goto(`/admin/users?q=${encodeURIComponent(email)}`);
+
+    const knopf = page.getByRole('button', { name: /Njih si i verifikuar/i });
+    await expect(knopf).toBeVisible({ timeout: 20_000 });
+    await knopf.click();
+
+    // Danach traegt die Zeile das Abzeichen, und der Knopf nimmt es zurueck.
+    await expect(page.getByText(/I verifikuar/i).first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole('button', { name: /Hiq verifikimin/i })).toBeVisible();
+  });
 });
