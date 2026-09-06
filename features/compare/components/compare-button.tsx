@@ -15,11 +15,17 @@ export function CompareButton({
   initialSelected,
   className,
   withLabel = false,
+  tone = 'overlay',
 }: {
   vehicleId: string;
   initialSelected: boolean;
   className?: string;
   withLabel?: boolean;
+  /**
+   * `overlay` liegt auf dem Foto der Trefferkarte und braucht deshalb einen
+   * eigenen Untergrund. `plain` steht auf einer Flaeche und fuegt sich ein.
+   */
+  tone?: 'overlay' | 'plain';
 }) {
   const t = useTranslations('compare');
   const router = useRouter();
@@ -57,8 +63,10 @@ export function CompareButton({
         withLabel ? 'h-11 border px-4 text-sm font-medium' : 'size-9',
         selected
           ? 'bg-primary text-primary-foreground border-primary'
-          : 'bg-white/90 text-foreground hover:bg-white dark:bg-black/50 dark:text-white dark:hover:bg-black/70',
-        'backdrop-blur-sm disabled:opacity-70',
+          : tone === 'overlay'
+            ? 'bg-white/90 text-foreground backdrop-blur-sm hover:bg-white dark:bg-black/50 dark:text-white dark:hover:bg-black/70'
+            : 'bg-card text-foreground hover:bg-muted',
+        'disabled:opacity-70',
         className,
       )}
     >

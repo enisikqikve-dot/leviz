@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { CompareButton } from '@/features/compare/components/compare-button';
+import { getCompareIds } from '@/features/compare/server';
 import { FavoriteButton } from '@/features/favorites/components/favorite-button';
 import { getFavoriteIds } from '@/features/favorites/queries';
 import { ReportDialog } from '@/features/reports/components/report-dialog';
@@ -106,7 +108,10 @@ export default async function VehiclePage({ params }: PageProps) {
     }),
   ]);
 
-  const favorites = await getFavoriteIds([vehicle.id]);
+  const [favorites, compareIds] = await Promise.all([
+    getFavoriteIds([vehicle.id]),
+    getCompareIds(),
+  ]);
 
   // Der Zähler darf den Seitenaufbau nicht aufhalten.
   void recordView({ vehicleId: vehicle.id, userId: viewer?.id });
@@ -169,10 +174,21 @@ export default async function VehiclePage({ params }: PageProps) {
           <aside className="mt-8 lg:sticky lg:top-20 lg:mt-0">
             <SellerCard vehicle={vehicle} locale={locale as Locale} viewer={viewer} />
 
+            {/* Vergleichen gehoert hierher, nicht nur auf die Trefferkarte.
+                Wer ein Fahrzeug offen hat, entscheidet genau an dieser Stelle,
+                ob er es neben ein anderes stellen will — vorher fuehrte der
+                einzige Weg dorthin ueber die Trefferliste zurueck. */}
             <div className="mt-3 flex gap-2">
               <div className="flex-1">
                 <ShareButton title={vehicle.title} />
               </div>
+              <CompareButton
+                vehicleId={vehicle.id}
+                initialSelected={compareIds.includes(vehicle.id)}
+                tone="plain"
+                withLabel
+                className="border"
+              />
               <FavoriteButton
                 vehicleId={vehicle.id}
                 initialFavorited={favorites.has(vehicle.id)}

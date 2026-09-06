@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Toaster } from 'sonner';
 
+import { ReportBugButton } from '@/components/leviz/report-bug-button';
 import { SiteFooter } from '@/components/leviz/site-footer';
 import { SiteHeader } from '@/components/leviz/site-header';
 import { ThemeProvider } from '@/components/leviz/theme-provider';
@@ -98,6 +99,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               </main>
               <SiteFooter />
             </div>
+            <ReportBugButton />
             <Toaster position="top-center" richColors closeButton />
           </NextIntlClientProvider>
         </ThemeProvider>
