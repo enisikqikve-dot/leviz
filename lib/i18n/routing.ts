@@ -114,6 +114,7 @@ export const pathnames = {
   // Der Admin-Bereich ist intern und bleibt in allen Sprachen englisch.
   '/admin': '/admin',
   '/admin/users': '/admin/users',
+  '/admin/users/[id]': '/admin/users/[id]',
   '/admin/vehicles': '/admin/vehicles',
   '/admin/dealers': '/admin/dealers',
   '/admin/reports': '/admin/reports',

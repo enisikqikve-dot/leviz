@@ -110,3 +110,76 @@ export async function listBrandsForAdmin() {
 
   return brands;
 }
+
+/**
+ * Ein einzelnes Konto mit allem, was zur Beurteilung gehoert.
+ *
+ * Bewusst ohne `passwordHash`: er hat auf keiner Seite etwas zu suchen. Aus
+ * ihm laesst sich zwar kein Passwort zurueckrechnen, aber eine Zeichenkette,
+ * die auf einer Verwaltungsseite steht, landet frueher oder spaeter in einem
+ * Bildschirmfoto oder einem Fehlerbericht.
+ */
+export async function getUserForAdmin(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      emailVerified: true,
+      phone: true,
+      phoneVerified: true,
+      role: true,
+      status: true,
+      locale: true,
+      trustScore: true,
+      createdAt: true,
+      lastSeenAt: true,
+      suspendedAt: true,
+      suspendedReason: true,
+
+      profile: {
+        select: {
+          notifyByEmail: true,
+          notifyBySms: true,
+          city: { select: { name: true, country: { select: { code: true } } } },
+        },
+      },
+
+      dealer: { select: { id: true, slug: true, companyName: true, verifiedAt: true } },
+
+      _count: {
+        select: {
+          vehicles: true,
+          favorites: true,
+          savedSearches: true,
+          sentMessages: true,
+          reportsFiled: true,
+        },
+      },
+
+      vehicles: {
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: {
+          id: true, slug: true, title: true, status: true,
+          priceCents: true, createdAt: true,
+        },
+      },
+    },
+  });
+}
+
+/** Zahlungen eines Kontos, neueste zuerst. */
+export function listPaymentsForUser(userId: string, take = 10) {
+  return prisma.payment.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    take,
+    select: {
+      id: true, amountCents: true, status: true, createdAt: true,
+      package: { select: { nameSq: true, nameDe: true, nameEn: true } },
+      vehicle: { select: { title: true } },
+    },
+  });
+}

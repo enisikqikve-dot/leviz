@@ -971,6 +971,35 @@
         "RESOLVED": "Shëno si të rregulluar",
         "DISMISSED": "Mbyll"
       }
+    },
+    "userDetail": {
+      "back": "Kthehu te përdoruesit",
+      "email": "Email",
+      "phone": "Telefoni",
+      "city": "Qyteti",
+      "language": "Gjuha",
+      "joined": "Regjistruar",
+      "lastSeen": "Parë së fundi",
+      "trust": "Pikët e besimit",
+      "listings": "Shpallje",
+      "favorites": "Të preferuara",
+      "savedSearches": "Kërkime",
+      "messages": "Mesazhe",
+      "reportsFiled": "Raportime",
+      "dealer": "Autosalloni",
+      "verified": "I verifikuar",
+      "notVerified": "I paverifikuar",
+      "recentListings": "Shpalljet e fundit",
+      "payments": "Pagesat",
+      "sendReset": "Dërgo lidhjen për fjalëkalim",
+      "resetSent": "Lidhja u dërgua",
+      "noEmail": "Kjo llogari nuk ka email — lidhja nuk mund të dërgohet.",
+      "passwordNote": "Fjalëkalimi nuk shfaqet askund: në bazën e të dhënave ruhet vetëm një hash Argon2id, që nuk kthehet mbrapsht. Kështu mbeten fjalëkalimet e klientëve të sigurta edhe nëse baza vidhet.",
+      "status": {
+        "ACTIVE": "Aktive",
+        "SUSPENDED": "E pezulluar",
+        "DELETED": "E fshirë"
+      }
     }
   },
   "pricing": {

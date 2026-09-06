@@ -353,3 +353,68 @@ export async function savePackageAction(input: unknown): Promise<ActionResult> {
   revalidatePath('/pricing');
   return ok();
 }
+
+/**
+ * Schickt einem Konto den Link zum Zuruecksetzen des Passworts.
+ *
+ * Das ist die ehrliche Antwort auf "ich komme nicht mehr rein". Das Passwort
+ * selbst kann niemand nachschlagen -- in der Datenbank steht ein Argon2id-Hash,
+ * eine Einbahnstrasse. Und das soll so bleiben: wird die Datenbank je
+ * gestohlen, sind die Passwoerter der Kunden trotzdem sicher.
+ *
+ * Der Verwalter setzt auch kein neues. Sonst kennte er es, koennte sich als
+ * der Nutzer anmelden, und niemand koennte spaeter unterscheiden, wer
+ * gehandelt hat. Der Nutzer waehlt es selbst, ueber einen Link, der eine
+ * Stunde gilt.
+ */
+export async function sendPasswordResetForUserAction(
+  userId: string,
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, locale: true },
+  });
+
+  if (!user) return fail('Ky perdorues nuk u gjet');
+  if (!user.email) return fail('errorNoEmail');
+
+  const { randomBytes, createHash } = await import('node:crypto');
+  const token = randomBytes(32).toString('base64url');
+
+  await prisma.passwordResetToken.create({
+    data: {
+      userId: user.id,
+      tokenHash: createHash('sha256').update(token).digest('hex'),
+      expiresAt: new Date(Date.now() + 60 * 60_000),
+    },
+  });
+
+  const locale = (user.locale as 'sq' | 'de' | 'en') ?? 'sq';
+  const prefix = locale === 'sq' ? '' : `/${locale}`;
+  const path =
+    locale === 'sq'
+      ? '/rivendos-fjalekalimin'
+      : locale === 'de'
+        ? '/passwort-zuruecksetzen'
+        : '/reset-password';
+
+  const { passwordResetEmail } = await import('@/lib/email/templates');
+  const { sendEmail, EMAIL_FROM } = await import('@/lib/email');
+  const { siteConfig } = await import('@/lib/site');
+
+  const template = passwordResetEmail(
+    locale,
+    `${siteConfig.url}${prefix}${path}?token=${token}`,
+  );
+
+  await sendEmail({
+    to: user.email,
+    subject: template.subject,
+    text: template.text,
+    replyTo: EMAIL_FROM,
+  });
+
+  return ok();
+}

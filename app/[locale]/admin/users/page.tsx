@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 import { UserSuspendButton } from '@/features/admin/components/row-actions';
+import { Link } from '@/lib/i18n/navigation';
 import { listUsersForAdmin } from '@/features/admin/queries';
 import { formatPhone } from '@/features/auth/phone';
 import { formatDate } from '@/features/vehicles/format';
@@ -60,7 +61,14 @@ export default async function AdminUsersPage({
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="truncate font-semibold">{user.name ?? '—'}</span>
+                  {/* Der Name fuehrt ins Profil: von der Liste aus laesst sich
+                      ein Konto sonst nur sperren, nicht ansehen. */}
+                  <Link
+                    href={{ pathname: '/admin/users/[id]', params: { id: user.id } }}
+                    className="truncate font-semibold hover:underline"
+                  >
+                    {user.name ?? user.email ?? '—'}
+                  </Link>
                   <span
                     className={cn(
                       'rounded-md px-2 py-0.5 text-xs font-medium',

@@ -971,6 +971,35 @@
         "RESOLVED": "Als behoben markieren",
         "DISMISSED": "Schließen"
       }
+    },
+    "userDetail": {
+      "back": "Zurück zu den Nutzern",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "city": "Stadt",
+      "language": "Sprache",
+      "joined": "Registriert",
+      "lastSeen": "Zuletzt gesehen",
+      "trust": "Vertrauenspunkte",
+      "listings": "Inserate",
+      "favorites": "Merkliste",
+      "savedSearches": "Suchen",
+      "messages": "Nachrichten",
+      "reportsFiled": "Meldungen",
+      "dealer": "Autohaus",
+      "verified": "Geprüft",
+      "notVerified": "Nicht geprüft",
+      "recentListings": "Letzte Inserate",
+      "payments": "Zahlungen",
+      "sendReset": "Link zum Zurücksetzen senden",
+      "resetSent": "Link verschickt",
+      "noEmail": "Dieses Konto hat keine E-Mail — der Link kann nicht verschickt werden.",
+      "passwordNote": "Das Passwort steht nirgends: in der Datenbank liegt nur ein Argon2id-Hash, der sich nicht zurückrechnen lässt. So bleiben die Passwörter deiner Kunden auch dann sicher, wenn die Datenbank gestohlen wird.",
+      "status": {
+        "ACTIVE": "Aktiv",
+        "SUSPENDED": "Gesperrt",
+        "DELETED": "Gelöscht"
+      }
     }
   },
   "pricing": {

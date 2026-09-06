@@ -971,6 +971,35 @@
         "RESOLVED": "Mark as fixed",
         "DISMISSED": "Close"
       }
+    },
+    "userDetail": {
+      "back": "Back to users",
+      "email": "Email",
+      "phone": "Phone",
+      "city": "City",
+      "language": "Language",
+      "joined": "Registered",
+      "lastSeen": "Last seen",
+      "trust": "Trust score",
+      "listings": "Listings",
+      "favorites": "Saved",
+      "savedSearches": "Searches",
+      "messages": "Messages",
+      "reportsFiled": "Reports",
+      "dealer": "Dealership",
+      "verified": "Verified",
+      "notVerified": "Not verified",
+      "recentListings": "Recent listings",
+      "payments": "Payments",
+      "sendReset": "Send password reset link",
+      "resetSent": "Link sent",
+      "noEmail": "This account has no email — the link cannot be sent.",
+      "passwordNote": "The password is shown nowhere: the database holds only an Argon2id hash, which cannot be reversed. That keeps your customers’ passwords safe even if the database is stolen.",
+      "status": {
+        "ACTIVE": "Active",
+        "SUSPENDED": "Suspended",
+        "DELETED": "Deleted"
+      }
     }
   },
   "pricing": {
