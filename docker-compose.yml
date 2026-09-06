@@ -8,6 +8,46 @@
 # Die Werte kommen aus einer Datei .env neben dieser hier. Sie enthaelt
 # Geheimnisse und gehoert nicht ins Repository -- .gitignore schliesst sie aus.
 
+# Die Umgebung der Anwendung, an einer Stelle.
+#
+# Sie gilt fuer zwei Behaelter: die Anwendung selbst und den Wartungsbehaelter
+# "migrate", in dem die Betriebsskripte laufen -- Verwalterkonto anlegen,
+# Belege aufraeumen, Mailversand pruefen.
+#
+# Getrennt gepflegt hat schon einmal in die Irre gefuehrt: der Wartungsbehaelter
+# kannte die Mailwerte nicht, und die Pruefung meldete deshalb "Probemodus",
+# obwohl die Anwendung richtig eingerichtet war. Ein Pruefwerkzeug, das eine
+# andere Umgebung sieht als der Betrieb, prueft nichts.
+x-app-environment: &app-environment
+  DATABASE_URL: postgresql://${POSTGRES_USER:-leviz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-leviz}?schema=public
+  NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+  AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET fehlt in .env}
+  AUTH_TRUST_HOST: 'true'
+  # Ohne diese Angabe leitet Auth.js die Adresse selbst her und landet
+  # hinter dem Webserver bei der Bindeadresse des Containers: nach dem
+  # Abmelden fuehrte die Weiterleitung auf 0.0.0.0:3000 statt auf die
+  # Domaene. Dieselbe Adresse wie NEXT_PUBLIC_SITE_URL, damit beide nicht
+  # auseinanderlaufen koennen.
+  AUTH_URL: ${NEXT_PUBLIC_SITE_URL}
+
+  # Auf einem einzelnen Server reicht die Festplatte fuer die Fotos.
+  STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+
+  EMAIL_DRIVER: ${EMAIL_DRIVER:-console}
+  EMAIL_FROM: ${EMAIL_FROM:-LEVIZ <no-reply@localhost>}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  SMS_DRIVER: ${SMS_DRIVER:-console}
+  AI_DRIVER: ${AI_DRIVER:-local}
+
+  PAYMENTS_DRIVER: ${PAYMENTS_DRIVER:-mock}
+  PAYTEN_GATEWAY_URL: ${PAYTEN_GATEWAY_URL:-}
+  PAYTEN_CLIENT_ID: ${PAYTEN_CLIENT_ID:-}
+  PAYTEN_STORE_KEY: ${PAYTEN_STORE_KEY:-}
+  PAYTEN_STORE_TYPE: ${PAYTEN_STORE_TYPE:-}
+
 services:
   db:
     image: postgres:18-alpine
@@ -52,7 +92,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-leviz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-leviz}?schema=public
+      <<: *app-environment
 
   app:
     build:
@@ -68,34 +108,8 @@ services:
       migrate:
         condition: service_completed_successfully
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-leviz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-leviz}?schema=public
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
-      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET fehlt in .env}
-      AUTH_TRUST_HOST: 'true'
-      # Ohne diese Angabe leitet Auth.js die Adresse selbst her und landet
-      # hinter dem Webserver bei der Bindeadresse des Containers: nach dem
-      # Abmelden fuehrte die Weiterleitung auf 0.0.0.0:3000 statt auf die
-      # Domaene. Dieselbe Adresse wie NEXT_PUBLIC_SITE_URL, damit beide nicht
-      # auseinanderlaufen koennen.
-      AUTH_URL: ${NEXT_PUBLIC_SITE_URL}
+      <<: *app-environment
 
-      # Auf einem einzelnen Server reicht die Festplatte fuer die Fotos.
-      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
-
-      EMAIL_DRIVER: ${EMAIL_DRIVER:-console}
-      EMAIL_FROM: ${EMAIL_FROM:-LEVIZ <no-reply@localhost>}
-      SMTP_HOST: ${SMTP_HOST:-}
-      SMTP_PORT: ${SMTP_PORT:-}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMS_DRIVER: ${SMS_DRIVER:-console}
-      AI_DRIVER: ${AI_DRIVER:-local}
-
-      PAYMENTS_DRIVER: ${PAYMENTS_DRIVER:-mock}
-      PAYTEN_GATEWAY_URL: ${PAYTEN_GATEWAY_URL:-}
-      PAYTEN_CLIENT_ID: ${PAYTEN_CLIENT_ID:-}
-      PAYTEN_STORE_KEY: ${PAYTEN_STORE_KEY:-}
-      PAYTEN_STORE_TYPE: ${PAYTEN_STORE_TYPE:-}
     volumes:
       # Ohne diesen Speicher waeren die Fotos der Verkaeufer nach jedem
       # Neustart des Behaelters verschwunden.
