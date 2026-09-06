@@ -147,6 +147,40 @@
     @apply border-border;
   }
 
+  /*
+   * Der Platz der Bildlaufleiste bleibt immer reserviert.
+   *
+   * Ohne das springt die ganze Seite, sobald irgendein Menue aufgeht: die
+   * Bibliothek hinter den Auswahlfeldern sperrt dafuer das Scrollen, die
+   * Bildlaufleiste verschwindet, und das Fenster wird schlagartig 15 Pixel
+   * breiter. Alles, was fest in einer Ecke sitzt, rutscht mit.
+   *
+   * Der Wert steht auf beiden Elementen. Steht er nur auf html, geht er
+   * verloren, sobald der Ueberlauf von body auf das Fenster durchschlaegt --
+   * und genau das tut die Sperre.
+   *
+   * Nebenwirkung, die hier erwuenscht ist: auch der Wechsel zwischen einer
+   * langen und einer kurzen Seite verschiebt den Inhalt nicht mehr.
+   */
+  html,
+  body {
+    scrollbar-gutter: stable;
+  }
+
+  /*
+   * Die Sperre gleicht die verschwundene Leiste selbst aus, indem sie dem
+   * body 15 Pixel Rand gibt. Zusammen mit dem reservierten Platz oben waere
+   * das doppelt gemoppelt -- der Inhalt wuerde stattdessen schmaler. Der
+   * Ausgleich wird deshalb zurueckgenommen.
+   *
+   * Zwei Elemente im Selektor, weil die Bibliothek ihre Regel zur Laufzeit
+   * mit !important einfuegt: gleiche Gewichtung wuerde nach Reihenfolge
+   * entschieden, und die Reihenfolge gehoert uns nicht.
+   */
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }
