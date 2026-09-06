@@ -23,6 +23,17 @@ export function getEmailProvider(): EmailProvider {
   const driver = process.env.EMAIL_DRIVER ?? 'console';
 
   if (driver === 'console') {
+    // Im Betrieb ist das fast immer ein Versehen: die Anwendung laeuft
+    // scheinbar normal, aber kein Kunde bekommt je eine Mail. Der Hinweis
+    // steht im Protokoll, wo beim Suchen ohnehin zuerst jemand hinschaut.
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(
+        '  LEVIZ: EMAIL_DRIVER=console — es wird nichts verschickt. ' +
+          'Zuruecksetzen des Passworts erreicht niemanden. ' +
+          'Pruefen mit: npx tsx scripts/email-test.ts deine@adresse.tld',
+      );
+    }
+
     provider = new ConsoleEmailProvider();
     return provider;
   }

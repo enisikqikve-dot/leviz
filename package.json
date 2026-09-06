@@ -21,6 +21,7 @@
     "db:reset": "prisma migrate reset --force",
     "db:init": "node scripts/db-init.mjs",
     "admin:create": "tsx scripts/create-admin.ts",
+    "email:test": "tsx scripts/email-test.ts",
     "db:start": "node scripts/db-server.mjs start",
     "db:stop": "node scripts/db-server.mjs stop",
     "db:status": "node scripts/db-server.mjs status",

@@ -285,6 +285,24 @@ einer Meldung abbrechen, die den fehlenden Namen nennt. Der bequeme Weg wäre,
 still auf das Terminal zurückzufallen — dann liefe der Betrieb scheinbar
 normal, und niemand bekäme je eine Mail.
 
+Steht der Weg auf `console`, schreibt die Anwendung im Betrieb eine Warnung
+ins Protokoll. Das ist dort fast immer ein Versehen, und von aussen sieht man
+es nicht: die Seite antwortet mit Absicht immer gleich, egal ob es die Adresse
+gibt — sonst liesse sich darüber herausfinden, wer registriert ist.
+
+### Nachsehen, ob der Versand wirklich läuft
+
+```bash
+cd ~/leviz && docker compose run --rm migrate npx tsx scripts/email-test.ts deine@adresse.tld
+```
+
+Das Skript nennt den eingerichteten Weg, Server und Postfach, verschickt eine
+Testmail und sagt beim Fehlschlag, woran es lag — falsches Passwort, fehlendes
+Postfach, gesperrter Port. „Die Mail kommt nicht an" hat vier mögliche
+Ursachen, und ohne dieses Skript bleibt nur Raten.
+
+Lokal genügt `npm run email:test -- deine@adresse.tld`.
+
 ---
 
 ## Ausweisprüfung
