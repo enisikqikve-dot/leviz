@@ -6,6 +6,7 @@ import { AuthShell } from '@/features/auth/components/auth-shell';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { authErrorKey } from '@/features/auth/oauth-error';
 import { getSessionUser } from '@/lib/auth/guards';
+import { smsConfigured } from '@/lib/sms';
 import { Link } from '@/lib/i18n/navigation';
 
 export async function generateMetadata({
@@ -61,7 +62,7 @@ export default async function LoginPage({
         </p>
       ) : null}
 
-      <LoginForm githubEnabled={githubEnabled} />
+      <LoginForm githubEnabled={githubEnabled} phoneEnabled={smsConfigured()} />
     </AuthShell>
   );
 }

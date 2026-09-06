@@ -39,17 +39,36 @@ class ConsoleSmsProvider implements SmsProvider {
 
 let provider: SmsProvider | undefined;
 
+/**
+ * Ob Codes tatsaechlich verschickt werden koennen.
+ *
+ * Die Anmeldung per Telefonnummer wird ohne einen echten Anbieter gar nicht
+ * erst angeboten. Ein Reiter, der zu einem Code fuehrt, den niemand bekommt,
+ * ist keine Anmeldemoeglichkeit, sondern eine Sackgasse -- und der Kunde
+ * sucht den Fehler bei sich.
+ */
+export function smsConfigured(): boolean {
+  const driver = process.env.SMS_DRIVER ?? 'console';
+  return driver !== 'console';
+}
+
 export function getSmsProvider(): SmsProvider {
   if (provider) return provider;
 
   const driver = process.env.SMS_DRIVER ?? 'console';
 
-  switch (driver) {
-    case 'console':
-    default:
-      provider = new ConsoleSmsProvider();
-      return provider;
+  if (driver === 'console') {
+    provider = new ConsoleSmsProvider();
+    return provider;
   }
+
+  // Nicht still auf das Terminal zurueckfallen: sonst liefe der Betrieb
+  // scheinbar normal, und die Codes stuenden nur im Protokoll. Wie beim
+  // Mailversand gilt: lieber laut scheitern als leise ins Leere schicken.
+  throw new Error(
+    `SMS_DRIVER="${driver}" ist nicht angebunden. Moeglich ist derzeit nur "console"; ` +
+      'ein echter Anbieter gehoert in lib/sms.',
+  );
 }
 
 export function sendSms(message: SmsMessage): Promise<SmsResult> {

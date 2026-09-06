@@ -21,7 +21,14 @@ import {
 } from '@/features/auth/schemas';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 
-export function LoginForm({ githubEnabled }: { githubEnabled: boolean }) {
+export function LoginForm({
+  githubEnabled,
+  phoneEnabled,
+}: {
+  githubEnabled: boolean;
+  /** Ob ein echter SMS-Anbieter eingerichtet ist. */
+  phoneEnabled: boolean;
+}) {
   const t = useTranslations('auth');
   const router = useRouter();
 
@@ -41,18 +48,25 @@ export function LoginForm({ githubEnabled }: { githubEnabled: boolean }) {
 
   return (
     <Tabs defaultValue="password">
-      <TabsList className="mb-6 grid w-full grid-cols-2">
-        <TabsTrigger value="password">{t('tabPassword')}</TabsTrigger>
-        <TabsTrigger value="phone">{t('tabPhone')}</TabsTrigger>
-      </TabsList>
+      {/* Ohne einen echten SMS-Anbieter gibt es den Weg ueber das Telefon
+          nicht. Ein Reiter, der zu einem Code fuehrt, den niemand bekommt,
+          ist eine Sackgasse -- und der Kunde sucht den Fehler bei sich. */}
+      {phoneEnabled ? (
+        <TabsList className="mb-6 grid w-full grid-cols-2">
+          <TabsTrigger value="password">{t('tabPassword')}</TabsTrigger>
+          <TabsTrigger value="phone">{t('tabPhone')}</TabsTrigger>
+        </TabsList>
+      ) : null}
 
       <TabsContent value="password">
         <PasswordForm onDone={goToDashboard} />
       </TabsContent>
 
-      <TabsContent value="phone">
-        <PhoneForm onDone={goToDashboard} />
-      </TabsContent>
+      {phoneEnabled ? (
+        <TabsContent value="phone">
+          <PhoneForm onDone={goToDashboard} />
+        </TabsContent>
+      ) : null}
 
       {githubEnabled ? (
         <div className="mt-6">

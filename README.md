@@ -348,6 +348,22 @@ monatelang niemand in die Verwaltung, ebenso.
 
 ---
 
+## Anmeldung per Telefonnummer
+
+Sie wird **nur angeboten, wenn ein echter SMS-Anbieter eingerichtet ist**.
+Steht `SMS_DRIVER=console` — die Vorgabe —, landet der Code nur im Protokoll,
+und der Reiter „Mit Telefon" erscheint gar nicht erst. Ein Weg, der zu einem
+Code führt, den niemand bekommt, ist keine Anmeldemöglichkeit, sondern eine
+Sackgasse; der Kunde sucht den Fehler dann bei sich.
+
+In `lib/sms` steckt bisher nur der Terminal-Anbieter. Für den echten Betrieb
+gehört dort ein Anbieter hinein — Twilio, oder ein Gateway aus der Region.
+Jede SMS kostet Geld, deshalb ist das eine Entscheidung und keine
+Voreinstellung. Ein unbekannter Wert in `SMS_DRIVER` lässt die Anwendung
+laut scheitern, statt still auf das Terminal zurückzufallen.
+
+---
+
 ## Rechtliche Seiten
 
 Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:
