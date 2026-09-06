@@ -32,6 +32,28 @@ services:
       timeout: 5s
       retries: 10
 
+  # Wendet die Migrationen an und beendet sich wieder.
+  #
+  # Aus der Bau-Stufe, weil dort alle Abhaengigkeiten liegen: der
+  # Prisma-Befehl braucht deutlich mehr als das schlanke Betriebs-Abbild
+  # enthaelt. Die Stufe ist ohnehin gebaut, es entsteht also kein Mehraufwand.
+  #
+  # Schlaegt die Migration fehl, startet die Anwendung gar nicht erst -- gegen
+  # ein veraltetes Schema richtet sie mehr Schaden an, als wenn sie steht.
+  migrate:
+    build:
+      context: .
+      target: build
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    command: npx prisma migrate deploy
+    restart: 'no'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-leviz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-leviz}?schema=public
+
   app:
     build:
       context: .
@@ -43,6 +65,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-leviz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-leviz}?schema=public
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
