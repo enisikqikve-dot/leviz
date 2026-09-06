@@ -145,7 +145,7 @@ export default async function HomePage({
               </p>
             </div>
             <Button asChild variant="outline" size="lg" className="mt-8 self-start">
-              <Link href="/sell">
+              <Link href="/valuation">
                 {t('valuation.cta')}
                 <ArrowRight className="size-4" aria-hidden />
               </Link>

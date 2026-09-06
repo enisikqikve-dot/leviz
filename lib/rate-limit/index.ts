@@ -99,4 +99,7 @@ export const RATE_LIMITS = {
   // Folge mehrfach stellt, meint es nicht ernst -- fuer eine Nachbesserung
   // nach einer Ablehnung reichen fuenf am Tag bei Weitem.
   verification: { limit: 5, windowMs: 24 * 60 * 60_000 },
+  // Eine Wertschaetzung ist eine Datenbankabfrage, kein teurer Dienst.
+  // Die Grenze haelt nur automatisches Abgrasen des Preisgefuges heraus.
+  valuation: { limit: 60, windowMs: 60 * 60_000 },
 } as const;

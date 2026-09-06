@@ -1512,5 +1512,27 @@
       "BUSINESS_REGISTRATION": "Der Registerauszug fehlt",
       "ADDRESS_PROOF": "Der Adressnachweis fehlt"
     }
+  },
+  "valuation": {
+    "title": "Was ist mein Auto wert?",
+    "intro": "Eine Einschätzung aus den laufenden Angeboten auf LEVIZ. Ohne Konto, ohne Warten.",
+    "brand": "Marke",
+    "model": "Modell",
+    "year": "Baujahr",
+    "mileage": "Kilometerstand",
+    "choose": "Wählen",
+    "loading": "Wird geladen…",
+    "submit": "Fahrzeug bewerten",
+    "range": "Preisspanne",
+    "basis": "Gerechnet aus {count} vergleichbaren Fahrzeugen.",
+    "basisBrand": "Vom selben Modell gab es zu wenige, deshalb wurden ähnliche Fahrzeuge derselben Marke herangezogen.",
+    "disclaimer": "Eine Schätzung aus laufenden Angeboten, kein amtlicher Preis.",
+    "sellNow": "Fahrzeug jetzt anbieten",
+    "errorBrand": "Bitte eine Marke wählen",
+    "errorModel": "Bitte ein Modell wählen",
+    "errorYear": "Bitte ein gültiges Baujahr eintragen",
+    "errorMileage": "Bitte den Kilometerstand eintragen",
+    "errorTooFew": "Für eine belastbare Schätzung gibt es auf LEVIZ noch zu wenige vergleichbare Fahrzeuge. Versuch es wieder, wenn der Markt gewachsen ist — oder stell dein Fahrzeug jetzt ein.",
+    "errorTooMany": "Zu viele Anfragen. Bitte kurz warten."
   }
 }

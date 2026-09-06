@@ -21,7 +21,7 @@ export const pathnames = {
     en: '/vehicle/[slug]',
   },
 
-  '/sell': { sq: '/shit', de: '/verkaufen', en: '/sell' },
+  '/valuation': { sq: '/vleresim', de: '/bewerten', en: '/valuation' },
   '/sell/create': {
     sq: '/shit/krijo',
     de: '/verkaufen/erstellen',

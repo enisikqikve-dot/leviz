@@ -1512,5 +1512,27 @@
       "BUSINESS_REGISTRATION": "The business registration is missing",
       "ADDRESS_PROOF": "The proof of address is missing"
     }
+  },
+  "valuation": {
+    "title": "What is my car worth?",
+    "intro": "An estimate from the listings currently live on LEVIZ. No account, no waiting.",
+    "brand": "Make",
+    "model": "Model",
+    "year": "Year",
+    "mileage": "Mileage",
+    "choose": "Choose",
+    "loading": "Loading…",
+    "submit": "Value my car",
+    "range": "price range",
+    "basis": "Based on {count} comparable vehicles.",
+    "basisBrand": "There were too few of the same model, so similar vehicles of the same make were used.",
+    "disclaimer": "An estimate from active listings, not an official price.",
+    "sellNow": "List your car",
+    "errorBrand": "Please choose a make",
+    "errorModel": "Please choose a model",
+    "errorYear": "Please enter a valid year",
+    "errorMileage": "Please enter the mileage",
+    "errorTooFew": "There are not yet enough comparable vehicles on LEVIZ for a reliable estimate. Try again as the market grows — or list your car now.",
+    "errorTooMany": "Too many requests. Please wait a moment."
   }
 }

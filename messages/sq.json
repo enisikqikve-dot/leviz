@@ -1512,5 +1512,27 @@
       "BUSINESS_REGISTRATION": "Mungon certifikata e biznesit",
       "ADDRESS_PROOF": "Mungon dëshmia e adresës"
     }
+  },
+  "valuation": {
+    "title": "Sa vlen vetura ime?",
+    "intro": "Merr një vlerësim orientues nga shpalljet aktive në LEVIZ. Pa llogari, pa pritje.",
+    "brand": "Marka",
+    "model": "Modeli",
+    "year": "Viti i prodhimit",
+    "mileage": "Kilometrazhi",
+    "choose": "Zgjidh",
+    "loading": "Duke ngarkuar…",
+    "submit": "Vlerëso veturën",
+    "range": "brezi i çmimit",
+    "basis": "Bazuar në {count} vetura të krahasueshme.",
+    "basisBrand": "Nuk kishte mjaft nga i njëjti model, prandaj u përdorën vetura të ngjashme të së njëjtës markë.",
+    "disclaimer": "Ky është vlerësim nga shpalljet aktive, jo çmim zyrtar.",
+    "sellNow": "Shit veturën tënde",
+    "errorBrand": "Zgjidh markën",
+    "errorModel": "Zgjidh modelin",
+    "errorYear": "Shkruaj një vit të vlefshëm",
+    "errorMileage": "Shkruaj kilometrazhin",
+    "errorTooFew": "Ende nuk ka mjaft vetura të ngjashme në LEVIZ për një vlerësim të besueshëm. Provo përsëri kur tregu të rritet — ose shto shpalljen tënde tani.",
+    "errorTooMany": "Shumë kërkesa. Provo pas pak."
   }
 }
