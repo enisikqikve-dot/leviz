@@ -35,8 +35,18 @@ export const phoneSchema = z
     return normalized;
   });
 
+export const ACCOUNT_TYPES = ['PRIVATE', 'DEALER'] as const;
+export type AccountType = (typeof ACCOUNT_TYPES)[number];
+
 export const registerSchema = z
   .object({
+    /**
+     * Privatverkäufer oder Autohaus. Die Wahl fällt bei der Registrierung und
+     * nicht später: ein Händler, der erst ein Privatkonto anlegt und dann
+     * umsteigen muss, legt in der Praxis ein zweites Konto an.
+     */
+    accountType: z.enum(ACCOUNT_TYPES).default('PRIVATE'),
+
     name: z.string().trim().min(2, 'Name ist zu kurz').max(80),
     email: emailSchema,
     password: passwordSchema,
@@ -44,10 +54,40 @@ export const registerSchema = z
     acceptTerms: z.literal(true, {
       message: 'Bitte akzeptiere die Nutzungsbedingungen',
     }),
+
+    /** Nur beim Autohaus. Leere Felder werden zu `null`. */
+    companyName: z
+      .string()
+      .trim()
+      .max(160)
+      .nullish()
+      .transform((value) => value || null),
+    registrationNumber: z
+      .string()
+      .trim()
+      .max(40)
+      .nullish()
+      .transform((value) => value || null),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwörter stimmen nicht überein',
     path: ['confirmPassword'],
+  })
+  .superRefine((data, ctx) => {
+    if (data.accountType !== 'DEALER') return;
+
+    // Ohne diese beiden Angaben ist es kein Händlerkonto, sondern ein
+    // Privatkonto mit einem Abzeichen davor.
+    if (!data.companyName) {
+      ctx.addIssue({ code: 'custom', path: ['companyName'], message: 'errorCompanyName' });
+    }
+    if (!data.registrationNumber) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['registrationNumber'],
+        message: 'errorRegistrationNumber',
+      });
+    }
   });
 
 export const credentialsLoginSchema = z.object({
@@ -82,6 +122,8 @@ export const resetPasswordSchema = z
     path: ['confirmPassword'],
   });
 
+/** Was das Formular haelt -- vor der Umwandlung leerer Felder zu `null`. */
+export type RegisterFormInput = z.input<typeof registerSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type CredentialsLoginInput = z.infer<typeof credentialsLoginSchema>;
 export type PhoneLoginInput = z.infer<typeof phoneLoginSchema>;

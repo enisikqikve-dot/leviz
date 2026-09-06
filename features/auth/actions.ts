@@ -4,6 +4,8 @@ import { createHash, randomBytes } from 'node:crypto';
 
 import { getLocale } from 'next-intl/server';
 
+// slugify ist allgemein und liegt nur zufaellig bei den Fahrzeugen.
+import { slugify } from '@/features/vehicles/slug';
 import { fail, fromZod, ok, type ActionResult } from '@/lib/action-result';
 import { hashPassword } from '@/lib/auth/password';
 import { issuePhoneCode } from '@/lib/auth/phone-code';
@@ -40,6 +42,31 @@ async function limited(
 
 // ---------------------------------------------------------------------------
 
+/**
+ * Ein freier Pfad fuer das Haendlerprofil.
+ *
+ * Zwei Autohaeuser koennen denselben Namen tragen -- "Auto Center" gibt es in
+ * jeder Stadt einmal. Der Pfad steht in der Adresse des Profils und muss
+ * eindeutig bleiben, sonst scheitert die Registrierung an einem
+ * Datenbankfehler, den der Anmelder nicht versteht.
+ */
+async function freierHaendlerpfad(companyName: string): Promise<string> {
+  const basis = slugify(companyName).slice(0, 60) || 'autosallon';
+
+  for (let versuch = 0; versuch < 20; versuch += 1) {
+    const kandidat = versuch === 0 ? basis : `${basis}-${versuch + 1}`;
+    const belegt = await prisma.dealer.findUnique({
+      where: { slug: kandidat },
+      select: { id: true },
+    });
+
+    if (!belegt) return kandidat;
+  }
+
+  // Nach zwanzig gleichnamigen Haeusern entscheidet der Zufall.
+  return `${basis}-${Date.now().toString(36)}`;
+}
+
 export async function registerAction(
   input: unknown,
 ): Promise<ActionResult<{ email: string }>> {
@@ -51,7 +78,7 @@ export async function registerAction(
   const parsed = registerSchema.safeParse(input);
   if (!parsed.success) return fromZod(parsed.error.issues);
 
-  const { name, email, password } = parsed.data;
+  const { accountType, name, email, password, companyName, registrationNumber } = parsed.data;
 
   const existing = await prisma.user.findUnique({
     where: { email },
@@ -67,6 +94,8 @@ export async function registerAction(
   const locale = (await getLocale()) as Locale;
   const passwordHash = await hashPassword(password);
 
+  const istHaendler = accountType === 'DEALER' && companyName !== null;
+
   await prisma.user.create({
     data: {
       name,
@@ -74,8 +103,21 @@ export async function registerAction(
       passwordHash,
       locale,
       // Wer sich registriert, will meist auch verkaufen koennen.
-      role: 'PRIVATE_SELLER',
+      role: istHaendler ? 'DEALER' : 'PRIVATE_SELLER',
       profile: { create: {} },
+      ...(istHaendler
+        ? {
+            dealer: {
+              create: {
+                companyName,
+                registrationNumber,
+                // Ungeprueft: das Abzeichen kommt erst nach der
+                // Ausweispruefung. Inserieren darf er trotzdem sofort.
+                slug: await freierHaendlerpfad(companyName),
+              },
+            },
+          }
+        : {}),
     },
   });
 

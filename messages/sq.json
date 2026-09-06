@@ -192,7 +192,19 @@
     "forgotSuccess": "Nëse ekziston një llogari me këtë email, lidhja është dërguar.",
     "resetSuccess": "Fjalëkalimi u ndryshua. Tani mund të hysh.",
     "codeSent": "Kodi u dërgua me SMS.",
-    "codeHint": "Në zhvillim kodi shfaqet në terminal."
+    "codeHint": "Në zhvillim kodi shfaqet në terminal.",
+    "accountType": "Lloji i llogarisë",
+    "accountPrivate": "Privat",
+    "accountDealer": "Autosallon",
+    "accountPrivateHint": "Për të shitur veturën tënde. Falas, pa kufizim kohor.",
+    "accountDealerHint": "Për biznese me disa vetura. Profil publik, faqe e vetja dhe shenja e verifikimit pas kontrollit të dokumenteve.",
+    "companyName": "Emri i biznesit",
+    "registrationNumber": "Numri i biznesit",
+    "registrationNumberHint": "Numri unik identifikues (NUI) nga certifikata e regjistrimit.",
+    "contactName": "Personi kontaktues",
+    "submitRegisterDealer": "Krijo llogari biznesi",
+    "errorCompanyName": "Shkruaj emrin e biznesit",
+    "errorRegistrationNumber": "Shkruaj numrin e biznesit"
   },
   "dashboard": {
     "title": "Paneli im",

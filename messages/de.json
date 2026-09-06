@@ -192,7 +192,19 @@
     "forgotSuccess": "Falls ein Konto mit dieser Adresse besteht, ist der Link unterwegs.",
     "resetSuccess": "Passwort geändert. Du kannst dich jetzt anmelden.",
     "codeSent": "Code per SMS gesendet.",
-    "codeHint": "In der Entwicklung erscheint der Code im Terminal."
+    "codeHint": "In der Entwicklung erscheint der Code im Terminal.",
+    "accountType": "Art des Kontos",
+    "accountPrivate": "Privat",
+    "accountDealer": "Autohaus",
+    "accountPrivateHint": "Um das eigene Fahrzeug zu verkaufen. Kostenlos, ohne Frist.",
+    "accountDealerHint": "Für Betriebe mit mehreren Fahrzeugen. Öffentliches Profil, eigene Seite und das Prüfabzeichen nach Vorlage der Papiere.",
+    "companyName": "Firmenname",
+    "registrationNumber": "Betriebsnummer",
+    "registrationNumberHint": "Die Nummer aus dem Registerauszug (NUI).",
+    "contactName": "Ansprechpartner",
+    "submitRegisterDealer": "Händlerkonto anlegen",
+    "errorCompanyName": "Bitte den Firmennamen eintragen",
+    "errorRegistrationNumber": "Bitte die Betriebsnummer eintragen"
   },
   "dashboard": {
     "title": "Mein Konto",

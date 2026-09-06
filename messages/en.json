@@ -192,7 +192,19 @@
     "forgotSuccess": "If an account with that address exists, the link is on its way.",
     "resetSuccess": "Password changed. You can log in now.",
     "codeSent": "Code sent by SMS.",
-    "codeHint": "In development the code appears in the terminal."
+    "codeHint": "In development the code appears in the terminal.",
+    "accountType": "Account type",
+    "accountPrivate": "Private",
+    "accountDealer": "Dealer",
+    "accountPrivateHint": "To sell your own car. Free, with no time limit.",
+    "accountDealerHint": "For businesses with several vehicles. A public profile, your own page, and the verification badge once your documents are checked.",
+    "companyName": "Company name",
+    "registrationNumber": "Business number",
+    "registrationNumberHint": "The number from the registration certificate (NUI).",
+    "contactName": "Contact person",
+    "submitRegisterDealer": "Create business account",
+    "errorCompanyName": "Please enter the company name",
+    "errorRegistrationNumber": "Please enter the business number"
   },
   "dashboard": {
     "title": "My account",
