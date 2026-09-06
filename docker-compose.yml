@@ -17,7 +17,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
       POSTGRES_DB: ${POSTGRES_DB:-leviz}
     volumes:
-      - db-data:/var/lib/postgresql/data
+      # Ab PostgreSQL 18 gehoert der Speicher an /var/lib/postgresql, nicht
+      # mehr an /var/lib/postgresql/data. Die Daten liegen dann in einem
+      # Unterverzeichnis je Hauptversion, damit ein spaeteres pg_upgrade nicht
+      # ueber die Grenze des Einhaengepunkts stolpert. Haengt man wie frueher
+      # direkt auf .../data, verweigert das Abbild den Start.
+      - db-data:/var/lib/postgresql
     # Kein Port nach aussen: die Datenbank ist nur aus dem internen Netz
     # erreichbar. Ein offener Port 5432 im Internet wird binnen Stunden
     # durchprobiert.

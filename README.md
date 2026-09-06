@@ -404,6 +404,10 @@ kein Zertifikat, und der Start endet in einer Schleife aus Fehlversuchen.
 docker compose up -d --build
 ```
 
+> Der Speicher der Datenbank haengt an `/var/lib/postgresql`, nicht an
+> `/var/lib/postgresql/data`. Ab PostgreSQL 18 ist das Pflicht — sonst
+> verweigert das Abbild den Start mit einem Hinweis auf `pg_ctlcluster`.
+
 Der erste Lauf dauert einige Minuten. Beim Start wendet der Behälter die
 Migrationen selbst an (`prisma migrate deploy`) — schlägt das fehl, startet
 der Server bewusst gar nicht erst: eine Anwendung gegen ein veraltetes Schema
