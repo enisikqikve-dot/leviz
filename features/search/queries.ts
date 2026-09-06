@@ -293,30 +293,45 @@ export async function searchVehicles(
 }
 
 /** Zaehlt, wie viele Fahrzeuge je Marke zu den restlichen Filtern passen. */
+/**
+ * Alle Marken für die Auswahlliste, die mit Treffern zuerst.
+ *
+ * Frueher standen hier ausschliesslich Marken mit Inseraten — damit keine
+ * Kombination angeboten wird, die null Treffer liefert. Auf einem laufenden
+ * Marktplatz ist das richtig; auf einem neuen sieht der Filter dadurch kaputt
+ * aus: er bietet nur „Jede Marke" an, und der Besucher schliesst daraus, dass
+ * die Seite nicht funktioniert.
+ *
+ * Deshalb erscheint jede Marke. Wo es Inserate gibt, steht die Zahl daneben;
+ * wo nicht, steht die Marke ohne Zahl. Wer sie waehlt, bekommt eine ehrliche
+ * leere Trefferliste statt einer Auswahl, die es nicht gibt.
+ */
 export async function countByBrand(params: SearchParams, limit = 12) {
   const where = buildWhere({ ...params, make: undefined, model: undefined });
 
-  const grouped = await prisma.vehicle.groupBy({
-    by: ['brandId'],
-    where,
-    _count: { _all: true },
-    orderBy: { _count: { brandId: 'desc' } },
-    take: limit,
-  });
+  const [grouped, brands] = await Promise.all([
+    prisma.vehicle.groupBy({
+      by: ['brandId'],
+      where,
+      _count: { _all: true },
+      orderBy: { _count: { brandId: 'desc' } },
+      take: limit,
+    }),
+    prisma.brand.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: [{ popular: 'desc' }, { name: 'asc' }],
+    }),
+  ]);
 
-  const brands = await prisma.brand.findMany({
-    where: { id: { in: grouped.map((entry) => entry.brandId) } },
-    select: { id: true, name: true, slug: true },
-  });
+  const countById = new Map(grouped.map((entry) => [entry.brandId, entry._count._all]));
 
-  const byId = new Map(brands.map((brand) => [brand.id, brand]));
-
-  return grouped
-    .map((entry) => {
-      const brand = byId.get(entry.brandId);
-      return brand ? { ...brand, count: entry._count._all } : null;
-    })
-    .filter((entry): entry is { id: string; name: string; slug: string; count: number } =>
-      entry !== null,
-    );
+  return brands
+    .map((brand) => ({ ...brand, count: countById.get(brand.id) ?? 0 }))
+    .sort((a, b) => {
+      // Marken mit Treffern zuerst, darin die haeufigste oben. Der Rest
+      // behaelt die Reihenfolge aus der Datenbank: beliebte Marken vorn,
+      // sonst alphabetisch.
+      if (a.count !== b.count) return b.count - a.count;
+      return 0;
+    });
 }

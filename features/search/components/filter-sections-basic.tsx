@@ -31,7 +31,11 @@ export function BasicFilters({ params, data, update }: SectionProps) {
         value={params.make}
         placeholder={t('options.anyMake')}
         options={data.brands.map((brand) => ({
-          value: brand.slug, label: brand.name, count: brand.count,
+          value: brand.slug,
+          label: brand.name,
+          // Ohne Inserate keine Zahl: „BMW (0)" liest sich wie ein Fehler,
+          // „BMW" wie eine Marke, zu der gerade nichts angeboten wird.
+          count: brand.count ? brand.count : undefined,
         }))}
         onChange={(make) => update({ make, model: undefined })}
       />
