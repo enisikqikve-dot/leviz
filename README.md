@@ -482,26 +482,45 @@ docker compose run --rm app npx tsx scripts/create-admin.ts deine@adresse.tld "D
 git pull && docker compose up -d --build
 ```
 
-### Was du selbst im Blick behalten musst
+### Sicherung
 
-Ein eigener Server heißt, dass niemand sonst sichert. **Richte eine tägliche
-Sicherung der Datenbank ein**, bevor das erste echte Inserat entsteht:
+Ein eigener Server heißt, dass niemand sonst sichert. `docker/backup.sh` legt
+Datenbank und Fotos zusammen ab, prüft jede erzeugte Datei und räumt alte
+Stände auf. Einmalig einrichten:
 
 ```bash
-docker compose exec -T db pg_dump -U leviz leviz | gzip > leviz-$(date +%F).sql.gz
+chmod +x ~/leviz/docker/backup.sh
+~/leviz/docker/backup.sh
 ```
 
-Dazu gehören die hochgeladenen Fotos — sie liegen im Docker-Speicher
-`uploads`, nicht in der Datenbank.
+Wenn dieser Lauf durchgeht, in `crontab -e` eine Zeile anfügen — jede Nacht
+um 3:15 Uhr:
 
-Und: Systemaktualisierungen (`apt upgrade`), ein aktives `ufw` mit nur den
-Ports 22, 80 und 443, sowie regelmässige `docker compose pull` für die
+```
+15 3 * * * /root/leviz/docker/backup.sh >> /var/log/leviz-backup.log 2>&1
+```
+
+Die Sicherungen liegen in `~/leviz-sicherung`, 14 Tage werden aufbewahrt.
+Mehrere Tage deshalb, weil ein versehentlich gelöschtes Inserat selten am
+selben Tag auffällt — eine Sicherung, die den Fehler schon mitgeschrieben
+hat, nützt nichts.
+
+**Den Verlust des Servers deckt das nicht ab.** Die Dateien liegen auf
+derselben Platte. Sie retten vor dem falschen Befehl und vor gelöschten
+Daten, nicht vor einem Totalausfall. Dagegen hilft nur eine Kopie woanders;
+die Befehle zum Herunterladen und zum Zurückspielen stehen im Kopf des
+Skripts.
+
+### Was du sonst im Blick behalten musst
+
+Systemaktualisierungen (`apt upgrade`), ein aktives `ufw` mit nur den Ports
+22, 80 und 443, sowie regelmässige `docker compose pull` für die
 Basis-Abbilder.
 
-> **Ungetestet gebaut.** Auf diesem Entwicklungsrechner ist Docker nicht
-> installiert; das Abbild wurde nie gebaut. Geprüft ist nur, dass Next.js die
-> eigenständige Ausgabe erzeugt, auf der es aufsetzt. Rechne beim ersten
-> `docker compose up --build` mit Nacharbeit.
+> **Läuft.** Das Abbild wird auf einem Hostinger-VPS gebaut und betrieben,
+> Caddy besorgt das Zertifikat selbst. Auf dem Entwicklungsrechner bleibt
+> Docker unbenutzbar (WSL fehlt) — Änderungen am `Dockerfile` oder an
+> `docker-compose.yml` zeigen sich also erst auf dem Server.
 
 ---
 
