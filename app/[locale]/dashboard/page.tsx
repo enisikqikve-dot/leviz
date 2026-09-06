@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Bookmark, Car, Heart, MessageSquare, Settings } from 'lucide-react';
+import { BadgeCheck, Bookmark, Car, Heart, MessageSquare, Settings } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,7 @@ const SECTIONS = [
   { href: '/favorites', key: 'myFavorites', icon: Heart },
   { href: '/messages', key: 'myMessages', icon: MessageSquare },
   { href: '/searches', key: 'mySearches', icon: Bookmark },
+  { href: '/dashboard/verification', key: 'verification', icon: BadgeCheck },
   { href: '/dashboard/settings', key: 'settings', icon: Settings },
 ] as const;
 

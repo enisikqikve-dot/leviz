@@ -95,6 +95,10 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # sonst waeren die Bilder nach jedem Neustart weg.
 RUN mkdir -p /app/public/uploads && chown leviz:leviz /app/public/uploads
 
+# Ausweisbelege. Eigenes Verzeichnis ausserhalb von public/, damit sie nicht
+# ueber ihre Adresse abrufbar sind; auch hier haengt ein dauerhafter Speicher.
+RUN mkdir -p /app/var/verification && chown -R leviz:leviz /app/var
+
 USER leviz
 EXPOSE 3000
 

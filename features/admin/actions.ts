@@ -144,7 +144,8 @@ export async function setDealerVerificationAction(
   dealerId: string,
   verified: boolean,
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  // Der Rueckgabewert wird hier nicht gebraucht, der Riegel schon.
+  await requireAdmin();
 
   const dealer = await prisma.dealer.findUnique({
     where: { id: dealerId },
@@ -158,15 +159,6 @@ export async function setDealerVerificationAction(
       data: {
         verification: verified ? 'VERIFIED' : 'UNVERIFIED',
         verifiedAt: verified ? new Date() : null,
-      },
-    }),
-    prisma.dealerVerification.create({
-      data: {
-        dealerId,
-        status: verified ? 'VERIFIED' : 'REJECTED',
-        reviewedById: admin.id,
-        reviewedAt: new Date(),
-        documentUrls: [],
       },
     }),
     ...(verified

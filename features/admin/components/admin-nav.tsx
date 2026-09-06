@@ -1,7 +1,8 @@
 'use client';
 
 import {
-  Bug, Car, CreditCard, Flag, LayoutDashboard, Package, Settings, Store, Tags, Users,
+  BadgeCheck, Bug, Car, CreditCard, Flag, LayoutDashboard, Package, Settings, Store,
+  Tags, Users,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -13,6 +14,7 @@ const ITEMS = [
   { href: '/admin/vehicles', key: 'vehicles', icon: Car },
   { href: '/admin/reports', key: 'reports', icon: Flag },
   { href: '/admin/bugs', key: 'bugs', icon: Bug },
+  { href: '/admin/verifications', key: 'verifications', icon: BadgeCheck },
   { href: '/admin/dealers', key: 'dealers', icon: Store },
   { href: '/admin/users', key: 'users', icon: Users },
   { href: '/admin/brands', key: 'brands', icon: Tags },
@@ -24,9 +26,11 @@ const ITEMS = [
 export function AdminNav({
   openReports,
   openBugs,
+  openVerifications,
 }: {
   openReports: number;
   openBugs: number;
+  openVerifications: number;
 }) {
   const t = useTranslations('admin.nav');
   const pathname = usePathname();
@@ -49,9 +53,9 @@ export function AdminNav({
           >
             <Icon className="size-4" aria-hidden />
             {t(key)}
-            {badgeFor(key, openReports, openBugs) ? (
+            {badgeFor(key, openReports, openBugs, openVerifications) ? (
               <span className="bg-destructive text-destructive-foreground ms-auto inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold">
-                {badgeFor(key, openReports, openBugs)}
+                {badgeFor(key, openReports, openBugs, openVerifications)}
               </span>
             ) : null}
           </Link>
@@ -62,8 +66,14 @@ export function AdminNav({
 }
 
 /** Zahl neben einem Eintrag, oder 0 fuer keine. */
-function badgeFor(key: string, openReports: number, openBugs: number): number {
+function badgeFor(
+  key: string,
+  openReports: number,
+  openBugs: number,
+  openVerifications: number,
+): number {
   if (key === 'reports') return openReports;
   if (key === 'bugs') return openBugs;
+  if (key === 'verifications') return openVerifications;
   return 0;
 }

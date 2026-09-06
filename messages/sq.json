@@ -214,7 +214,8 @@
       "DEALER": "Autosallon",
       "ADMIN": "Administrator",
       "SUPER_ADMIN": "Administrator kryesor"
-    }
+    },
+    "verification": "Verifikimi"
   },
   "account": {
     "title": "Cilësimet",
@@ -503,7 +504,8 @@
       "serviceHistory": "Me libër servisi",
       "accidentFree": "Pa aksident",
       "financingAvailable": "Financim i mundshëm",
-      "customsCleared": "E doganuar"
+      "customsCleared": "E doganuar",
+      "verifiedSeller": "Shitës i verifikuar"
     },
     "seller": {
       "private": "Shitës privat",
@@ -796,7 +798,8 @@
       "settings": "Cilësimet",
       "packages": "Pakot",
       "payments": "Pagesat",
-      "bugs": "Gabimet"
+      "bugs": "Gabimet",
+      "verifications": "Verifikimet"
     },
     "stats": {
       "totalUsers": "Përdorues",
@@ -1000,6 +1003,44 @@
         "SUSPENDED": "E pezulluar",
         "DELETED": "E fshirë"
       }
+    },
+    "verifications": {
+      "title": "Verifikimet",
+      "subtitle": "Kërkesat e hapura, më e vjetra e para.",
+      "empty": "Nuk ka kërkesa në pritje.",
+      "decided": "Të vendosura",
+      "kinds": {
+        "PERSON": "Person",
+        "DEALER": "Autosallon"
+      },
+      "status": {
+        "VERIFIED": "E pranuar",
+        "REJECTED": "E refuzuar"
+      },
+      "legalName": "Emri",
+      "account": "Llogaria",
+      "contact": "Kontakti",
+      "address": "Adresa",
+      "company": "Biznesi",
+      "registrationNumber": "Numri",
+      "submitted": "Dërguar",
+      "openProfile": "Hap profilin",
+      "documentTypes": {
+        "ID_FRONT": "Letërnjoftimi (para)",
+        "ID_BACK": "Letërnjoftimi (prapa)",
+        "BUSINESS_REGISTRATION": "Certifikata",
+        "ADDRESS_PROOF": "Adresa"
+      },
+      "documentsPurged": "Dokumentet janë fshirë sipas afatit.",
+      "note": "Arsyeja",
+      "notePlaceholder": "E detyrueshme kur refuzon — përndryshe personi nuk di çfarë të ndreqë.",
+      "approve": "Prano",
+      "reject": "Refuzo",
+      "approved": "Kërkesa u pranua",
+      "rejected": "Kërkesa u refuzua",
+      "errorReasonRequired": "Shkruaj arsyen e refuzimit",
+      "errorAlreadyDecided": "Kjo kërkesë është vendosur tashmë",
+      "errorNotFound": "Kërkesa nuk u gjet"
     }
   },
   "pricing": {
@@ -1275,6 +1316,14 @@
           ]
         },
         {
+          "heading": "Dokumentet e identitetit",
+          "body": [
+            "Autosallonet duhet të vërtetojnë identitetin; shitësit privatë mund ta bëjnë vullnetarisht. Për këtë ngarkohen letërnjoftimi, certifikata e biznesit dhe një dëshmi e adresës.",
+            "Këto dokumente ruhen ndaras nga të gjitha skedarët publikë dhe nuk janë kurrë të arritshme përmes një adrese publike. Vetëm administrata e LEVIZ mund t'i shohë, dhe vetëm për shqyrtimin e kërkesës.",
+            "90 ditë pas vendimit ato fshihen automatikisht. Mbetet vetëm fakti që u krye shqyrtimi, kur dhe me çfarë rezultati — jo vetë dokumenti."
+          ]
+        },
+        {
           "heading": "Kush i sheh",
           "body": [
             "Përdoruesit e tjerë shohin atë që publikohet në një shpallje, si dhe emrin që shfaqet me një mesazh.",
@@ -1404,5 +1453,64 @@
     "thanksBody": "Raportimi arriti te ne. Nëse le një email, të shkruajmë kur ta rregullojmë.",
     "reportAnother": "Raporto diçka tjetër",
     "errorTooManyReports": "Shumë raportime brenda pak kohe. Provo përsëri më vonë."
+  },
+  "verification": {
+    "title": "Verifikimi i identitetit",
+    "introPerson": "Verifikimi është vullnetar. Blerësit shohin një shenjë te shpalljet e tua dhe ndihen më të sigurt — sidomos te veturat e shtrenjta.",
+    "introDealer": "Për autosallonet verifikimi është i detyrueshëm. Dërgo letërnjoftimin, certifikatën e biznesit dhe një dëshmi të adresës.",
+    "legalName": "Emri sipas dokumentit",
+    "legalNameHint": "Shkruaje ashtu siç është në letërnjoftim.",
+    "companyName": "Emri i biznesit",
+    "registrationNumber": "Numri i biznesit",
+    "registrationNumberHint": "Numri unik identifikues (NUI) nga certifikata.",
+    "addressLine": "Rruga dhe numri",
+    "postalCode": "Kodi postar",
+    "city": "Qyteti",
+    "documents": "Dokumentet",
+    "documentTypes": {
+      "ID_FRONT": "Letërnjoftimi — ana e përparme",
+      "ID_BACK": "Letërnjoftimi — ana e prapme",
+      "BUSINESS_REGISTRATION": "Certifikata e biznesit",
+      "ADDRESS_PROOF": "Dëshmi e adresës"
+    },
+    "documentHints": {
+      "ID_FRONT": "Foto ose skanim, i lexueshëm",
+      "ID_BACK": "Ana ku shkruhet adresa",
+      "BUSINESS_REGISTRATION": "PDF ose foto e certifikatës",
+      "ADDRESS_PROOF": "P.sh. faturë e rrymës ose kontratë qiraje"
+    },
+    "chooseFile": "Zgjidh",
+    "replaceFile": "Ndrysho",
+    "privacyNote": "Dokumentet i sheh vetëm administrata dhe fshihen automatikisht 90 ditë pas vendimit. Ato nuk shfaqen kurrë publikisht.",
+    "submit": "Dërgo për verifikim",
+    "submitted": "Kërkesa u dërgua",
+    "statusVerified": "Identiteti u verifikua",
+    "verifiedOn": "Verifikuar më {date}",
+    "statusPending": "Në shqyrtim",
+    "pendingBody": "Pranuar më {date} · {count} dokumente",
+    "statusRejected": "Kërkesa nuk u pranua",
+    "rejectedHint": "Mund ta dërgosh përsëri me dokumente të tjera.",
+    "errorTooLarge": "Skedari është më i madh se 8 MB",
+    "errorMissingDocuments": "Të gjitha dokumentet janë të nevojshme",
+    "errorTooMany": "Shumë kërkesa. Provo nesër.",
+    "errorNoDealer": "Kjo llogari nuk është autosallon",
+    "errorAlreadyPending": "Një kërkesë është ende në shqyrtim",
+    "errorLegalName": "Shkruaj emrin e plotë",
+    "errorAddress": "Shkruaj adresën",
+    "errorCity": "Shkruaj qytetin",
+    "errorCompanyName": "Shkruaj emrin e biznesit",
+    "errorRegistrationNumber": "Shkruaj numrin e biznesit",
+    "errorFile": {
+      "empty": "Skedari është bosh",
+      "tooLarge": "Skedari është shumë i madh",
+      "unsupportedFormat": "Vetëm JPG, PNG, WebP, AVIF ose PDF",
+      "heicNotSupported": "HEIC nga iPhone nuk mbështetet — eksportoje si JPG"
+    },
+    "errorMissing": {
+      "ID_FRONT": "Mungon ana e përparme e letërnjoftimit",
+      "ID_BACK": "Mungon ana e prapme e letërnjoftimit",
+      "BUSINESS_REGISTRATION": "Mungon certifikata e biznesit",
+      "ADDRESS_PROOF": "Mungon dëshmia e adresës"
+    }
   }
 }

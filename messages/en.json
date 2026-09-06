@@ -214,7 +214,8 @@
       "DEALER": "Dealer",
       "ADMIN": "Administrator",
       "SUPER_ADMIN": "Super administrator"
-    }
+    },
+    "verification": "Identity check"
   },
   "account": {
     "title": "Settings",
@@ -503,7 +504,8 @@
       "serviceHistory": "Full service history",
       "accidentFree": "Accident-free",
       "financingAvailable": "Financing available",
-      "customsCleared": "Customs cleared"
+      "customsCleared": "Customs cleared",
+      "verifiedSeller": "Verified seller"
     },
     "seller": {
       "private": "Private seller",
@@ -796,7 +798,8 @@
       "settings": "Settings",
       "packages": "Packages",
       "payments": "Payments",
-      "bugs": "Bugs"
+      "bugs": "Bugs",
+      "verifications": "Verifications"
     },
     "stats": {
       "totalUsers": "Users",
@@ -1000,6 +1003,44 @@
         "SUSPENDED": "Suspended",
         "DELETED": "Deleted"
       }
+    },
+    "verifications": {
+      "title": "Verifications",
+      "subtitle": "Open requests, oldest first.",
+      "empty": "No open requests.",
+      "decided": "Decided",
+      "kinds": {
+        "PERSON": "Person",
+        "DEALER": "Dealer"
+      },
+      "status": {
+        "VERIFIED": "Approved",
+        "REJECTED": "Rejected"
+      },
+      "legalName": "Name",
+      "account": "Account",
+      "contact": "Contact",
+      "address": "Address",
+      "company": "Company",
+      "registrationNumber": "Number",
+      "submitted": "Received",
+      "openProfile": "Open profile",
+      "documentTypes": {
+        "ID_FRONT": "ID (front)",
+        "ID_BACK": "ID (back)",
+        "BUSINESS_REGISTRATION": "Registration",
+        "ADDRESS_PROOF": "Address"
+      },
+      "documentsPurged": "The documents were deleted after the retention period.",
+      "note": "Reason",
+      "notePlaceholder": "Required when rejecting — otherwise the applicant cannot tell what to fix.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approved": "Request approved",
+      "rejected": "Request rejected",
+      "errorReasonRequired": "Please give a reason for the rejection",
+      "errorAlreadyDecided": "This request has already been decided",
+      "errorNotFound": "Request not found"
     }
   },
   "pricing": {
@@ -1275,6 +1316,14 @@
           ]
         },
         {
+          "heading": "Identity documents",
+          "body": [
+            "Dealer accounts must prove their identity; private sellers may do so voluntarily. This involves uploading an ID card, the business registration and proof of address.",
+            "These documents are stored separately from all public files and are never reachable through a public address. Only LEVIZ administrators can view them, and only to review the request.",
+            "They are deleted automatically 90 days after the decision. What remains is only that a review took place, when, and with what outcome — not the document itself."
+          ]
+        },
+        {
           "heading": "Recipients",
           "body": [
             "Other users see what is published in a listing, and the name shown with a message.",
@@ -1404,5 +1453,64 @@
     "thanksBody": "Your report reached us. If you left an email, we will write once it is fixed.",
     "reportAnother": "Report something else",
     "errorTooManyReports": "Too many reports in a short time. Please try again later."
+  },
+  "verification": {
+    "title": "Identity verification",
+    "introPerson": "Verification is optional. Buyers see a badge on your listings — it matters most on expensive cars.",
+    "introDealer": "Verification is required for dealers. Submit your ID, the business registration and proof of address.",
+    "legalName": "Name as on your ID",
+    "legalNameHint": "Exactly as it appears on the document.",
+    "companyName": "Company name",
+    "registrationNumber": "Business number",
+    "registrationNumberHint": "The number from the registration certificate (NUI).",
+    "addressLine": "Street and number",
+    "postalCode": "Postcode",
+    "city": "City",
+    "documents": "Documents",
+    "documentTypes": {
+      "ID_FRONT": "ID card — front",
+      "ID_BACK": "ID card — back",
+      "BUSINESS_REGISTRATION": "Business registration",
+      "ADDRESS_PROOF": "Proof of address"
+    },
+    "documentHints": {
+      "ID_FRONT": "Photo or scan, clearly readable",
+      "ID_BACK": "The side showing the address",
+      "BUSINESS_REGISTRATION": "PDF or photo of the certificate",
+      "ADDRESS_PROOF": "E.g. an electricity bill or rental contract"
+    },
+    "chooseFile": "Choose",
+    "replaceFile": "Replace",
+    "privacyNote": "Only administrators see these documents. They are deleted automatically 90 days after the decision and are never publicly reachable.",
+    "submit": "Send for verification",
+    "submitted": "Request received",
+    "statusVerified": "Identity verified",
+    "verifiedOn": "Verified on {date}",
+    "statusPending": "Under review",
+    "pendingBody": "Received on {date} · {count} documents",
+    "statusRejected": "Request rejected",
+    "rejectedHint": "You can submit again with different documents.",
+    "errorTooLarge": "The file is larger than 8 MB",
+    "errorMissingDocuments": "Some documents are still missing",
+    "errorTooMany": "Too many requests. Please try again tomorrow.",
+    "errorNoDealer": "This account is not a dealer account",
+    "errorAlreadyPending": "A request is still under review",
+    "errorLegalName": "Please enter your full name",
+    "errorAddress": "Please enter the address",
+    "errorCity": "Please enter the city",
+    "errorCompanyName": "Please enter the company name",
+    "errorRegistrationNumber": "Please enter the business number",
+    "errorFile": {
+      "empty": "The file is empty",
+      "tooLarge": "The file is too large",
+      "unsupportedFormat": "Only JPG, PNG, WebP, AVIF or PDF",
+      "heicNotSupported": "HEIC from iPhone is not supported — please export as JPG"
+    },
+    "errorMissing": {
+      "ID_FRONT": "The front of the ID card is missing",
+      "ID_BACK": "The back of the ID card is missing",
+      "BUSINESS_REGISTRATION": "The business registration is missing",
+      "ADDRESS_PROOF": "The proof of address is missing"
+    }
   }
 }

@@ -214,7 +214,8 @@
       "DEALER": "Händler",
       "ADMIN": "Administrator",
       "SUPER_ADMIN": "Hauptadministrator"
-    }
+    },
+    "verification": "Identitätsprüfung"
   },
   "account": {
     "title": "Einstellungen",
@@ -503,7 +504,8 @@
       "serviceHistory": "Scheckheftgepflegt",
       "accidentFree": "Unfallfrei",
       "financingAvailable": "Finanzierung möglich",
-      "customsCleared": "Verzollt"
+      "customsCleared": "Verzollt",
+      "verifiedSeller": "Verkäufer bestätigt"
     },
     "seller": {
       "private": "Privatverkäufer",
@@ -796,7 +798,8 @@
       "settings": "Einstellungen",
       "packages": "Pakete",
       "payments": "Zahlungen",
-      "bugs": "Fehler"
+      "bugs": "Fehler",
+      "verifications": "Prüfungen"
     },
     "stats": {
       "totalUsers": "Nutzer",
@@ -1000,6 +1003,44 @@
         "SUSPENDED": "Gesperrt",
         "DELETED": "Gelöscht"
       }
+    },
+    "verifications": {
+      "title": "Prüfungen",
+      "subtitle": "Offene Anträge, der älteste zuerst.",
+      "empty": "Keine offenen Anträge.",
+      "decided": "Entschieden",
+      "kinds": {
+        "PERSON": "Person",
+        "DEALER": "Händler"
+      },
+      "status": {
+        "VERIFIED": "Angenommen",
+        "REJECTED": "Abgelehnt"
+      },
+      "legalName": "Name",
+      "account": "Konto",
+      "contact": "Kontakt",
+      "address": "Adresse",
+      "company": "Firma",
+      "registrationNumber": "Nummer",
+      "submitted": "Eingegangen",
+      "openProfile": "Profil öffnen",
+      "documentTypes": {
+        "ID_FRONT": "Ausweis (vorn)",
+        "ID_BACK": "Ausweis (hinten)",
+        "BUSINESS_REGISTRATION": "Registerauszug",
+        "ADDRESS_PROOF": "Adresse"
+      },
+      "documentsPurged": "Die Belege sind nach Ablauf der Frist gelöscht.",
+      "note": "Begründung",
+      "notePlaceholder": "Bei einer Ablehnung Pflicht — sonst weiß der Antragsteller nicht, was er nachbessern soll.",
+      "approve": "Annehmen",
+      "reject": "Ablehnen",
+      "approved": "Antrag angenommen",
+      "rejected": "Antrag abgelehnt",
+      "errorReasonRequired": "Bitte den Grund der Ablehnung eintragen",
+      "errorAlreadyDecided": "Über diesen Antrag ist bereits entschieden",
+      "errorNotFound": "Antrag nicht gefunden"
     }
   },
   "pricing": {
@@ -1275,6 +1316,14 @@
           ]
         },
         {
+          "heading": "Ausweisdokumente",
+          "body": [
+            "Wer ein Händlerkonto führt, muss seine Identität nachweisen; Privatverkäufer können es freiwillig tun. Dafür werden Ausweis, Registerauszug und ein Adressnachweis hochgeladen.",
+            "Diese Belege liegen getrennt von allen öffentlichen Dateien und sind nie über eine öffentliche Adresse abrufbar. Einsehen kann sie ausschliesslich die Verwaltung von LEVIZ, und nur zur Prüfung des Antrags.",
+            "90 Tage nach der Entscheidung werden sie automatisch gelöscht. Erhalten bleibt allein, dass geprüft wurde, wann und mit welchem Ergebnis — nicht das Dokument selbst."
+          ]
+        },
+        {
           "heading": "Empfänger",
           "body": [
             "Andere Nutzer sehen, was in einem Inserat veröffentlicht wird, sowie den bei einer Nachricht angezeigten Namen.",
@@ -1404,5 +1453,64 @@
     "thanksBody": "Deine Meldung ist angekommen. Wenn du eine E-Mail hinterlassen hast, schreiben wir dir, sobald es behoben ist.",
     "reportAnother": "Noch etwas melden",
     "errorTooManyReports": "Zu viele Meldungen in kurzer Zeit. Bitte versuche es später erneut."
+  },
+  "verification": {
+    "title": "Identitätsprüfung",
+    "introPerson": "Die Prüfung ist freiwillig. Käufer sehen ein Abzeichen an deinen Anzeigen — besonders bei teuren Fahrzeugen zählt das.",
+    "introDealer": "Für Händler ist die Prüfung Pflicht. Reiche deinen Ausweis, den Registerauszug und einen Adressnachweis ein.",
+    "legalName": "Name laut Ausweis",
+    "legalNameHint": "Genau so, wie er im Ausweis steht.",
+    "companyName": "Firmenname",
+    "registrationNumber": "Betriebsnummer",
+    "registrationNumberHint": "Die Nummer aus dem Registerauszug (NUI).",
+    "addressLine": "Straße und Hausnummer",
+    "postalCode": "PLZ",
+    "city": "Ort",
+    "documents": "Belege",
+    "documentTypes": {
+      "ID_FRONT": "Ausweis — Vorderseite",
+      "ID_BACK": "Ausweis — Rückseite",
+      "BUSINESS_REGISTRATION": "Registerauszug",
+      "ADDRESS_PROOF": "Adressnachweis"
+    },
+    "documentHints": {
+      "ID_FRONT": "Foto oder Scan, gut lesbar",
+      "ID_BACK": "Die Seite mit der Adresse",
+      "BUSINESS_REGISTRATION": "PDF oder Foto der Urkunde",
+      "ADDRESS_PROOF": "Z. B. Stromrechnung oder Mietvertrag"
+    },
+    "chooseFile": "Wählen",
+    "replaceFile": "Ersetzen",
+    "privacyNote": "Die Belege sieht nur die Verwaltung. Sie werden 90 Tage nach der Entscheidung automatisch gelöscht und sind nie öffentlich abrufbar.",
+    "submit": "Zur Prüfung senden",
+    "submitted": "Antrag eingegangen",
+    "statusVerified": "Identität bestätigt",
+    "verifiedOn": "Bestätigt am {date}",
+    "statusPending": "In Prüfung",
+    "pendingBody": "Eingegangen am {date} · {count} Belege",
+    "statusRejected": "Antrag abgelehnt",
+    "rejectedHint": "Du kannst ihn mit anderen Belegen erneut stellen.",
+    "errorTooLarge": "Die Datei ist größer als 8 MB",
+    "errorMissingDocuments": "Es fehlen noch Belege",
+    "errorTooMany": "Zu viele Anträge. Bitte morgen wieder.",
+    "errorNoDealer": "Dieses Konto ist kein Händlerkonto",
+    "errorAlreadyPending": "Ein Antrag ist noch in Prüfung",
+    "errorLegalName": "Bitte den vollständigen Namen eintragen",
+    "errorAddress": "Bitte die Adresse eintragen",
+    "errorCity": "Bitte den Ort eintragen",
+    "errorCompanyName": "Bitte den Firmennamen eintragen",
+    "errorRegistrationNumber": "Bitte die Betriebsnummer eintragen",
+    "errorFile": {
+      "empty": "Die Datei ist leer",
+      "tooLarge": "Die Datei ist zu groß",
+      "unsupportedFormat": "Nur JPG, PNG, WebP, AVIF oder PDF",
+      "heicNotSupported": "HEIC vom iPhone wird nicht unterstützt — bitte als JPG exportieren"
+    },
+    "errorMissing": {
+      "ID_FRONT": "Die Vorderseite des Ausweises fehlt",
+      "ID_BACK": "Die Rückseite des Ausweises fehlt",
+      "BUSINESS_REGISTRATION": "Der Registerauszug fehlt",
+      "ADDRESS_PROOF": "Der Adressnachweis fehlt"
+    }
   }
 }

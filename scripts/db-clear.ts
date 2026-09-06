@@ -69,7 +69,6 @@ async function main() {
     prisma.vehicle.deleteMany(),
 
     prisma.review.deleteMany(),
-    prisma.dealerVerification.deleteMany(),
     prisma.dealer.deleteMany(),
 
     prisma.notification.deleteMany(),
@@ -80,6 +79,8 @@ async function main() {
     prisma.subscription.deleteMany(),
     prisma.passwordResetToken.deleteMany(),
     prisma.phoneVerification.deleteMany(),
+    prisma.verificationDocument.deleteMany(),
+    prisma.verificationRequest.deleteMany(),
 
     // Profile, Sitzungen und verknüpfte Anmeldungen hängen am Konto und
     // verschwinden mit ihm (onDelete: Cascade).

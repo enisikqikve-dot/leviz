@@ -27,5 +27,8 @@ lib/generated
 # Hochgeladene Bilder der Entwicklung
 public/uploads
 
+# Ausweisbelege der Entwicklung
+var
+
 # Nur fuer Menschen
 README.md

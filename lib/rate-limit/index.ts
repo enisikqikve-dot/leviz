@@ -95,4 +95,8 @@ export const RATE_LIMITS = {
   // Fehlermeldungen sind ohne Anmeldung moeglich; die Grenze haelt
   // Formular-Spam heraus, ohne einen ehrlichen Melder auszubremsen.
   bugReport: { limit: 10, windowMs: 60 * 60_000 },
+  // Ein Antrag auf Pruefung kostet einen Menschen Arbeit. Wer ihn in kurzer
+  // Folge mehrfach stellt, meint es nicht ernst -- fuer eine Nachbesserung
+  // nach einer Ablehnung reichen fuenf am Tag bei Weitem.
+  verification: { limit: 5, windowMs: 24 * 60 * 60_000 },
 } as const;

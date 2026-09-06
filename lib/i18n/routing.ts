@@ -66,6 +66,11 @@ export const pathnames = {
     de: '/konto/statistik',
     en: '/dashboard/statistics',
   },
+  '/dashboard/verification': {
+    sq: '/paneli/verifikimi',
+    de: '/konto/verifizierung',
+    en: '/dashboard/verification',
+  },
   '/dashboard/settings': {
     sq: '/paneli/cilesimet',
     de: '/konto/einstellungen',
@@ -117,6 +122,7 @@ export const pathnames = {
   '/admin/users/[id]': '/admin/users/[id]',
   '/admin/vehicles': '/admin/vehicles',
   '/admin/dealers': '/admin/dealers',
+  '/admin/verifications': '/admin/verifications',
   '/admin/reports': '/admin/reports',
   '/admin/bugs': '/admin/bugs',
   '/admin/brands': '/admin/brands',

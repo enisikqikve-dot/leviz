@@ -141,7 +141,7 @@ enum FeatureCategory {
   INTERIOR
 }
 
-enum DealerVerificationStatus {
+enum VerificationStatus {
   UNVERIFIED
   PENDING
   VERIFIED
@@ -205,6 +205,10 @@ enum NotificationType {
   PAYMENT_SUCCEEDED
   SUBSCRIPTION_EXPIRING
   DEALER_VERIFIED
+  /// Die Ausweisprüfung ist entschieden. Bei einer Ablehnung steht der Grund
+  /// im Text — ohne ihn lädt der Antragsteller dasselbe noch einmal hoch.
+  IDENTITY_VERIFIED
+  IDENTITY_REJECTED
 }
 
 enum PackageTier {
@@ -266,6 +270,11 @@ model User {
   /// Fließt in das Ranking ein: verifiziert, Alter des Kontos, Meldungen.
   trustScore Int @default(50)
 
+  /// Ausweisprüfung der Person. Für Händler Pflicht, für Privatverkäufer
+  /// freiwillig — beide bekommen danach dasselbe Abzeichen.
+  verification VerificationStatus @default(UNVERIFIED)
+  verifiedAt   DateTime?
+
   suspendedAt     DateTime?
   suspendedReason String?
   lastSeenAt      DateTime?
@@ -292,6 +301,9 @@ model User {
 
   bugReports        BugReport[] @relation("BugReporter")
   bugReportsHandled BugReport[] @relation("BugHandler")
+
+  verificationRequests VerificationRequest[] @relation("VerificationSubject")
+  verificationsHandled VerificationRequest[] @relation("VerificationReviewer")
 
   reportsFiled    Report[] @relation("ReportReporter")
   reportsHandled  Report[] @relation("ReportHandler")
@@ -427,7 +439,7 @@ model Dealer {
   /// Öffnungszeiten je Wochentag, validiert über ein Zod-Schema.
   openingHours Json?
 
-  verification DealerVerificationStatus @default(UNVERIFIED)
+  verification VerificationStatus @default(UNVERIFIED)
   verifiedAt   DateTime?
 
   ratingAvg   Float @default(0)
@@ -441,29 +453,10 @@ model Dealer {
   city          City?               @relation(fields: [cityId], references: [id], onDelete: SetNull)
   vehicles      Vehicle[]
   reviews       Review[]
-  verifications DealerVerification[]
   subscriptions Subscription[]
 
   @@index([verification, ratingAvg])
   @@index([cityId])
-}
-
-model DealerVerification {
-  id       String                   @id @default(cuid())
-  dealerId String
-  status   DealerVerificationStatus @default(PENDING)
-
-  /// Belege liegen im Dateispeicher; hier stehen nur Verweise.
-  documentUrls String[]
-  note         String?
-  reviewedById String?
-  reviewedAt   DateTime?
-  createdAt    DateTime @default(now())
-
-  dealer Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
-
-  @@index([dealerId, status])
-  @@index([status, createdAt])
 }
 
 model Review {
@@ -1044,6 +1037,87 @@ model Report {
 /// Meldung ueber die Seite selbst -- ein Fehler, eine falsche Darstellung
 /// oder ein Vorschlag. Nicht zu verwechseln mit Report: dort geht es um ein
 /// einzelnes Inserat, hier um LEVIZ.
+enum VerificationKind {
+  /// Ausweis einer Person. Grundlage jeder Prüfung.
+  PERSON
+  /// Zusätzlich die Firma: Registrierung und Geschäftsadresse.
+  DEALER
+}
+
+enum VerificationDocumentType {
+  ID_FRONT
+  ID_BACK
+  BUSINESS_REGISTRATION
+  ADDRESS_PROOF
+}
+
+/// Ein Antrag auf Prüfung der Identität.
+///
+/// Die Belege liegen nicht bei den Fahrzeugfotos, sondern in einem Speicher
+/// ausserhalb des öffentlichen Verzeichnisses; hier steht nur der Schlüssel.
+/// Sie werden nach der Entscheidung automatisch gelöscht — die Entscheidung
+/// selbst bleibt dauerhaft nachvollziehbar.
+model VerificationRequest {
+  id     String           @id @default(cuid())
+  userId String
+  kind   VerificationKind
+
+  /// UNVERIFIED kommt hier nicht vor: ein Antrag ist mindestens PENDING.
+  status VerificationStatus @default(PENDING)
+
+  /// Name genau wie im Ausweis. Weicht er vom Kontonamen ab, ist das der
+  /// erste Punkt, den der Prüfer anschaut.
+  legalName String
+
+  addressLine String
+  postalCode  String?
+  city        String
+
+  /// Nur bei Händlern: Firmenname und Betriebsnummer aus dem Register.
+  companyName        String?
+  registrationNumber String?
+
+  /// Begründung der Entscheidung. Bei einer Ablehnung sieht der Antragsteller
+  /// sie — sonst weiss er nicht, was er nachbessern soll.
+  note String?
+
+  reviewedById String?
+  reviewedAt   DateTime?
+
+  /// Wann die Belege gelöscht wurden. Solange leer, liegen sie noch.
+  documentsPurgedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user       User                   @relation(name: "VerificationSubject", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User?                  @relation(name: "VerificationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  documents  VerificationDocument[]
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@index([reviewedAt])
+}
+
+model VerificationDocument {
+  id        String @id @default(cuid())
+  requestId String
+
+  type VerificationDocumentType
+
+  /// Pfad im privaten Speicher. Nie über eine öffentliche Adresse abrufbar,
+  /// sondern nur über eine Route, die den Verwalter prüft.
+  storageKey  String
+  contentType String
+  sizeBytes   Int
+
+  createdAt DateTime @default(now())
+
+  request VerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
 model BugReport {
   id String @id @default(cuid())
 

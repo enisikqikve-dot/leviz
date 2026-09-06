@@ -287,6 +287,49 @@ normal, und niemand bekäme je eine Mail.
 
 ---
 
+## Ausweisprüfung
+
+Händler müssen sich ausweisen, Privatverkäufer dürfen es. Beide bekommen
+danach dasselbe Abzeichen an ihren Anzeigen; ohne Prüfung fehlt nur das
+Abzeichen, inserieren darf jeder.
+
+| Beleg | Person | Händler |
+|---|---|---|
+| Ausweis, Vorder- und Rückseite | Pflicht | Pflicht |
+| Registerauszug mit Betriebsnummer | — | Pflicht |
+| Adressnachweis | — | Pflicht |
+
+Der Antrag läuft über `/paneli/verifikimi` (`/de/konto/verifizierung`), die
+Entscheidung über `/admin/verifications`. Eine Ablehnung verlangt eine
+Begründung — sonst steht der Antragsteller vor einem „nein" ohne Anhaltspunkt
+und lädt dieselben Bilder noch einmal hoch.
+
+### Wo die Belege liegen
+
+**Nicht** bei den Fahrzeugfotos. Was unter `public/` liegt, ist mit der blossen
+Adresse abrufbar; bei einem Foto ist das der Zweck, bei einem Ausweis der
+Schaden. Die Belege liegen unter `var/verification/`, im Behälter an einem
+eigenen dauerhaften Speicher, und kommen ausschliesslich über
+`/api/verification/documents/[id]` heraus — eine Route, die vorher die Rolle
+prüft. Wer nicht darf, bekommt 404 statt 403: eine 403 wäre die Bestätigung,
+dass es unter dieser Kennung etwas gibt.
+
+### Löschen nach 90 Tagen
+
+Die Belege verschwinden 90 Tage nach der Entscheidung, die Entscheidung selbst
+bleibt. Der Verwaltungsbereich räumt beim Öffnen auf; dazu als tägliche
+Aufgabe auf dem Server (`crontab -e`):
+
+```
+30 3 * * * cd /root/leviz && docker compose run --rm migrate npx tsx scripts/purge-verification.ts >> /var/log/leviz-purge.log 2>&1
+```
+
+Beides zusammen, weil keins allein genügt: läuft die Zeitsteuerung nicht,
+sammeln sich Ausweiskopien an, von denen niemand etwas ahnt — und schaut
+monatelang niemand in die Verwaltung, ebenso.
+
+---
+
 ## Rechtliche Seiten
 
 Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:

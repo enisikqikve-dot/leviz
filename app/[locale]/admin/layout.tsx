@@ -18,9 +18,10 @@ export default async function AdminLayout({
   await requireAdmin();
 
   const t = await getTranslations('admin');
-  const [openReports, openBugs] = await Promise.all([
+  const [openReports, openBugs, openVerifications] = await Promise.all([
     prisma.report.count({ where: { status: 'OPEN' } }),
     prisma.bugReport.count({ where: { status: 'OPEN' } }),
+    prisma.verificationRequest.count({ where: { status: 'PENDING' } }),
   ]);
 
   return (
@@ -29,7 +30,11 @@ export default async function AdminLayout({
 
       <div className="mt-6 lg:grid lg:grid-cols-[13rem_1fr] lg:items-start lg:gap-8">
         <aside className="lg:sticky lg:top-20">
-          <AdminNav openReports={openReports} openBugs={openBugs} />
+          <AdminNav
+            openReports={openReports}
+            openBugs={openBugs}
+            openVerifications={openVerifications}
+          />
         </aside>
         <div className="mt-6 min-w-0 lg:mt-0">{children}</div>
       </div>

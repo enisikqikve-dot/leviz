@@ -32,7 +32,7 @@ export const getVehicleBySlug = cache(async (slug: string) => {
       seller: {
         select: {
           id: true, name: true, image: true, phone: true, createdAt: true,
-          trustScore: true,
+          trustScore: true, verification: true,
         },
       },
       dealer: {

@@ -67,5 +67,8 @@ next-env.d.ts
 # Versehentlich im Projektordner gelandete Downloads
 /Download.*
 
+# Ausweisbelege der Pruefung. Gehoeren nie in ein Repository.
+/var/
+
 # Werte fuer docker compose auf dem Server. Enthaelt Passwoerter.
 /.env.docker

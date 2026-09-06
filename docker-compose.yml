@@ -100,6 +100,9 @@ services:
       # Ohne diesen Speicher waeren die Fotos der Verkaeufer nach jedem
       # Neustart des Behaelters verschwunden.
       - uploads:/app/public/uploads
+      # Ausweisbelege der Pruefung. Bewusst ein eigener Speicher ausserhalb
+      # von public/: was dort liegt, ist mit der blossen Adresse abrufbar.
+      - verification:/app/var/verification
 
   web:
     image: caddy:2-alpine
@@ -121,5 +124,6 @@ services:
 volumes:
   db-data:
   uploads:
+  verification:
   caddy-data:
   caddy-config:

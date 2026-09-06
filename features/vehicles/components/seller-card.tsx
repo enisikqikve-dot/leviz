@@ -75,9 +75,22 @@ export async function SellerCard({
         </>
       ) : (
         <>
-          <h2 className="text-base font-semibold">
-            {vehicle.seller.name ?? t('seller.private')}
-          </h2>
+          <div className="flex items-start gap-2">
+            <h2 className="min-w-0 flex-1 text-base font-semibold">
+              {vehicle.seller.name ?? t('seller.private')}
+            </h2>
+            {/* Auch ein Privatverkaeufer kann sich ausweisen. Das Abzeichen
+                ist dasselbe wie beim Haendler -- geprueft ist geprueft. */}
+            {vehicle.seller.verification === 'VERIFIED' ? (
+              <span
+                title={t('trust.verifiedSeller')}
+                className="text-primary inline-flex shrink-0 items-center"
+              >
+                <BadgeCheck className="size-5" aria-hidden />
+                <span className="sr-only">{t('trust.verifiedSeller')}</span>
+              </span>
+            ) : null}
+          </div>
           <p className="text-muted-foreground mt-1 text-sm">{t('seller.private')}</p>
           <p className="text-muted-foreground mt-3 text-xs">
             {t('seller.memberSince')} {formatDate(vehicle.seller.createdAt, locale)}
