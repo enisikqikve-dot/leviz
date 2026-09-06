@@ -57,6 +57,9 @@ export function RegisterForm() {
     });
 
     router.push(signedIn && !signedIn.error ? '/dashboard' : '/login');
+    // Siehe login-form.tsx: ohne refresh zeigt die Kopfzeile weiter den
+    // abgemeldeten Zustand.
+    router.refresh();
   }
 
   return (

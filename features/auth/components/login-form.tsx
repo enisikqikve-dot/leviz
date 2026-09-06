@@ -25,6 +25,20 @@ export function LoginForm({ githubEnabled }: { githubEnabled: boolean }) {
   const t = useTranslations('auth');
   const router = useRouter();
 
+  /**
+   * Nach dem Anmelden auch den Rahmen neu holen.
+   *
+   * `push` allein reicht nicht: Next.js haelt die zuletzt gerenderten Teile im
+   * Browser vor und verwendet Kopf- und Fusszeile wieder. Die stammen dann noch
+   * aus der Zeit vor der Anmeldung — oben stuende weiterhin „Anmelden", obwohl
+   * man laengst drin ist. `refresh` holt den servergerenderten Baum neu und
+   * damit die Kopfzeile mit dem Konto.
+   */
+  const goToDashboard = () => {
+    router.push('/dashboard');
+    router.refresh();
+  };
+
   return (
     <Tabs defaultValue="password">
       <TabsList className="mb-6 grid w-full grid-cols-2">
@@ -33,11 +47,11 @@ export function LoginForm({ githubEnabled }: { githubEnabled: boolean }) {
       </TabsList>
 
       <TabsContent value="password">
-        <PasswordForm onDone={() => router.push('/dashboard')} />
+        <PasswordForm onDone={goToDashboard} />
       </TabsContent>
 
       <TabsContent value="phone">
-        <PhoneForm onDone={() => router.push('/dashboard')} />
+        <PhoneForm onDone={goToDashboard} />
       </TabsContent>
 
       {githubEnabled ? (
