@@ -89,14 +89,32 @@ export function CompareActions({
         </div>
       </div>
 
-      {/* Breite Tabellen scrollen in sich, die Seite selbst nicht. */}
+      {/*
+        Breite Tabellen scrollen in sich, die Seite selbst nicht.
+
+        `table-fixed` ist hier kein Detail, sondern der ganze Punkt: ohne diese
+        Angabe teilt der Browser die Spalten nach ihrem Inhalt auf. Ein breites
+        Foto zog seine Spalte auf, das danebenstehende schrumpfte — zwei Autos
+        nebeneinander waren dann unterschiedlich gross, und ein Vergleich, in
+        dem eine Seite groesser wirkt als die andere, vergleicht nicht mehr.
+        Mit fester Aufteilung bekommt jedes Fahrzeug genau gleich viel Platz.
+
+        Die Mindestbreite waechst mit der Anzahl mit, statt fest zu stehen: bei
+        vier Fahrzeugen waeren feste 46rem je Spalte zu eng geworden.
+      */}
       <div className="mt-4 overflow-x-auto rounded-xl border">
-        <table className="w-full min-w-[46rem] border-collapse">
+        <table
+          className="w-full table-fixed border-collapse"
+          style={{ minWidth: `calc(10rem + ${vehicles.length} * 15rem)` }}
+        >
           <thead>
             <tr>
               <th className="bg-card sticky start-0 w-40 border-b px-3 py-3 text-start" />
               {vehicles.map((vehicle) => (
-                <th key={vehicle.id} className="border-b p-3 align-top">
+                // `text-start`, weil eine Kopfzelle sonst mittig ausrichtet:
+                // Name und Preis standen zentriert ueber einem Foto, das die
+                // ganze Spalte fuellt — und damit versetzt zu allem darunter.
+                <th key={vehicle.id} className="border-b p-3 text-start align-top">
                   <div className="relative">
                     <button
                       type="button"
@@ -114,7 +132,16 @@ export function CompareActions({
                     >
                       <div className="bg-muted relative aspect-[4/3] overflow-hidden rounded-lg">
                         {vehicle.imageUrl ? (
-                          <Image src={vehicle.imageUrl} alt="" fill sizes="220px" className="object-cover" />
+                          // 220px war zu wenig: bei zwei Fahrzeugen auf einem
+                          // breiten Bildschirm wird eine Spalte ueber 600px
+                          // breit, und das kleine Bild wurde hochgerechnet.
+                          <Image
+                            src={vehicle.imageUrl}
+                            alt=""
+                            fill
+                            sizes="(min-width: 1280px) 30vw, (min-width: 640px) 40vw, 60vw"
+                            className="object-cover"
+                          />
                         ) : null}
                       </div>
                       <p className="mt-2 truncate text-sm font-semibold">{vehicle.title}</p>
