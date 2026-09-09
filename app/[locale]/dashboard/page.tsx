@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { BadgeCheck, Bookmark, Car, Heart, MessageSquare, Settings } from 'lucide-react';
+import {
+  BadgeCheck, Bookmark, Car, Heart, MessageSquare, Settings, Upload,
+} from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +20,16 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'dashboard' });
   return { title: t('title'), robots: { index: false } };
 }
+
+/**
+ * Der Bestandsimport steht nur bei Haendlerkonten.
+ *
+ * Ein Privatverkaeufer mit einem Auto hat nichts zu importieren; die Kachel
+ * waere fuer ihn eine Sackgasse mit Erklaerung.
+ */
+const DEALER_SECTIONS = [
+  { href: '/dashboard/import', key: 'importListings', icon: Upload },
+] as const;
 
 const SECTIONS = [
   { href: '/dashboard/listings', key: 'myListings', icon: Car },
@@ -43,7 +55,10 @@ export default async function DashboardPage({
 
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: sessionUser.id },
-    select: { name: true, email: true, phone: true, role: true, createdAt: true },
+    select: {
+      name: true, email: true, phone: true, role: true, createdAt: true,
+      dealer: { select: { id: true } },
+    },
   });
 
   const displayName = user.name ?? user.email ?? (user.phone ? formatPhone(user.phone) : '');
@@ -84,7 +99,7 @@ export default async function DashboardPage({
       </dl>
 
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {SECTIONS.map(({ href, key, icon: Icon }) => (
+        {[...(user.dealer ? DEALER_SECTIONS : []), ...SECTIONS].map(({ href, key, icon: Icon }) => (
           <li key={href}>
             <Link
               href={href}

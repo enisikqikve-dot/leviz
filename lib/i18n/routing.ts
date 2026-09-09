@@ -66,6 +66,11 @@ export const pathnames = {
     de: '/konto/statistik',
     en: '/dashboard/statistics',
   },
+  '/dashboard/import': {
+    sq: '/paneli/importo',
+    de: '/konto/import',
+    en: '/dashboard/import',
+  },
   '/dashboard/verification': {
     sq: '/paneli/verifikimi',
     de: '/konto/verifizierung',

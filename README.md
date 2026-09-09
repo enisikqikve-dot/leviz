@@ -364,6 +364,96 @@ laut scheitern, statt still auf das Terminal zurückzufallen.
 
 ---
 
+## Bestandsimport für Händler
+
+Ein Händler mit vierzig Autos legt keine vierzig Inserate von Hand an. Unter
+`/paneli/importo` (`/konto/import`, `/dashboard/import`) lädt er eine
+CSV-Datei aus dem Programm, das er ohnehin benutzt, und alle Fahrzeuge
+entstehen auf einmal.
+
+Die Seite steht nur bei Händlerkonten; die Aktionen dahinter prüfen das noch
+einmal selbst.
+
+### Zwei Schritte, und der erste ist der wichtige
+
+Erst wird gezeigt, **was entstehen würde** — je Zeile, mit Fehlern und
+Zeilennummer. Erst danach wird angelegt. Vierzig Inserate aus einer Datei zu
+erzeugen, die niemand vorher gesehen hat, geht genau einmal gut; danach löscht
+der Händler vierzig Inserate von Hand.
+
+Angelegt wird über `saveListingAction` — **dieselbe** Funktion, die auch der
+Inserats-Assistent benutzt. Ein eigener, schnellerer Weg wäre verlockend und
+falsch: er liefe an Moderation, Qualitätsbewertung und Preisverlauf vorbei, und
+der Unterschied fiele erst auf, wenn der Bestand schon drin ist.
+
+### Was die Datei enthalten darf
+
+Spaltennamen und Werte werden in allen drei Sprachen erkannt. `Marke`,
+`marka`, `Hersteller` und `Make` sind dieselbe Spalte; `Naftë`,
+`Diesel` und `Dizel` derselbe Kraftstoff. Wer auf exakte Vorlagen besteht,
+bekommt keine Händler — er bekommt Händler, die es einmal versuchen und danach
+wieder von Hand inserieren.
+
+Eine Vorlage mit den passenden Spalten und einer Beispielzeile liegt unter
+`/api/import/template?lang=sq|de|en`. Sie hat Semikolon als Trennzeichen und
+eine Byte-Reihenfolge-Markierung, damit Excel sie richtig öffnet.
+
+Erkannt wird außerdem, ohne dass der Händler etwas umstellen muss:
+
+- **Trennzeichen** — Semikolon, Komma oder Tabulator, entschieden an der Kopfzeile
+- **Zahlen** — `18.000`, `18,000`, `18 000`, `18.000 €` sind dasselbe
+- **Leistung** — `190 PS` und `140 kW`; fehlt die Einheit, gilt PS
+- **Datum** — `2018`, `03/2018`, `2018-03`
+- **Ortsnamen** — `Prishtina` und `Prishtinë` sind dieselbe Stadt
+
+Geraten wird nichts. Ein BMW **320d** landet nicht von selbst beim 3er: die
+Zeile bekommt einen Fehler und daneben die Modelle, die es bei dieser Marke
+gibt.
+
+### Fotos
+
+Die Spalte `Fotot`/`Bilder` enthält Adressen, getrennt durch `|`. Der
+Server lädt sie herunter und legt sie im eigenen Speicher ab — ein Inserat, das
+auf fremde Adressen zeigt, verliert seine Bilder, sobald der Händler seine Seite
+umbaut. Ohne mindestens ein Foto entsteht kein Inserat; das verlangt der
+Assistent genauso.
+
+Das ist die heikelste Stelle des Imports: der Server ruft eine Adresse auf, die
+jemand anderes bestimmt hat. Gesperrt sind deshalb alle Adressen, die nach innen
+zeigen — Rückschleife, private Netze, der Metadatendienst `169.254.169.254`,
+Nachbarn im Docker-Netz. Geprüft wird auch der aufgelöste Name, nicht nur die
+Zeichenkette, und Weiterleitungen werden nicht verfolgt. Der Inhalt jeder Datei
+wird an den ersten Bytes geprüft, nicht an der Endung.
+
+### Grenzen
+
+- **100 Fahrzeuge je Durchgang.** Für jedes werden Fotos von fremden Servern
+  geholt; bei mehr sitzt der Händler vor einer Seite, die sich nicht rührt.
+- **Die Paketgrenze gilt.** Passen nicht alle Zeilen hinein, wird vorher gesagt,
+  wie viele angelegt werden.
+- **Dieselbe Datei zweimal verdoppelt den Bestand nicht** — erkannt an der
+  Fahrgestellnummer. Ohne VIN in der Datei kann das niemand unterscheiden.
+
+### Beschreibung ergänzen
+
+Ein Häkchen, standardmäßig gesetzt: fehlt die Beschreibung oder ist sie zu kurz,
+wird sie **aus den Angaben derselben Zeile** gebildet — `BMW 3er · Viti 2018 ·
+150.000 km · Naftë · Automatik · 190 kf`. Kein erfundener Werbetext, nur
+dieselben Zahlen als Satz. Solche Zeilen werden in der Vorschau gekennzeichnet,
+damit der Händler weiß, wo er nacharbeiten sollte.
+
+Ohne das Häkchen gilt die Mindestlänge des Assistenten, und zu kurze Zeilen
+werden abgelehnt.
+
+### Entwurf oder sofort sichtbar
+
+Ohne Häkchen liegen die Inserate als Entwurf bereit. Mit Häkchen laufen sie
+durch `publishListingAction` — also durch dieselbe automatische Prüfung wie
+sonst, die je Inserat entscheidet, ob es sofort erscheint oder auf eine Freigabe
+wartet.
+
+---
+
 ## Rechtliche Seiten
 
 Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:
