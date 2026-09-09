@@ -1,14 +1,16 @@
-import { BadgeCheck, Clock, Globe, MapPin, Phone, Star } from 'lucide-react';
+import { BadgeCheck, Clock, Globe, MapPin, MessageCircle, Phone, Star } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { InquiryDialog } from '@/features/inquiries/components/inquiry-dialog';
 import { ContactSellerDialog } from '@/features/messages/components/contact-seller-dialog';
 import { formatPhone } from '@/features/auth/phone';
+import { viberLink, whatsappLink } from '@/features/vehicles/contact-links';
 import { formatDate } from '@/features/vehicles/format';
 import type { VehicleDetail } from '@/features/vehicles/queries';
 import { Link } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
+import { absoluteUrl } from '@/lib/seo/alternates';
 
 const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
@@ -30,6 +32,14 @@ export async function SellerCard({
     dealer?.openingHours && typeof dealer.openingHours === 'object'
       ? (dealer.openingHours as Record<string, string | null>)
       : null;
+
+  const vorschlag = t('seller.message', {
+    vehicle: `${vehicle.brand.name} ${vehicle.model.name}`,
+    url: absoluteUrl({ pathname: '/vehicle/[slug]', params: { slug: vehicle.slug } }, locale),
+  });
+
+  const whatsapp = whatsappLink(phone, vorschlag);
+  const viber = viberLink(phone);
 
   return (
     <div className="bg-card text-card-foreground shadow-card rounded-xl border p-5">
@@ -122,6 +132,40 @@ export async function SellerCard({
               {formatPhone(phone)}
             </a>
           </Button>
+        ) : null}
+
+        {/*
+          WhatsApp und Viber stehen neben dem Anruf, nicht an seiner Stelle.
+
+          Geschrieben wird in Kosovo, Albanien und Nordmazedonien fast immer
+          über einen dieser beiden Wege — anrufen tut man erst, wenn man sich
+          schon einig ist. Die erste Nachricht steht bereits im Feld, samt
+          Adresse des Inserats: bei einem Händler mit vierzig Autos ist
+          „welches meinst du?" sonst die erste Rückfrage.
+
+          Unterschied zwischen beiden: `wa.me` führt auch ohne App zu einer
+          Seite, die weiterhilft. `viber://` öffnet nur die installierte App.
+        */}
+        {whatsapp || viber ? (
+          <div className="flex gap-2">
+            {whatsapp ? (
+              <Button asChild variant="outline" size="lg" className="h-11 flex-1">
+                <a href={whatsapp} target="_blank" rel="noopener noreferrer">
+                  <MessageCircle className="size-4" aria-hidden />
+                  {t('seller.whatsapp')}
+                </a>
+              </Button>
+            ) : null}
+
+            {viber ? (
+              <Button asChild variant="outline" size="lg" className="h-11 flex-1">
+                <a href={viber}>
+                  <MessageCircle className="size-4" aria-hidden />
+                  {t('seller.viber')}
+                </a>
+              </Button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 

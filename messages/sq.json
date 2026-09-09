@@ -529,7 +529,10 @@
       "openingHours": "Orari",
       "website": "Faqja e internetit",
       "viewProfile": "Shiko profilin",
-      "reviews": "{count} vlerësime"
+      "reviews": "{count} vlerësime",
+      "whatsapp": "WhatsApp",
+      "viber": "Viber",
+      "message": "Përshëndetje! A është ende në shitje {vehicle}? E pashë në LEVIZ: {url}"
     },
     "stats": {
       "views": "{count} shikime",

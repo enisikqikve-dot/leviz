@@ -529,7 +529,10 @@
       "openingHours": "Öffnungszeiten",
       "website": "Webseite",
       "viewProfile": "Profil ansehen",
-      "reviews": "{count} Bewertungen"
+      "reviews": "{count} Bewertungen",
+      "whatsapp": "WhatsApp",
+      "viber": "Viber",
+      "message": "Hallo! Ist der {vehicle} noch zu haben? Gesehen auf LEVIZ: {url}"
     },
     "stats": {
       "views": "{count} Aufrufe",
