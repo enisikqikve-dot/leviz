@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db';
 
 import { estimatePrice, MIN_SAMPLE, type PriceEstimate } from './estimate';
+import { standingsFor, type Standing, type StandingItem } from './standings';
 
 export type EstimateRequest = {
   brandId: string;
@@ -93,16 +94,46 @@ export async function estimateForVehicle(
 }
 
 /**
- * Wie sich ein Preis zur Schätzung verhält.
+ * Marktvergleich für eine ganze Trefferliste, in einer einzigen Abfrage.
  *
- * Bewusst grob in drei Stufen: eine prozentgenaue Aussage würde eine
- * Genauigkeit vortäuschen, die die Datenlage nicht hergibt.
+ * `PROBEN_GRENZE` deckelt, wie viele Vergleichsfahrzeuge insgesamt geholt
+ * werden. Die neuesten zuerst: sie beschreiben den heutigen Markt am besten,
+ * und ohne Deckel würde die Abfrage mitwachsen, wenn irgendwann Zehntausende
+ * Inserate desselben Modells eingestellt sind.
  */
-export function priceStanding(
-  priceCents: number,
-  estimate: PriceEstimate,
-): 'below' | 'within' | 'above' {
-  if (priceCents < estimate.lowCents) return 'below';
-  if (priceCents > estimate.highCents) return 'above';
-  return 'within';
+const PROBEN_GRENZE = 1500;
+
+export async function loadPriceStandings(
+  items: StandingItem[],
+): Promise<Map<string, Standing>> {
+  const modelIds = [...new Set(items.map((item) => item.modelId))];
+  if (modelIds.length === 0) return new Map();
+
+  const rows = await prisma.vehicle.findMany({
+    where: {
+      status: 'ACTIVE',
+      priceCents: { gt: 0 },
+      modelId: { in: modelIds },
+    },
+    select: {
+      id: true,
+      modelId: true,
+      priceCents: true,
+      firstRegistration: true,
+      mileageKm: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: PROBEN_GRENZE,
+  });
+
+  return standingsFor(
+    items,
+    rows.map((row) => ({
+      id: row.id,
+      modelId: row.modelId,
+      priceCents: row.priceCents,
+      year: row.firstRegistration ? row.firstRegistration.getFullYear() : null,
+      mileageKm: row.mileageKm,
+    })),
+  );
 }

@@ -400,7 +400,8 @@
       "dealer": "Autosallon",
       "customsCleared": "E doganuar",
       "customsNotCleared": "E padoganuar",
-      "accidentFree": "Pa aksident"
+      "accidentFree": "Pa aksident",
+      "belowMarket": "Nën çmimin e tregut"
     },
     "listedToday": "Sot",
     "listedYesterday": "Dje",

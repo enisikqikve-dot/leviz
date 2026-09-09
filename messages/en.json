@@ -400,7 +400,8 @@
       "dealer": "Dealer",
       "customsCleared": "Cleared",
       "customsNotCleared": "Not cleared",
-      "accidentFree": "Accident-free"
+      "accidentFree": "Accident-free",
+      "belowMarket": "Below market price"
     },
     "listedToday": "Today",
     "listedYesterday": "Yesterday",

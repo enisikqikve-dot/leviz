@@ -1,4 +1,4 @@
-import { BadgeCheck, Fuel, Gauge, MapPin, Settings2, Star, Zap } from 'lucide-react';
+import { BadgeCheck, Fuel, Gauge, MapPin, Settings2, Star, TrendingDown, Zap } from 'lucide-react';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 
@@ -7,6 +7,7 @@ import { FavoriteButton } from '@/features/favorites/components/favorite-button'
 import {
   daysSince, formatMileage, formatPower, registrationYear, variantFromTitle,
 } from '@/features/vehicles/format';
+import type { Standing } from '@/features/pricing/standings';
 import type { VehicleCard as VehicleCardData } from '@/features/search/queries';
 import { formatPrice, type Currency } from '@/lib/currency';
 import { formatDistanceKm } from '@/lib/geo/distance';
@@ -21,13 +22,20 @@ type Props = {
   eurToAll: number;
   favorited: boolean;
   inCompare?: boolean;
+  /**
+   * Wie der Preis zum Markt steht, sofern genug Vergleiche vorliegen.
+   *
+   * Fehlt die Angabe, erscheint kein Siegel — das ist der Normalfall, solange
+   * von einem Modell nur wenige Inserate im Umlauf sind.
+   */
+  standing?: Standing;
   layout?: 'grid' | 'list';
   priority?: boolean;
 };
 
 export async function VehicleCard({
   vehicle, locale, currency, eurToAll, favorited, inCompare = false,
-  layout = 'grid', priority = false,
+  standing, layout = 'grid', priority = false,
 }: Props) {
   const t = await getTranslations('vehicles');
   const image = vehicle.images[0];
@@ -152,6 +160,23 @@ export async function VehicleCard({
               </span>
             ) : null}
           </p>
+
+          {/*
+            Nur der gute Fall wird ausgezeichnet.
+
+            „Über Marktwert" wäre technisch dieselbe Rechnung, aber es steht
+            auf dem Inserat eines Verkäufers, der hier bezahlt — und es beruht
+            auf einer Schätzung aus wenigen Vergleichen. Wer ein Auto teuer
+            findet, sieht das am Preis; wer ein günstiges übersieht, dem hilft
+            der Hinweis. Die vollständige Einordnung mit Spanne steht auf der
+            Fahrzeugseite, wo Platz für die Erklärung ist.
+          */}
+          {standing === 'below' ? (
+            <p className="text-success mt-1.5 inline-flex items-center gap-1 text-xs font-medium">
+              <TrendingDown className="size-3.5" aria-hidden />
+              {t('badges.belowMarket')}
+            </p>
+          ) : null}
 
           <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
             {vehicle.city ? (

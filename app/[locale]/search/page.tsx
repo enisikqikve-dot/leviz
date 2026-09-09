@@ -15,6 +15,7 @@ import { suggestSearchName } from '@/features/searches/name';
 import { searchVehicles } from '@/features/search/queries';
 import { countActiveFilters, parseSearchParams, toQueryString } from '@/features/search/schema';
 import { SearchAssistant } from '@/features/ai/components/search-assistant';
+import { loadPriceStandings } from '@/features/pricing/queries';
 import { VehicleCard } from '@/features/vehicles/components/vehicle-card';
 import { formatNumber, formatPrice } from '@/lib/currency';
 import { getCurrency } from '@/lib/currency-server';
@@ -55,9 +56,19 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
     getEurToAllRate(),
   ]);
 
-  const [favorites, compareIds] = await Promise.all([
+  const [favorites, compareIds, standings] = await Promise.all([
     getFavoriteIds(result.items.map((item) => item.id)),
     getCompareIds(),
+    // Eine Abfrage für die ganze Seite, nicht eine je Fahrzeug.
+    loadPriceStandings(
+      result.items.map((item) => ({
+        id: item.id,
+        modelId: item.modelId,
+        priceCents: item.priceCents,
+        year: item.firstRegistration ? item.firstRegistration.getFullYear() : null,
+        mileageKm: item.mileageKm,
+      })),
+    ),
   ]);
   const compare = new Set(compareIds);
   const hasResults = result.items.length > 0;
@@ -132,6 +143,7 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
                       eurToAll={eurToAll}
                       favorited={favorites.has(vehicle.id)}
                       inCompare={compare.has(vehicle.id)}
+                      standing={standings.get(vehicle.id)}
                       priority={index < 3}
                     />
                   </li>

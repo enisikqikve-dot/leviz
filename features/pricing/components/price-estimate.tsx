@@ -2,7 +2,7 @@ import { Info, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 import type { EstimateResult } from '@/features/pricing/queries';
-import { priceStanding } from '@/features/pricing/queries';
+import { priceStanding } from '@/features/pricing/estimate';
 import { formatPrice, type Currency } from '@/lib/currency';
 import type { Locale } from '@/lib/i18n/routing';
 import { cn } from '@/lib/utils';

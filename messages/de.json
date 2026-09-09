@@ -400,7 +400,8 @@
       "dealer": "Händler",
       "customsCleared": "Verzollt",
       "customsNotCleared": "Unverzollt",
-      "accidentFree": "Unfallfrei"
+      "accidentFree": "Unfallfrei",
+      "belowMarket": "Unter Marktwert"
     },
     "listedToday": "Heute",
     "listedYesterday": "Gestern",

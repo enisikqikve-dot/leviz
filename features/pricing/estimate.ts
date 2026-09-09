@@ -129,3 +129,18 @@ export function estimatePrice(input: EstimateInput): PriceEstimate | null {
     confidence: Math.round(bySample * 0.5 * 100 + bySpread * 0.5 * 100) / 100,
   };
 }
+
+/**
+ * Wie sich ein Preis zur Schätzung verhält.
+ *
+ * Bewusst grob in drei Stufen: eine prozentgenaue Aussage würde eine
+ * Genauigkeit vortäuschen, die die Datenlage nicht hergibt.
+ */
+export function priceStanding(
+  priceCents: number,
+  estimate: PriceEstimate,
+): 'below' | 'within' | 'above' {
+  if (priceCents < estimate.lowCents) return 'below';
+  if (priceCents > estimate.highCents) return 'above';
+  return 'within';
+}

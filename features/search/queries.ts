@@ -155,7 +155,7 @@ export function buildOrderBy(
 }
 
 export const CARD_SELECT = {
-  id: true, slug: true, title: true,
+  id: true, slug: true, title: true, modelId: true,
   priceCents: true, negotiable: true,
   mileageKm: true, firstRegistration: true,
   fuel: true, transmission: true, powerKw: true, bodyType: true, driveType: true,
