@@ -831,7 +831,8 @@
       "soldListings": "Sold",
       "newThisWeek": "New this week",
       "openReports": "Open reports",
-      "unverifiedDealers": "Unverified"
+      "unverifiedDealers": "Unverified",
+      "newUsersThisWeek": "New accounts (7 days)"
     },
     "users": {
       "title": "Users",
@@ -1117,6 +1118,13 @@
       "errorUnknown": "This code was not found",
       "errorRedeemed": "This code has been redeemed — disable it instead of deleting it",
       "errorPrefix": "The prefix is too long (max 12)"
+    },
+    "signups": {
+      "title": "Latest sign-ups",
+      "empty": "No sign-ups yet.",
+      "dealer": "Dealer",
+      "private": "Private",
+      "all": "All accounts"
     }
   },
   "pricing": {

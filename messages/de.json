@@ -831,7 +831,8 @@
       "soldListings": "Verkauft",
       "newThisWeek": "Neu diese Woche",
       "openReports": "Offene Meldungen",
-      "unverifiedDealers": "Ohne Verifizierung"
+      "unverifiedDealers": "Ohne Verifizierung",
+      "newUsersThisWeek": "Neue Konten (7 Tage)"
     },
     "users": {
       "title": "Nutzer",
@@ -1117,6 +1118,13 @@
       "errorUnknown": "Dieser Code wurde nicht gefunden",
       "errorRedeemed": "Dieser Code wurde eingelöst — schalte ihn ab, statt ihn zu löschen",
       "errorPrefix": "Das Präfix ist zu lang (höchstens 12)"
+    },
+    "signups": {
+      "title": "Zuletzt registriert",
+      "empty": "Noch keine Registrierung.",
+      "dealer": "Händler",
+      "private": "Privat",
+      "all": "Alle Konten"
     }
   },
   "pricing": {

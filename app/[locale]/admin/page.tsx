@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import {
-  AlertTriangle, Car, CheckCircle2, Clock, Flag, ShieldAlert, Store, Tag, Users,
+  AlertTriangle, Car, CheckCircle2, Clock, Flag, ShieldAlert, Store, Tag, UserPlus, Users,
 } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
-import { getPlatformStats } from '@/features/admin/queries';
+import { getPlatformStats, getRecentSignups } from '@/features/admin/queries';
 import { StatCard } from '@/features/dealers/components/stat-card';
 import { formatNumber } from '@/lib/currency';
 import { Link } from '@/lib/i18n/navigation';
@@ -19,8 +19,14 @@ export default async function AdminDashboardPage({
   const t = await getTranslations('admin.stats');
   const tn = await getTranslations('admin.nav');
 
-  const stats = await getPlatformStats();
+  const [stats, signups] = await Promise.all([getPlatformStats(), getRecentSignups()]);
   const number = (value: number) => formatNumber(value, locale as Locale);
+
+  const ts = await getTranslations('admin.signups');
+  const wann = new Intl.DateTimeFormat(locale === 'sq' ? 'sq-AL' : locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
 
   return (
     <div className="space-y-8">
@@ -72,7 +78,64 @@ export default async function AdminDashboardPage({
           value={number(stats.unverifiedDealers)}
           icon={AlertTriangle}
         />
+        <StatCard
+          label={t('newUsersThisWeek')}
+          value={number(stats.newUsersThisWeek)}
+          icon={UserPlus}
+        />
       </div>
+
+      {/*
+        Wer sich zuletzt registriert hat, steht hier mit Namen.
+
+        Gemeldet wird zusaetzlich per Mail an die Verwalter -- aber eine Mail
+        kommt nur an, solange der Versand eingerichtet ist. Diese Liste wirkt
+        immer, und sie steht dort, wo die Verwaltung ohnehin hinschaut.
+      */}
+      <section className="bg-card rounded-xl border">
+        <div className="flex items-center justify-between gap-4 border-b px-5 py-4">
+          <h2 className="text-base font-semibold">{ts('title')}</h2>
+          <Link href="/admin/users" className="text-primary text-sm font-medium hover:underline">
+            {ts('all')}
+          </Link>
+        </div>
+
+        {signups.length === 0 ? (
+          <p className="text-muted-foreground px-5 py-8 text-center text-sm">{ts('empty')}</p>
+        ) : (
+          <ul className="divide-y">
+            {signups.map((person) => (
+              <li key={person.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3">
+                <span className="min-w-0 flex-1">
+                  <Link
+                    href={{ pathname: '/admin/users/[id]', params: { id: person.id } }}
+                    className="truncate text-sm font-medium hover:underline"
+                  >
+                    {person.dealer?.companyName ?? person.name ?? person.email}
+                  </Link>
+                  <span className="text-muted-foreground block truncate text-xs">
+                    {person.email}
+                  </span>
+                </span>
+
+                <span
+                  className={
+                    person.dealer
+                      ? 'bg-primary/10 text-primary rounded-md px-2 py-0.5 text-xs font-medium'
+                      : 'bg-muted text-muted-foreground rounded-md px-2 py-0.5 text-xs font-medium'
+                  }
+                >
+                  {person.dealer ? ts('dealer') : ts('private')}
+                </span>
+
+                <span className="text-muted-foreground text-xs">
+                  {wann.format(person.createdAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

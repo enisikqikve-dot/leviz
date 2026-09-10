@@ -7,6 +7,7 @@ export async function getPlatformStats() {
   const [
     totalUsers, totalDealers, unverifiedDealers, totalVehicles,
     activeListings, pendingReview, soldListings, newThisWeek, openReports,
+    newUsersThisWeek,
   ] = await Promise.all([
     prisma.user.count({ where: { status: { not: 'DELETED' } } }),
     prisma.dealer.count(),
@@ -17,12 +18,39 @@ export async function getPlatformStats() {
     prisma.vehicle.count({ where: { status: 'SOLD' } }),
     prisma.vehicle.count({ where: { createdAt: { gte: weekAgo } } }),
     prisma.report.count({ where: { status: 'OPEN' } }),
+    prisma.user.count({
+      where: { status: { not: 'DELETED' }, createdAt: { gte: weekAgo } },
+    }),
   ]);
 
   return {
     totalUsers, totalDealers, unverifiedDealers, totalVehicles,
     activeListings, pendingReview, soldListings, newThisWeek, openReports,
+    newUsersThisWeek,
   };
+}
+
+/**
+ * Die zuletzt angelegten Konten.
+ *
+ * Steht auf der Uebersicht, weil eine Meldung per Mail nur ankommt, solange
+ * der Versand eingerichtet ist -- und weil die Verwaltung hier ohnehin
+ * hinschaut. Beides zusammen: gemeldet wird gestossen, nachgesehen wird
+ * gezogen.
+ */
+export function getRecentSignups(take = 8) {
+  return prisma.user.findMany({
+    where: { status: { not: 'DELETED' } },
+    orderBy: { createdAt: 'desc' },
+    take,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      createdAt: true,
+      dealer: { select: { companyName: true } },
+    },
+  });
 }
 
 /** Inserate, die auf eine Freigabe warten — die wichtigste Warteschlange. */

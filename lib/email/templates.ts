@@ -43,3 +43,52 @@ export function passwordResetEmail(locale: Locale, url: string): Template {
 
   return byLocale[locale];
 }
+
+/**
+ * Meldung an die Verwaltung, wenn sich jemand registriert hat.
+ *
+ * Bewusst mit Namen, Adresse und Kontoart im Text: eine Meldung, die nur
+ * "Es gibt eine neue Registrierung" sagt, zwingt zum Nachschlagen und wird
+ * nach der dritten ungelesen weggewischt.
+ *
+ * Die Sprache richtet sich nach dem Verwalter, der sie bekommt, nicht nach
+ * dem, der sich registriert hat.
+ */
+export function newSignupEmail(
+  locale: Locale,
+  signup: {
+    name: string;
+    email: string;
+    dealer: string | null;
+    url: string;
+  },
+): Template {
+  const art = {
+    sq: signup.dealer ? `Autosallon: ${signup.dealer}` : 'Shitës privat',
+    de: signup.dealer ? `Händler: ${signup.dealer}` : 'Privatkonto',
+    en: signup.dealer ? `Dealer: ${signup.dealer}` : 'Private account',
+  } satisfies Record<Locale, string>;
+
+  const byLocale: Record<Locale, Template> = {
+    sq: {
+      subject: signup.dealer
+        ? `Autosallon i ri në ${BRAND}: ${signup.dealer}`
+        : `Llogari e re në ${BRAND}: ${signup.name}`,
+      text: `Dikush sapo u regjistrua.\n\n${signup.name}\n${signup.email}\n${art.sq}\n\nShiko te ${signup.url}\n\n${BRAND}`,
+    },
+    de: {
+      subject: signup.dealer
+        ? `Neuer Händler bei ${BRAND}: ${signup.dealer}`
+        : `Neues Konto bei ${BRAND}: ${signup.name}`,
+      text: `Es hat sich jemand registriert.\n\n${signup.name}\n${signup.email}\n${art.de}\n\nAnsehen unter ${signup.url}\n\n${BRAND}`,
+    },
+    en: {
+      subject: signup.dealer
+        ? `New dealer on ${BRAND}: ${signup.dealer}`
+        : `New account on ${BRAND}: ${signup.name}`,
+      text: `Someone just signed up.\n\n${signup.name}\n${signup.email}\n${art.en}\n\nOpen ${signup.url}\n\n${BRAND}`,
+    },
+  };
+
+  return byLocale[locale];
+}

@@ -6,6 +6,7 @@ import GitHub from 'next-auth/providers/github';
 import { prisma } from '@/lib/db';
 import { verifyPassword } from '@/lib/auth/password';
 import { consumePhoneCode } from '@/lib/auth/phone-code';
+import { notifyAdminsOfSignup } from '@/features/admin/signup-notice';
 import { credentialsLoginSchema, phoneLoginSchema } from '@/features/auth/schemas';
 
 /** GitHub erscheint nur, wenn tatsaechlich Zugangsdaten hinterlegt sind. */
@@ -88,6 +89,12 @@ export const authConfig = {
         if (!accepted) return null;
 
         // Eine bestaetigte Nummer legt beim ersten Mal ein Konto an.
+        //
+        // Offen: die Verwaltung erfaehrt davon noch nichts. Ueber das Formular
+        // und ueber GitHub wird gemeldet, hier nicht -- `upsert` sagt nicht,
+        // ob es angelegt oder gefunden hat. Der Weg ist derzeit ohnehin zu,
+        // weil kein SMS-Anbieter eingerichtet ist; wer einen anschliesst,
+        // muss diese Stelle mitnehmen.
         const user = await prisma.user.upsert({
           where: { phone: parsed.data.phone },
           update: { phoneVerified: new Date() },
@@ -197,6 +204,17 @@ export const authConfig = {
         where: { userId: user.id },
         create: { userId: user.id },
         update: {},
+      });
+
+      // Dieses Ereignis feuert nur, wenn der Adapter das Konto anlegt -- also
+      // bei GitHub. Die Registrierung ueber das Formular meldet sich selbst;
+      // sie geht an diesem Weg vorbei, deshalb entsteht keine doppelte Meldung.
+      await notifyAdminsOfSignup({
+        name: user.name ?? user.email ?? 'GitHub',
+        email: user.email ?? '—',
+        dealer: null,
+      }).catch((fehler) => {
+        console.error('  LEVIZ: Verwaltermeldung fehlgeschlagen —', fehler);
       });
     },
   },

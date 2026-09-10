@@ -4,6 +4,7 @@ import { createHash, randomBytes } from 'node:crypto';
 
 import { getLocale } from 'next-intl/server';
 
+import { notifyAdminsOfSignup } from '@/features/admin/signup-notice';
 // slugify ist allgemein und liegt nur zufaellig bei den Fahrzeugen.
 import { slugify } from '@/features/vehicles/slug';
 import { fail, fromZod, ok, type ActionResult } from '@/lib/action-result';
@@ -136,6 +137,20 @@ export async function registerAction(
     });
   } catch (fehler) {
     console.error('  LEVIZ: Willkommensmail nicht zustellbar —', fehler);
+  }
+
+  // Die Verwaltung erfaehrt vom Zulauf, ohne die Uebersicht offen zu haben.
+  // Aus demselben Grund abgesichert wie der Gruss oben: das Konto steht
+  // bereits, und ein stummes Postfach darf die Registrierung nicht scheitern
+  // lassen.
+  try {
+    await notifyAdminsOfSignup({
+      name,
+      email,
+      dealer: istHaendler ? companyName : null,
+    });
+  } catch (fehler) {
+    console.error('  LEVIZ: Verwaltermeldung fehlgeschlagen —', fehler);
   }
 
   return ok({ email });

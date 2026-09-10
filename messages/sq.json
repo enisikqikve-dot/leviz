@@ -831,7 +831,8 @@
       "soldListings": "Të shitura",
       "newThisWeek": "Të reja këtë javë",
       "openReports": "Raportime të hapura",
-      "unverifiedDealers": "Pa verifikim"
+      "unverifiedDealers": "Pa verifikim",
+      "newUsersThisWeek": "Llogari të reja (7 ditë)"
     },
     "users": {
       "title": "Përdoruesit",
@@ -1117,6 +1118,13 @@
       "errorUnknown": "Ky kod nuk u gjet",
       "errorRedeemed": "Ky kod është shfrytëzuar — çaktivizoje në vend që ta fshish",
       "errorPrefix": "Parashtesa është shumë e gjatë (max 12)"
+    },
+    "signups": {
+      "title": "Regjistrimet e fundit",
+      "empty": "Ende asnjë regjistrim.",
+      "dealer": "Autosallon",
+      "private": "Privat",
+      "all": "Të gjitha llogaritë"
     }
   },
   "pricing": {
