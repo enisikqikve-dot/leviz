@@ -1320,6 +1320,15 @@ model Payment {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
+  /// Wann der Kaeufer der sofortigen Ausfuehrung zugestimmt hat.
+  ///
+  /// Ohne diese Zustimmung bleibt das Widerrufsrecht vierzehn Tage bestehen,
+  /// auch nachdem die Leistung erbracht ist -- eine Hervorhebung laeuft dann
+  /// schon, und der Kaeufer kann sie trotzdem zurueckgeben. Der Zeitpunkt
+  /// steht hier, weil eine Zustimmung, die sich nicht belegen laesst, im
+  /// Streitfall keine ist.
+  withdrawalConsentAt DateTime?
+
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   package Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
   vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)

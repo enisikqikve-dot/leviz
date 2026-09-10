@@ -1161,7 +1161,10 @@
     "testNotice": "Dies ist eine Testseite. Es wird kein Geld abgebucht und keine Karte verlangt.",
     "notFound": "Diese Zahlung wurde nicht gefunden.",
     "settled": "Diese Zahlung ist bereits abgeschlossen.",
-    "backToPricing": "Zurück zu den Preisen"
+    "backToPricing": "Zurück zu den Preisen",
+    "consent": "Ich stimme zu, dass die Leistung sofort beginnt, und weiß, dass ich damit mein Widerrufsrecht verliere.",
+    "consentLink": "Widerrufsrecht",
+    "errorConsentRequired": "Bitte stimme der sofortigen Ausführung zu."
   },
   "billing": {
     "title": "Zahlungen",

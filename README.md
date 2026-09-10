@@ -487,13 +487,25 @@ schlimmer als gar keins: es sieht vollständig aus und ist trotzdem falsch.
 > Kosovo prüfen lassen — die albanische Fassung zusätzlich von einer
 > Muttersprachlerin, weil es bei Rechtstexten auf die Wortwahl ankommt.
 
-### Offener Punkt: Zustimmung zur sofortigen Ausführung
+### Zustimmung zur sofortigen Ausführung
 
-Die Widerrufsbelehrung nennt den Fall, dass das Widerrufsrecht vorzeitig
-erlischt, wenn der Käufer der sofortigen Ausführung ausdrücklich zustimmt. Für
-die sofortige Hervorhebung eines Inserats trifft genau das zu — **die
-Zustimmung wird im Kaufvorgang aber noch nicht abgefragt.** Ohne sie bleibt das
-Widerrufsrecht 14 Tage bestehen, auch nach erbrachter Leistung.
+Die Leistung beginnt mit der Zahlung: das Paket läuft, die Hervorhebung ist
+sichtbar. Das Widerrufsrecht erlischt dabei nur, wenn der Käufer der sofortigen
+Ausführung **vorher ausdrücklich zugestimmt** hat. Ohne diese Zustimmung könnte
+er vierzehn Tage lang zurückgeben, was längst erbracht ist.
+
+Deshalb steht über jedem Kaufknopf ein Häkchen mit genau diesem Satz, daneben
+der Verweis auf die Widerrufsseite — niemand soll einem Verzicht zustimmen, den
+er nicht nachlesen kann. Der Knopf bleibt bis dahin gesperrt.
+
+Geprüft wird das **auf dem Server**, nicht nur im Formular: `startCheckout`
+weist ohne Zustimmung ab. Ein Häkchen, das der Browser setzt, ist kein Nachweis
+— wer die Aktion direkt aufruft, umginge es.
+
+Festgehalten wird der Zeitpunkt an der Zahlung selbst
+(`Payment.withdrawalConsentAt`). Eine Zustimmung, die sich nicht belegen lässt,
+ist im Streitfall keine. Ältere Buchungen aus der Zeit davor haben das Feld
+leer — es wird kein Wert erfunden.
 
 ---
 

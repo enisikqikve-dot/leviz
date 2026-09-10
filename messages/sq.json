@@ -1161,7 +1161,10 @@
     "testNotice": "Kjo është faqe testimi. Nuk tërhiqet asnjë para dhe nuk kërkohet asnjë kartelë.",
     "notFound": "Kjo pagesë nuk u gjet.",
     "settled": "Kjo pagesë është kryer tashmë.",
-    "backToPricing": "Kthehu te çmimet"
+    "backToPricing": "Kthehu te çmimet",
+    "consent": "Pajtohem që shërbimi të fillojë menjëherë dhe pranoj se me këtë humb të drejtën e tërheqjes.",
+    "consentLink": "E drejta e tërheqjes",
+    "errorConsentRequired": "Duhet të pajtohesh që shërbimi të fillojë menjëherë."
   },
   "billing": {
     "title": "Pagesat",

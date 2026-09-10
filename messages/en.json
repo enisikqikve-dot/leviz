@@ -1161,7 +1161,10 @@
     "testNotice": "This is a test page. No money is taken and no card is required.",
     "notFound": "This payment was not found.",
     "settled": "This payment is already settled.",
-    "backToPricing": "Back to pricing"
+    "backToPricing": "Back to pricing",
+    "consent": "I agree that the service starts immediately and understand that I lose my right of withdrawal.",
+    "consentLink": "Right of withdrawal",
+    "errorConsentRequired": "Please agree to immediate performance."
   },
   "billing": {
     "title": "Billing",

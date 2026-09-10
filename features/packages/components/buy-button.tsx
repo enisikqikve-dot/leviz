@@ -14,7 +14,7 @@ import {
 import { goToCheckout } from '@/features/packages/redirect';
 import { previewVoucherAction, type VoucherPreview } from '@/features/vouchers/actions';
 import { formatPrice, type Currency } from '@/lib/currency';
-import { useRouter } from '@/lib/i18n/navigation';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import type { Locale } from '@/lib/i18n/routing';
 import { cn } from '@/lib/utils';
 
@@ -52,6 +52,7 @@ export function BuyButton({
   disabled?: boolean;
 }) {
   const t = useTranslations('vouchers');
+  const tc = useTranslations('checkout');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -59,9 +60,11 @@ export function BuyButton({
   const [code, setCode] = useState('');
   const [preview, setPreview] = useState<VoucherPreview | null>(null);
   const [pruefend, setPruefend] = useState(false);
+  const [zugestimmt, setZugestimmt] = useState(false);
 
   const preis = (cents: number) => formatPrice(cents, { currency, locale, eurToAll });
-  const meldung = (schluessel: string) => (t.has(schluessel) ? t(schluessel) : schluessel);
+  const meldung = (schluessel: string) =>
+    t.has(schluessel) ? t(schluessel) : tc.has(schluessel) ? tc(schluessel) : schluessel;
 
   async function pruefe() {
     if (!code.trim()) return;
@@ -85,10 +88,42 @@ export function BuyButton({
 
   return (
     <div className={cn('space-y-2', className)}>
+      {/*
+        Die Zustimmung zur sofortigen Ausfuehrung.
+
+        Die Leistung beginnt mit der Zahlung -- das Paket laeuft, die
+        Hervorhebung ist sichtbar. Das Widerrufsrecht erlischt dabei nur, wenn
+        der Kaeufer dem vorher ausdruecklich zugestimmt hat. Ohne das Haekchen
+        koennte er vierzehn Tage lang zurueckgeben, was laengst erbracht ist.
+
+        Der Verweis auf die Widerrufsseite steht daneben, damit niemand einem
+        Verzicht zustimmt, den er nicht nachlesen kann. Der Knopf bleibt bis
+        dahin gesperrt -- und der Server prueft es unabhaengig davon noch
+        einmal.
+      */}
+      <label className="flex cursor-pointer items-start gap-2.5 text-start">
+        <input
+          type="checkbox"
+          checked={zugestimmt}
+          onChange={(event) => setZugestimmt(event.target.checked)}
+          className="accent-primary mt-0.5 size-4 shrink-0"
+        />
+        <span className="text-muted-foreground text-xs leading-snug">
+          {tc('consent')}{' '}
+          <Link
+            href="/withdrawal"
+            target="_blank"
+            className="text-primary underline underline-offset-2"
+          >
+            {tc('consentLink')}
+          </Link>
+        </span>
+      </label>
+
       <Button
         type="button"
         variant={variant}
-        disabled={disabled || isPending}
+        disabled={disabled || isPending || !zugestimmt}
         className="w-full"
         onClick={() =>
           startTransition(async () => {
@@ -97,8 +132,8 @@ export function BuyButton({
             const angewandt = preview?.code ?? null;
 
             const result = vehicleId
-              ? await startFeatureCheckoutAction(vehicleId, packageId, angewandt)
-              : await startPackageCheckoutAction(packageId, angewandt);
+              ? await startFeatureCheckoutAction(vehicleId, packageId, angewandt, zugestimmt)
+              : await startPackageCheckoutAction(packageId, angewandt, zugestimmt);
 
             if (!result.ok) {
               toast.error(meldung(result.error));

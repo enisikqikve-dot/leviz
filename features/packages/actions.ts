@@ -90,6 +90,7 @@ async function startCheckout(
   vehicleId: string | null,
   description: string,
   code: string | null,
+  consent: boolean,
 ): Promise<ActionResult<CheckoutTarget>> {
   const pkg = await prisma.package.findFirst({
     where: { id: packageId, active: true },
@@ -97,6 +98,21 @@ async function startCheckout(
   });
   if (!pkg) return fail('Kjo pako nuk u gjet');
   if (pkg.priceCents <= 0) return fail('Kjo pako nuk kërkon pagesë');
+
+  /*
+   * Ohne ausdrueckliche Zustimmung wird nichts gebucht.
+   *
+   * Die Leistung beginnt sofort -- das Paket laeuft, die Hervorhebung ist
+   * sichtbar. Das Widerrufsrecht erlischt dabei nur, wenn der Kaeufer der
+   * sofortigen Ausfuehrung vorher ausdruecklich zugestimmt hat. Fehlt sie,
+   * kann er vierzehn Tage lang zurueckgeben, was laengst erbracht ist.
+   *
+   * Geprueft wird hier und nicht nur im Formular: ein Haekchen, das der
+   * Browser setzt, ist kein Nachweis. Der Zeitpunkt landet an der Zahlung,
+   * weil eine Zustimmung, die sich nicht belegen laesst, im Streitfall keine
+   * ist.
+   */
+  if (!consent) return fail('errorConsentRequired');
 
   // Der Gutschein wird geprueft, bevor irgendetwas entsteht. Der Rabatt kommt
   // dabei aus der Datenbank und nie aus dem Formular -- sonst bestimmte der
@@ -127,6 +143,7 @@ async function startCheckout(
         status: 'PENDING',
         description,
         provider: kostenlos ? 'voucher' : getPaymentProvider().name,
+        withdrawalConsentAt: new Date(),
       },
       select: { id: true },
     });
@@ -201,6 +218,7 @@ async function startCheckout(
 export async function startPackageCheckoutAction(
   packageId: string,
   code: string | null = null,
+  consent = false,
 ): Promise<ActionResult<CheckoutTarget>> {
   const user = await requireUser();
 
@@ -209,7 +227,14 @@ export async function startPackageCheckoutAction(
     select: { nameSq: true },
   });
 
-  return startCheckout(user.id, packageId, null, `Pako: ${pkg?.nameSq ?? packageId}`, code);
+  return startCheckout(
+    user.id,
+    packageId,
+    null,
+    `Pako: ${pkg?.nameSq ?? packageId}`,
+    code,
+    consent,
+  );
 }
 
 /** Bucht eine Hervorhebung fuer ein eigenes Inserat. */
@@ -217,6 +242,7 @@ export async function startFeatureCheckoutAction(
   vehicleId: string,
   packageId: string,
   code: string | null = null,
+  consent = false,
 ): Promise<ActionResult<CheckoutTarget>> {
   const user = await requireUser();
 
@@ -238,7 +264,14 @@ export async function startFeatureCheckoutAction(
   });
   if (!pkg || pkg.featuredDays <= 0) return fail('Kjo pako nuk ofron theksim');
 
-  return startCheckout(user.id, packageId, vehicle.id, `Theksim: ${vehicle.title}`, code);
+  return startCheckout(
+    user.id,
+    packageId,
+    vehicle.id,
+    `Theksim: ${vehicle.title}`,
+    code,
+    consent,
+  );
 }
 
 /**
