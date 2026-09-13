@@ -1,7 +1,10 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from './api';
-import type { Catalog, SearchResponse, VehicleResponse, VehicleCard } from './types';
+import type {
+  Catalog, ListingDetail, ListingFormValues, ListingOptions, OwnListing, Profile,
+  PublishResult, SaveResult, SearchResponse, VehicleResponse, VehicleCard,
+} from './types';
 
 /**
  * Die Abfragen der App, an einer Stelle.
@@ -91,6 +94,98 @@ export function useToggleFavorite() {
     onSuccess: () => {
       client.invalidateQueries({ queryKey: ['favorites'] });
       client.invalidateQueries({ queryKey: ['vehicle'] });
+    },
+  });
+}
+
+// --- Phase 2: eigene Inserate, Fotos, Profil --------------------------------
+
+/** "Meine Inserate" -- dieselbe Liste wie im Dashboard der Website. */
+export function useMyListings(enabled: boolean) {
+  return useQuery({
+    queryKey: ['my-listings'],
+    queryFn: () => api<{ items: OwnListing[] }>('/listings'),
+    enabled,
+  });
+}
+
+/** Ein eigenes Inserat in der Form des Assistenten, zum Bearbeiten. */
+export function useListing(id: string | undefined) {
+  return useQuery({
+    queryKey: ['listing', id],
+    queryFn: () => api<ListingDetail>(`/listings/${id}`),
+    enabled: Boolean(id),
+  });
+}
+
+/** Marken, Staedte, Herkunftslaender, Ausstattung -- und die Fotogrenze des Pakets. */
+export function useListingOptions(locale: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['listing-options', locale],
+    queryFn: () => api<ListingOptions>(`/listings/options?locale=${locale}`),
+    staleTime: 10 * 60_000,
+    enabled,
+  });
+}
+
+/** Anlegen oder aktualisieren; danach die Listen frisch holen. */
+export function useSaveListing() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ values, id }: { values: Partial<ListingFormValues>; id?: string }) =>
+      id
+        ? api<SaveResult>(`/listings/${id}`, { method: 'PUT', body: values })
+        : api<SaveResult>('/listings', { method: 'POST', body: values }),
+    onSuccess: (_, { id }) => {
+      client.invalidateQueries({ queryKey: ['my-listings'] });
+      if (id) client.invalidateQueries({ queryKey: ['listing', id] });
+    },
+  });
+}
+
+export type ListingCommand = 'publish' | 'pause' | 'sold' | 'delete';
+
+/**
+ * Veroeffentlichen, pausieren, verkauft, loeschen. Danach alles neu laden,
+ * was das Inserat zeigen koennte -- auch die oeffentliche Suche, denn ein
+ * pausiertes Fahrzeug verschwindet dort.
+ */
+export function useListingCommand() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, command }: { id: string; command: ListingCommand }) => {
+      if (command === 'delete') {
+        await api(`/listings/${id}`, { method: 'DELETE' });
+        return null;
+      }
+      return api<PublishResult | { status: 'ACTIVE' | 'PAUSED' } | undefined>(`/listings/${id}/${command}`, { method: 'POST' });
+    },
+    onSuccess: (_, { id }) => {
+      client.invalidateQueries({ queryKey: ['my-listings'] });
+      client.invalidateQueries({ queryKey: ['listing', id] });
+      client.invalidateQueries({ queryKey: ['vehicles'] });
+      client.invalidateQueries({ queryKey: ['home'] });
+    },
+  });
+}
+
+export function useProfile(enabled: boolean) {
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: () => api<Profile>('/me/profile'),
+    enabled,
+  });
+}
+
+/** Profil speichern; die Antwort ist schon das neue Profil, /me wird nachgeladen. */
+export function useUpdateProfile() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { name: string; phone: string | null; citySlug?: string; locale: string }) =>
+      api<Profile>('/me/profile', { method: 'PATCH', body: input }),
+    onSuccess: (profil) => {
+      client.setQueryData(['profile'], profil);
+      client.invalidateQueries({ queryKey: ['me'] });
     },
   });
 }

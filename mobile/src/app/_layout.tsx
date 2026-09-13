@@ -56,6 +56,10 @@ export default function RootLayout() {
               <Stack.Screen name="login" options={{ presentation: 'modal', title: '' }} />
               <Stack.Screen name="register" options={{ presentation: 'modal', title: '' }} />
               <Stack.Screen name="filters" options={{ presentation: 'modal', title: '' }} />
+              <Stack.Screen name="listings/index" options={{ title: '' }} />
+              <Stack.Screen name="listings/new" options={{ title: '' }} />
+              <Stack.Screen name="listings/[id]" options={{ title: '' }} />
+              <Stack.Screen name="profile" options={{ title: '' }} />
             </Stack>
           </AuthProvider>
         </QueryClientProvider>

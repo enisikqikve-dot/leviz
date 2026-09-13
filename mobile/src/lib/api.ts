@@ -103,6 +103,9 @@ async function erneuere(): Promise<Tokens | null> {
   return erneuerungLaeuft;
 }
 
+/** Fuer Anfragen, die nicht ueber `api` laufen (der Upload mit Fortschritt). */
+export const refreshTokens = erneuere;
+
 export type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;

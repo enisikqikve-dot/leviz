@@ -1,6 +1,6 @@
-/** Längste Kante nach der Verkleinerung. Reicht für Vollbild auf jedem Gerät. */
-export const MAX_EDGE = 1920;
-export const JPEG_QUALITY = 0.82;
+import { JPEG_QUALITY, MAX_EDGE } from './image-policy';
+
+export { JPEG_QUALITY, MAX_EDGE };
 
 export type CompressResult = {
   file: File;

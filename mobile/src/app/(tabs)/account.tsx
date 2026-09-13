@@ -10,11 +10,12 @@ import { locales, useI18n, type Locale } from '~/lib/i18n';
 import { spacing, useTheme } from '~/lib/theme';
 
 /**
- * Das Konto: wer man ist, die Sprache, die Abmeldung.
+ * Das Konto: wer man ist, die Sprache, die Abmeldung -- und der Einstieg zu
+ * Meine Inserate und Profil.
  *
- * Meine Inserate, Nachrichten und Einstellungen fuehren in dieser Phase noch
- * auf die Website -- sie kommen mit Phase 2 und 4 in die App. Bis dahin ist
- * ein Verweis, der funktioniert, besser als ein Knopf, der nichts tut.
+ * Nachrichten fuehren noch auf die Website; sie kommen mit Phase 4 in die
+ * App. Bis dahin ist ein Verweis, der funktioniert, besser als ein Knopf,
+ * der nichts tut.
  */
 export default function AccountScreen() {
   const theme = useTheme();
@@ -55,9 +56,10 @@ export default function AccountScreen() {
           </Card>
 
           <View style={{ gap: spacing.sm }}>
-            <Button label={t('dashboard.myListings')} variant="outline" onPress={() => Linking.openURL(webPfad('/paneli/shpalljet', '/konto/anzeigen', '/dashboard/listings'))} />
+            <Button label={t('myListings.create')} onPress={() => router.push('/listings/new')} />
+            <Button label={t('dashboard.myListings')} variant="outline" onPress={() => router.push('/listings')} />
+            <Button label={t('account.profileTitle')} variant="outline" onPress={() => router.push('/profile')} />
             <Button label={t('nav.messages')} variant="outline" onPress={() => Linking.openURL(webPfad('/mesazhet', '/nachrichten', '/messages'))} />
-            <Button label={t('dashboard.settings')} variant="outline" onPress={() => Linking.openURL(webPfad('/paneli/cilesimet', '/konto/einstellungen', '/dashboard/settings'))} />
           </View>
         </>
       ) : (

@@ -137,3 +137,66 @@ export type Notification = {
   readAt: string | null;
   createdAt: string;
 };
+
+// --- Phase 2: eigene Inserate, Fotos, Profil --------------------------------
+
+export type ListingStatus =
+  | 'DRAFT' | 'PENDING_REVIEW' | 'ACTIVE' | 'PAUSED' | 'SOLD' | 'REJECTED' | 'EXPIRED';
+
+/** Ein Eintrag in "Meine Inserate". */
+export type OwnListing = {
+  id: string;
+  slug: string;
+  title: string;
+  status: ListingStatus;
+  priceCents: number;
+  viewCount: number;
+  inquiryCount: number;
+  favoriteCount: number;
+  qualityScore: number;
+  featuredUntil: string | null;
+  expiresAt: string | null;
+  updatedAt: string;
+  brand: string;
+  model: string;
+  image: string | null;
+};
+
+/** Die Auswahllisten des Assistenten -- dieselben wie auf der Website. */
+export type ListingOptions = {
+  brands: { slug: string; name: string }[];
+  cities: { slug: string; name: string; countryCode: string }[];
+  importCountries: { code: string; name: string }[];
+  features: { slug: string; label: string; group: string }[];
+  photoLimit: number;
+};
+
+export type UploadedImage = { key: string; url: string };
+
+/**
+ * Was der Assistent sammelt. Der Typ kommt aus dem geteilten Schema des
+ * Hauptprojekts -- die App kann gar nichts anderes abschicken, als die
+ * Website prueft.
+ */
+export type { ListingFormValues } from '@/features/listings/schemas';
+
+export type ListingDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  status: ListingStatus;
+  values: Partial<import('@/features/listings/schemas').ListingFormValues>;
+};
+
+export type SaveResult = { id: string; slug: string; needsReview: boolean };
+export type PublishResult = { status: 'ACTIVE' | 'PENDING_REVIEW'; slug: string };
+
+export type Profile = {
+  name: string;
+  email: string | null;
+  phone: string | null;
+  locale: 'sq' | 'de' | 'en';
+  citySlug: string | null;
+  hasPassword: boolean;
+  cities: { slug: string; name: string; countryCode: string }[];
+};

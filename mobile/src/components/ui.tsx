@@ -57,7 +57,9 @@ export function Button({
   );
 }
 
-export function Input({ label, error, style, ...props }: TextInputProps & { label?: string; error?: string }) {
+export function Input({
+  label, error, invalid, style, ...props
+}: TextInputProps & { label?: string; error?: string; invalid?: boolean }) {
   const theme = useTheme();
   return (
     <View style={{ gap: 6 }}>
@@ -67,7 +69,8 @@ export function Input({ label, error, style, ...props }: TextInputProps & { labe
         {...props}
         style={[
           styles.input,
-          { backgroundColor: theme.card, borderColor: error ? theme.destructive : theme.border, color: theme.foreground },
+          // `invalid` faerbt nur den Rand -- wenn die Meldung schon woanders steht.
+          { backgroundColor: theme.card, borderColor: error || invalid ? theme.destructive : theme.border, color: theme.foreground },
           style,
         ]}
       />

@@ -516,13 +516,34 @@ der App. Ein Validierungsfehler trägt `fields` mit Pfad und Meldung.
 | DELETE | `/favorites/{vehicleId}` | vergessen |
 | GET | `/notifications?cursor=&limit=` | eigene Meldungen + `unread` |
 | POST | `/notifications/{id}/read` | gelesen |
+| GET | `/listings` | „Meine Inserate" — eigene und, für Händler, die des Autohauses |
+| POST | `/listings` | Entwurf anlegen; der Rumpf ist genau das, was der Assistent der Website abschickt → 201 |
+| GET | `/listings/options?locale=` | Marken, Städte, Herkunftsländer, Ausstattung, Fotogrenze des Pakets |
+| GET | `/listings/{id}` | ein eigenes Inserat als Formularwerte (`values`) — fremde: 404 |
+| PUT | `/listings/{id}` | aktualisieren |
+| DELETE | `/listings/{id}` | endgültig löschen, samt Fotos → 204 |
+| POST | `/listings/{id}/publish` | live schalten → `ACTIVE` oder `PENDING_REVIEW` |
+| POST | `/listings/{id}/pause` | pausieren ↔ freischalten |
+| POST | `/listings/{id}/sold` | verkauft → 204 |
+| POST | `/uploads` | multipart `file` → `{ key, url }` (201); Magic Bytes, 8 MB, 120 je Fenster |
+| DELETE | `/uploads` | `{ key }` — nur eigene → 204 |
+| GET | `/me/profile` | Name, Telefon, Wohnort, Sprache, Städte |
+| PATCH | `/me/profile` | speichern; Feldfehler als Schlüssel aus `account` |
 
 Die Ratenbegrenzung für Anmeldung und Registrierung ist dieselbe wie auf der
 Website. Nur öffentliche Inserate sind über die API erreichbar — ein Entwurf
 ist von außen nicht da, auch nicht für den, der die Adresse kennt.
 
-Noch nicht dabei, kommt mit den jeweiligen App-Bildschirmen: Inserat anlegen
-und Fotos hochladen, Nachrichten, Suchaufträge, Profil bearbeiten, Push.
+**Die Schreibpfade laufen durch dieselben Kerne wie die Website.**
+`features/listings/core.ts`, `upload-core.ts` und `features/account/core.ts`
+kennen keinen Cookie und kein Token, nur einen `Actor` — die Server Actions
+holen ihn aus der Sitzung, die API aus dem Bearer-Token. Paketgrenzen,
+Moderation, Qualitätswert und die Magic-Byte-Prüfung der Fotos gibt es
+deshalb genau einmal. Fachliche Fehler (`ActionResult` mit `ok: false`)
+werden zu `400 invalid` mit `message` und denselben `fields` wie bei Zod.
+
+Noch nicht dabei, kommt mit den jeweiligen App-Bildschirmen: Nachrichten,
+Suchaufträge, Push.
 
 ### Selbst prüfen
 
@@ -599,9 +620,31 @@ Preisschätzung, Anruf/WhatsApp/Viber und Teilen, Merkliste, Anmeldung und
 Registrierung (privat und Autosallon), Konto mit Sprachwahl. Alles lesend,
 alles gegen die echte API.
 
-**Was bewusst noch auf die Website führt:** Meine Inserate, Nachrichten und
-Einstellungen. Ein Verweis, der funktioniert, ist besser als ein Knopf, der
-nichts tut — die Bildschirme kommen mit Phase 2 und 4.
+### Was in Phase 2 drin ist
+
+**Inserat anlegen** — derselbe Assistent mit denselben neun Schritten. Die
+Schritte, ihre Reihenfolge und die Prüfung je Schritt kommen aus
+`features/listings/schemas.ts`: die App prüft mit demselben Zod-Schema, mit
+dem der Server später prüft. Der Qualitätswert in der Vorschau ist
+`calculateQualityScore` aus dem Hauptprojekt — dieselbe Funktion, die die
+Reihung in der Suche bestimmt.
+
+**Fotos** werden auf dem Telefon verkleinert, bevor sie ins Netz gehen — auf
+dieselbe Kante wie im Browser (`features/listings/image-policy.ts`: 1920 px,
+JPEG 82 %). Aus einem 5-MB-Handyfoto werden ~300 KB. Jeder Upload hat seinen
+eigenen Fortschrittsbalken (XMLHttpRequest statt fetch, weil nur XHR den
+Fortschritt des Sendens meldet). Das erste Foto ist das Hauptbild; verschoben
+wird mit Pfeilen, nicht mit Ziehen — auf einem Telefon ist ein Pfeil nie
+danebengegriffen.
+
+**Meine Inserate** mit Veröffentlichen, Bearbeiten, Pausieren, Verkauft,
+Löschen; **Bearbeiten** öffnet den Assistenten vorbelegt — die
+Rückübersetzung vom Datensatz in die Felder (`form-values.ts`) ist dieselbe
+wie für die Bearbeiten-Seite der Website. **Profil** mit Name, Telefon,
+Wohnort, Sprache; Feldfehler kommen als Schlüssel aus `account` und werden in
+der App übersetzt.
+
+**Was noch auf die Website führt:** Nachrichten — kommen mit Phase 4.
 
 ### Bauen und einreichen — ohne Mac
 
