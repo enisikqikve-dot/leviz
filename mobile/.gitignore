@@ -1,0 +1,16 @@
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.env
+.env.local
+# Native Ordner entstehen erst beim Bau (prebuild) und gehoeren nicht hierher.
+/ios
+/android

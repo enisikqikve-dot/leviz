@@ -68,6 +68,28 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        /*
+         * Die App-API darf von ueberall gerufen werden.
+         *
+         * Eine App auf dem Telefon kennt keine Herkunftspruefung; die
+         * Freigabe gilt der Web-Fassung von Expo und jedem, der die API mit
+         * einem Token aus einer anderen Herkunft benutzt. Unbedenklich, weil
+         * hier nichts an Cookies haengt: ohne Bearer-Token gibt die API nur
+         * her, was ohnehin oeffentlich ist.
+         *
+         * Bilder unter /uploads bleiben davon unberuehrt -- die App laedt sie
+         * als <img>, nicht per fetch.
+         */
+        source: '/api/v1/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Authorization, Content-Type' },
+          { key: 'Access-Control-Max-Age', value: '86400' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+      {
         // Hochgeladene Bilder liegen unter derselben Herkunft wie die
         // Anwendung. Ohne diese Sperre koennte eine als Bild getarnte
         // HTML-Datei Skripte im Namen von LEVIZ ausfuehren.
@@ -78,6 +100,10 @@ const nextConfig: NextConfig = {
             value: "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox",
           },
           { key: 'Content-Disposition', value: 'inline' },
+          // Die App zeigt die Fotos von einer anderen Herkunft aus an -- auf
+          // dem Telefon ohnehin, in der Web-Fassung von Expo ueber den
+          // Browser. Die Sperre oben gilt fuer alles andere weiter.
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
         ],
       },
     ];

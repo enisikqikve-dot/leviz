@@ -1,0 +1,90 @@
+{
+  "expo": {
+    "name": "LEVIZ",
+    "slug": "leviz",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "leviz",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.levizz.app",
+      "supportsTablet": false,
+      "icon": "./assets/expo.icon",
+      "associatedDomains": [
+        "applinks:levizz.com"
+      ],
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.levizz.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0F1C",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "levizz.com",
+              "pathPrefix": "/vetura/"
+            },
+            {
+              "scheme": "https",
+              "host": "levizz.com",
+              "pathPrefix": "/de/fahrzeug/"
+            },
+            {
+              "scheme": "https",
+              "host": "levizz.com",
+              "pathPrefix": "/en/vehicle/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0A0F1C",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 96
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf",
+            "node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf",
+            "node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf",
+            "node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"
+          ]
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

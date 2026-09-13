@@ -1,0 +1,139 @@
+/**
+ * Was die API liefert -- der Vertrag, gegen den die App gebaut ist.
+ *
+ * Bewusst hier ausgeschrieben statt aus den Prisma-Typen des Hauptprojekts
+ * abgeleitet: die App soll wissen, was sie bekommt, nicht was die Datenbank
+ * gerade hat. Aendert sich die API, aendert sich diese Datei -- sichtbar.
+ */
+
+export type Standing = 'below' | 'within' | 'above';
+
+export type VehicleCard = {
+  id: string;
+  slug: string;
+  title: string;
+  priceCents: number;
+  negotiable: boolean;
+  mileageKm: number | null;
+  firstRegistration: string | null;
+  fuel: string | null;
+  transmission: string | null;
+  powerKw: number | null;
+  bodyType: string | null;
+  condition: 'NEW' | 'USED';
+  customsStatus: 'CLEARED' | 'NOT_CLEARED' | 'NOT_APPLICABLE';
+  plateOrigin: 'RKS' | 'AL' | 'MK' | 'FOREIGN' | 'NONE';
+  sellerType: 'PRIVATE' | 'DEALER';
+  featuredScore: number;
+  publishedAt: string | null;
+  brand: { name: string; slug: string };
+  model: { name: string; slug: string };
+  city: { name: string; slug: string } | null;
+  dealer: { companyName: string; slug: string; verification: string } | null;
+  images: { url: string; altText: string | null }[];
+  standing?: Standing | null;
+  distanceKm?: number;
+};
+
+export type SearchResponse = {
+  items: VehicleCard[];
+  total: number;
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  center: { name: string; radiusKm: number } | null;
+};
+
+export type VehicleDetail = VehicleCard & {
+  description: string;
+  status: 'ACTIVE' | 'SOLD';
+  brandId: string;
+  modelId: string;
+  driveType: string | null;
+  doors: number | null;
+  seats: number | null;
+  color: string | null;
+  emissionClass: string | null;
+  consumptionCombined: number | null;
+  accidentFree: boolean;
+  serviceHistory: boolean;
+  ownersCount: number | null;
+  steeringSide: 'LEFT' | 'RIGHT';
+  importedFrom: { code: string; nameSq: string; nameDe: string; nameEn: string } | null;
+  images: { url: string; altText: string | null; position: number }[];
+  features: { feature: { slug: string; nameSq: string; nameDe: string; nameEn: string; group: string } }[];
+  seller: { id: string; name: string | null; image: string | null; phone: string | null; createdAt: string; verification: string };
+  dealer:
+    | (VehicleCard['dealer'] & {
+        id: string;
+        phone: string | null;
+        website: string | null;
+        logoUrl: string | null;
+        addressLine: string | null;
+        ratingAvg: number;
+        ratingCount: number;
+        city: { name: string } | null;
+        _count: { vehicles: number };
+      })
+    | null;
+  createdAt: string;
+};
+
+export type Estimate = {
+  lowCents: number;
+  averageCents: number;
+  highCents: number;
+  sampleSize: number;
+  scope: 'model' | 'brand';
+};
+
+export type VehicleResponse = {
+  vehicle: VehicleDetail;
+  similar: VehicleCard[];
+  estimate: Estimate | null;
+  favorited: boolean;
+};
+
+export type Account = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  image: string | null;
+  role: 'USER' | 'PRIVATE_SELLER' | 'DEALER' | 'ADMIN' | 'SUPER_ADMIN';
+  locale: string;
+  dealer: { id: string; slug: string; companyName: string; verified: boolean } | null;
+  createdAt: string;
+};
+
+export type SessionResponse = {
+  user: Account;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+};
+
+export type Catalog = {
+  brands: { slug: string; name: string; count: number }[];
+  models: { slug: string; name: string }[];
+  cities: { slug: string; name: string; countryCode: string }[];
+  countries: { code: string; name: string }[];
+  enums: {
+    fuel: readonly string[];
+    transmission: readonly string[];
+    drive: readonly string[];
+    body: readonly string[];
+    customs: readonly string[];
+    plates: readonly string[];
+  };
+};
+
+export type Notification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  readAt: string | null;
+  createdAt: string;
+};

@@ -1,0 +1,28 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ],
+      "@/*": [
+        "../*"
+      ]
+    },
+    "resolveJsonModule": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "../features/search/schema.ts",
+    "../features/vehicles/format.ts",
+    "../lib/currency.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // Die App prueft sich selbst (mobile/npm run lint) -- andere Regeln, anderes Ziel.
+    "mobile/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

@@ -537,6 +537,81 @@ curl -s -X POST localhost:3000/api/v1/auth/login -H 'content-type: application/j
 
 ---
 
+## Die App (iOS und Android)
+
+Unter `mobile/` liegt die LEVIZ-App — Expo mit React Native, ein Code für
+beide Plattformen. Sie ist **die mobile Fassung von levizz.com, kein zweiter
+Marktplatz**: sie spricht über `/api/v1` mit denselben Funktionen, und sie
+teilt Code mit der Website, statt ihn abzuschreiben.
+
+### Was geteilt wird
+
+Metro (der Bundler von Expo) sieht das Hauptprojekt; `@/…` zeigt auf die
+Wurzel des Repositories. Die App importiert daraus direkt:
+
+| Aus dem Hauptprojekt | Wofür |
+|---|---|
+| `messages/{sq,de,en}.json` | alle 1 256 Texte je Sprache, unverändert |
+| `features/search/schema.ts` | Sortierungen und die Aufzählungen der Filter |
+| `lib/currency.ts`, `features/vehicles/format.ts` | Preis, Kilometer, Leistung — dieselbe Schreibweise wie auf der Website |
+| `components/leviz/logo.tsx` (Pfade) | Wortmarke und Zeichen, nicht nachgezeichnet |
+
+Geteilt werden nur reine Module. Was Next.js importiert, lässt sich hier
+nicht laden — Metro sagt es dann laut, statt still etwas anderes zu bündeln.
+
+Die Texte kommen über ICU MessageFormat an, wie bei next-intl:
+`{count}` und `{count, plural, …}` funktionieren unverändert.
+
+### Starten
+
+```bash
+cd mobile && npm install && npx expo start
+```
+
+Dann **Expo Go** aus dem App Store oder Play Store auf dem Telefon öffnen und
+den QR-Code aus dem Terminal scannen. Die App läuft gegen `levizz.com`.
+
+Gegen den lokalen Server: in `mobile/.env` die Adresse des Rechners im WLAN
+eintragen — nicht `localhost`, das meint auf dem Telefon das Telefon selbst:
+
+```
+EXPO_PUBLIC_API_URL=http://192.168.1.20:3000
+```
+
+Für die Entwicklung ohne Telefon gibt es die Web-Fassung
+(`npx expo start --web`), die dieselben Bildschirme im Browser zeigt. Dafür
+gibt die API `/api/v1` CORS frei — unbedenklich, weil an ihr nichts an Cookies
+hängt.
+
+### Anmeldung
+
+Zugriffs- und Erneuerungs-Token liegen im Schlüsselbund des Telefons
+(`expo-secure-store`), nie im normalen Speicher. Läuft das Zugriffs-Token ab,
+erneuert die App es einmal und wiederholt die Anfrage — und zwar
+**höchstens einmal gleichzeitig**: laufen drei Anfragen parallel in ein
+abgelaufenes Token, darf nur eine erneuern. Sonst legte die zweite ein bereits
+ersetztes Token vor, und der Server hielte das für Diebstahl.
+
+### Was in Phase 1 drin ist
+
+Start, Suche mit Filtern und Sortierung, Fahrzeugseite mit Galerie,
+Preisschätzung, Anruf/WhatsApp/Viber und Teilen, Merkliste, Anmeldung und
+Registrierung (privat und Autosallon), Konto mit Sprachwahl. Alles lesend,
+alles gegen die echte API.
+
+**Was bewusst noch auf die Website führt:** Meine Inserate, Nachrichten und
+Einstellungen. Ein Verweis, der funktioniert, ist besser als ein Knopf, der
+nichts tut — die Bildschirme kommen mit Phase 2 und 4.
+
+### Bauen und einreichen — ohne Mac
+
+Kommt mit Phase 5 (EAS Build und EAS Submit). Die Kennungen stehen schon in
+`app.json`: `com.levizz.app` für beide Stores, Name **LEVIZ**, Schema
+`leviz://`, und die Pfade für Universal Links auf `levizz.com` in allen drei
+Sprachen.
+
+---
+
 ## Rechtliche Seiten
 
 Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:
