@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 
 import { api } from './api';
 import type {
-  Catalog, ListingDetail, ListingFormValues, ListingOptions, OwnListing, Profile,
+  Catalog, ListingDetail, ListingFormValues, ListingOptions, Notification, OwnListing, Profile,
   PublishResult, SaveResult, SearchResponse, VehicleResponse, VehicleCard,
 } from './types';
 
@@ -187,5 +187,32 @@ export function useUpdateProfile() {
       client.setQueryData(['profile'], profil);
       client.invalidateQueries({ queryKey: ['me'] });
     },
+  });
+}
+
+// --- Phase 3: Meldungen -----------------------------------------------------
+
+export type NotificationsPage = { items: Notification[]; unread: number; nextCursor: string | null };
+
+/** Die eigenen Meldungen, neueste zuerst, seitenweise -- und die Zahl der ungelesenen. */
+export function useNotifications(enabled: boolean) {
+  return useInfiniteQuery({
+    queryKey: ['notifications'],
+    queryFn: ({ pageParam }) => api<NotificationsPage>(`/notifications?limit=30${pageParam ? `&cursor=${pageParam}` : ''}`),
+    initialPageParam: '' as string,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+    enabled,
+    // Beim Oeffnen des Bildschirms lieber einmal zu oft fragen als eine
+    // Meldung zu spaet zeigen.
+    staleTime: 15_000,
+  });
+}
+
+/** Als gelesen markieren; die Liste und das Abzeichen folgen. */
+export function useMarkNotificationRead() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api(`/notifications/${id}/read`, { method: 'POST' }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['notifications'] }),
   });
 }

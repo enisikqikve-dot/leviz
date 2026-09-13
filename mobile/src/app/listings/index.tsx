@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Platform, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Platform, Pressable, RefreshControl, Share, StyleSheet, View } from 'react-native';
 
 import { formatPrice } from '@/lib/currency';
 
@@ -9,6 +9,7 @@ import { Button, Card, Chip, Empty, Txt } from '~/components/ui';
 import { imageUrl } from '~/lib/api';
 import { useAuth } from '~/lib/auth';
 import { useI18n } from '~/lib/i18n';
+import { webUrlFor } from '~/lib/links';
 import { useListingCommand, useMyListings, type ListingCommand } from '~/lib/queries';
 import { fonts, radius, spacing, useTheme } from '~/lib/theme';
 import type { ListingStatus, OwnListing } from '~/lib/types';
@@ -116,6 +117,13 @@ function Eintrag({
   const { t } = useI18n();
   const oeffentlich = item.status === 'ACTIVE' || item.status === 'SOLD';
 
+  // Geteilt wird die Adresse der Website: wer die App hat, landet damit in
+  // der App (Universal Link), alle anderen im Browser.
+  const teilen = () => {
+    const url = webUrlFor(locale, '/vehicle/[slug]', { slug: item.slug });
+    Share.share({ message: `${item.title} — ${url}`, url }).catch(() => {});
+  };
+
   return (
     <Card style={{ opacity: beschaeftigt ? 0.6 : 1 }}>
       <Pressable onPress={oeffentlich ? onOpen : onEdit} style={{ flexDirection: 'row', gap: spacing.md, padding: spacing.md }}>
@@ -140,6 +148,7 @@ function Eintrag({
         <Aktion label={t('myListings.edit')} onPress={onEdit} />
         {item.status === 'ACTIVE' ? <Aktion label={t('myListings.pause')} onPress={() => onCommand('pause')} /> : null}
         {item.status === 'PAUSED' ? <Aktion label={t('myListings.resume')} onPress={() => onCommand('pause')} /> : null}
+        {item.status === 'ACTIVE' ? <Aktion label={t('vehicleDetail.share')} onPress={teilen} /> : null}
         {item.status === 'ACTIVE' || item.status === 'PAUSED' ? <Aktion label={t('myListings.markSold')} onPress={() => onCommand('sold')} /> : null}
         <Aktion label={t('myListings.delete')} onPress={() => onCommand('delete')} destructive />
       </View>

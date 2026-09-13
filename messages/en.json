@@ -1716,5 +1716,14 @@
       "noImageLoaded": "no photo could be loaded",
       "options": "Models: {options}"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "emptyHint": "New messages, approvals and price changes will show up here.",
+    "unread": "{count, plural, =0 {None unread} =1 {1 unread} other {# unread}}",
+    "openOnWeb": "Open on levizz.com",
+    "notFoundTitle": "This page is not in the app",
+    "notFoundHint": "Open it on levizz.com or go back to the start."
   }
 }

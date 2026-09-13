@@ -80,6 +80,13 @@
             "node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"
           ]
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#2F5BFF",
+          "defaultChannel": "default"
+        }
       ]
     ],
     "experiments": {

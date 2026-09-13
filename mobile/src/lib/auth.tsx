@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
-import { api, ApiError, tokenStore } from './api';
+import { api, ApiError, pushTokenStore, tokenStore } from './api';
+import { registerDevice, unregisterDevice } from './push';
 import type { Account, SessionResponse } from './types';
 
 /**
@@ -37,12 +38,29 @@ export type RegisterInput = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+/**
+ * Das Telefon fuer Push anmelden -- nach jeder Anmeldung und bei jedem Start
+ * mit gueltiger Sitzung. Der Server nimmt ein bekanntes Token einfach noch
+ * einmal; ein neues (App neu installiert) ersetzt das alte. Fehler bleiben
+ * leise: Push ist Beiwerk, die Anmeldung darf daran nie scheitern.
+ */
+async function meldeGeraetAn(): Promise<void> {
+  try {
+    const token = await registerDevice();
+    if (token) await pushTokenStore.save(token);
+  } catch {
+    // Kein Netz, kein Geraet, keine Berechtigung -- beim naechsten Start wieder.
+  }
+}
+
 async function ladeKonto(): Promise<Account | null> {
   const tokens = await tokenStore.load();
   if (!tokens) return null;
 
   try {
-    return await api<Account>('/me');
+    const konto = await api<Account>('/me');
+    void meldeGeraetAn();
+    return konto;
   } catch (fehler) {
     // Abgelaufen und nicht erneuerbar: abgemeldet, ohne Drama.
     if (fehler instanceof ApiError && fehler.status === 401) {
@@ -67,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await tokenStore.save({ accessToken: session.accessToken, refreshToken: session.refreshToken });
       client.setQueryData(['me'], session.user);
       client.invalidateQueries({ queryKey: ['favorites'] });
+      void meldeGeraetAn();
     };
 
     return {
@@ -89,6 +108,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await uebernehmen(session);
       },
       async logout() {
+        // Erst das Telefon abmelden, solange das Token noch gilt.
+        const push = await pushTokenStore.load();
+        if (push) {
+          await unregisterDevice(push);
+          await pushTokenStore.clear();
+        }
+
         const tokens = await tokenStore.load();
         if (tokens) {
           await api('/auth/logout', {
@@ -100,6 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await tokenStore.clear();
         client.setQueryData(['me'], null);
         client.removeQueries({ queryKey: ['favorites'] });
+        client.removeQueries({ queryKey: ['notifications'] });
+        client.removeQueries({ queryKey: ['my-listings'] });
+        client.removeQueries({ queryKey: ['profile'] });
       },
     };
   }, [client, data, isPending]);

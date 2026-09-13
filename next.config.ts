@@ -42,6 +42,16 @@ const nextConfig: NextConfig = {
   // Die Kopfzeile mit der Technik verraet Angreifern die Version.
   poweredByHeader: false,
 
+  // Die Dateien, mit denen iOS und Android der App vertrauen (Universal
+  // Links, App Links). Sie muessen genau unter /.well-known/ liegen; die
+  // Routen dahinter lesen Team-ID und Fingerabdruck aus der Umgebung.
+  async rewrites() {
+    return [
+      { source: '/.well-known/apple-app-site-association', destination: '/api/well-known/apple-app-site-association' },
+      { source: '/.well-known/assetlinks.json', destination: '/api/well-known/assetlinks' },
+    ];
+  },
+
   async headers() {
     return [
       {

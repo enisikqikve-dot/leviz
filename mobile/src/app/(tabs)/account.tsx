@@ -7,6 +7,7 @@ import { Button, Card, Chip, Txt } from '~/components/ui';
 import { API_URL } from '~/lib/api';
 import { useAuth } from '~/lib/auth';
 import { locales, useI18n, type Locale } from '~/lib/i18n';
+import { useNotifications } from '~/lib/queries';
 import { spacing, useTheme } from '~/lib/theme';
 
 /**
@@ -23,6 +24,8 @@ export default function AccountScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user, ready, logout } = useAuth();
+  const { data: meldungen } = useNotifications(Boolean(user));
+  const ungelesen = meldungen?.pages[0]?.unread ?? 0;
 
   const webPfad = (sq: string, de: string, en: string) =>
     `${API_URL}${{ sq, de: `/de${de}`, en: `/en${en}` }[locale]}`;
@@ -58,6 +61,7 @@ export default function AccountScreen() {
           <View style={{ gap: spacing.sm }}>
             <Button label={t('myListings.create')} onPress={() => router.push('/listings/new')} />
             <Button label={t('dashboard.myListings')} variant="outline" onPress={() => router.push('/listings')} />
+            <Button label={ungelesen ? `${t('notifications.title')} · ${ungelesen}` : t('notifications.title')} variant="outline" onPress={() => router.push('/notifications')} />
             <Button label={t('account.profileTitle')} variant="outline" onPress={() => router.push('/profile')} />
             <Button label={t('nav.messages')} variant="outline" onPress={() => Linking.openURL(webPfad('/mesazhet', '/nachrichten', '/messages'))} />
           </View>

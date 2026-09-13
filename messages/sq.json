@@ -1716,5 +1716,14 @@
       "noImageLoaded": "asnjë foto nuk u ngarkua dot",
       "options": "Modelet: {options}"
     }
+  },
+  "notifications": {
+    "title": "Njoftimet",
+    "empty": "Nuk ke ende njoftime",
+    "emptyHint": "Këtu shfaqen mesazhet e reja, aprovimet dhe ndryshimet e çmimeve.",
+    "unread": "{count, plural, =0 {Asnjë e palexuar} =1 {1 e palexuar} other {# të palexuara}}",
+    "openOnWeb": "Hape në levizz.com",
+    "notFoundTitle": "Kjo faqe nuk është në aplikacion",
+    "notFoundHint": "Hape në levizz.com ose kthehu në fillim."
   }
 }

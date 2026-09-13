@@ -10,9 +10,10 @@ import { formatPrice } from '@/lib/currency';
 
 import { Button, Card, Chip, Txt } from '~/components/ui';
 import { VehicleCard } from '~/components/vehicle-card';
-import { API_URL, imageUrl } from '~/lib/api';
+import { imageUrl } from '~/lib/api';
 import { useAuth } from '~/lib/auth';
 import { useI18n } from '~/lib/i18n';
+import { webUrlFor } from '~/lib/links';
 import { useToggleFavorite, useVehicle } from '~/lib/queries';
 import { fonts, radius, spacing, useTheme } from '~/lib/theme';
 
@@ -51,10 +52,9 @@ export default function VehicleScreen() {
   const ziffern = telefon ? telefon.replace(/\D/g, '') : '';
   const name = { sq: 'nameSq', de: 'nameDe', en: 'nameEn' }[locale] as 'nameSq' | 'nameDe' | 'nameEn';
 
-  // Der Link ist die Adresse der Website -- wer ihn bekommt, landet dort oder,
-  // mit installierter App, hier (Phase 3).
-  const pfad = { sq: '/vetura/', de: '/de/fahrzeug/', en: '/en/vehicle/' }[locale];
-  const webUrl = `${API_URL}${pfad}${vehicle.slug}`;
+  // Der Link ist die Adresse der Website -- wer ihn bekommt, landet dort
+  // oder, mit installierter App, wieder hier (Universal Link).
+  const webUrl = webUrlFor(locale, '/vehicle/[slug]', { slug: vehicle.slug });
 
   const merken = () => {
     if (!user) return router.push('/login');

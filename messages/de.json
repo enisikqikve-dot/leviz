@@ -1716,5 +1716,14 @@
       "noImageLoaded": "kein Foto ließ sich laden",
       "options": "Modelle: {options}"
     }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "empty": "Noch keine Benachrichtigungen",
+    "emptyHint": "Hier erscheinen neue Nachrichten, Freigaben und Preisänderungen.",
+    "unread": "{count, plural, =0 {Keine ungelesen} =1 {1 ungelesen} other {# ungelesen}}",
+    "openOnWeb": "Auf levizz.com öffnen",
+    "notFoundTitle": "Diese Seite gibt es in der App nicht",
+    "notFoundHint": "Öffne sie auf levizz.com oder geh zurück zum Start."
   }
 }

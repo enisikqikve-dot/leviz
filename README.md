@@ -529,6 +529,8 @@ der App. Ein Validierungsfehler trägt `fields` mit Pfad und Meldung.
 | DELETE | `/uploads` | `{ key }` — nur eigene → 204 |
 | GET | `/me/profile` | Name, Telefon, Wohnort, Sprache, Städte |
 | PATCH | `/me/profile` | speichern; Feldfehler als Schlüssel aus `account` |
+| POST | `/devices` | `{ token, platform, device? }` — das Telefon für Push anmelden (201/200) |
+| DELETE | `/devices` | `{ token }` — beim Abmelden → 204 |
 
 Die Ratenbegrenzung für Anmeldung und Registrierung ist dieselbe wie auf der
 Website. Nur öffentliche Inserate sind über die API erreichbar — ein Entwurf
@@ -543,7 +545,58 @@ deshalb genau einmal. Fachliche Fehler (`ActionResult` mit `ok: false`)
 werden zu `400 invalid` mit `message` und denselben `fields` wie bei Zod.
 
 Noch nicht dabei, kommt mit den jeweiligen App-Bildschirmen: Nachrichten,
-Suchaufträge, Push.
+Suchaufträge.
+
+### Push-Meldungen
+
+Meldungen entstehen an zehn Stellen in Transaktionen — neue Nachricht,
+Freigabe, Ablehnung, Preisänderung, Zahlung. Der Versand aufs Telefon hängt
+**nicht** an diesen Stellen: `features/notifications/dispatch.ts` sieht alle
+15 Sekunden nach, was seit dem letzten Mal angekommen ist, und holt es mit
+einem einzigen `UPDATE … RETURNING` (`pushedAt`, `FOR UPDATE SKIP LOCKED`).
+So bekommt nur, was auch wirklich gespeichert wurde, einen Push — und zwei
+Läufe gleichzeitig nie dieselbe Meldung. Gestartet wird der Takt einmal je
+Serverprozess aus `instrumentation.ts`.
+
+Beansprucht werden nur Meldungen an Konten mit einem lebenden Gerät, und nur
+aus den letzten 24 Stunden: wer sein Telefon erst nächste Woche anmeldet,
+bekommt nicht den Stau von heute.
+
+Hinter `lib/push/` steht der **Push-Dienst von Expo**: der Server spricht eine
+HTTPS-Schnittstelle, Expo reicht an FCM (Android) und APNs (iOS) weiter. Die
+Zugangsdaten zu FCM und APNs liegen bei Expo (`eas credentials`), nicht auf
+dem Server. Ein Telefon, das es nicht mehr gibt, meldet der Dienst als
+`DeviceNotRegistered` — sofort oder erst in der Quittung, die der Takt nach
+einer Minute nachschlägt (`PushTicket`); das Gerät wird dann stillgelegt.
+
+| Variable | Bedeutung |
+|---|---|
+| `PUSH_DRIVER` | `console` (Vorgabe: ins Protokoll) oder `expo` |
+| `EXPO_ACCESS_TOKEN` | freiwillig; mit Token lehnt Expo Anfragen ab, die nicht von diesem Server kommen |
+
+Beim Zurücksetzen des Passworts werden alle Gerätetoken des Kontos gelöscht —
+ein Telefon, das nicht mehr angemeldet ist, soll auch keine „Neue Nachricht
+von …" mehr auf dem Sperrbildschirm zeigen.
+
+### Universal Links und App Links
+
+Damit ein Link auf levizz.com die App öffnet statt den Browser, müssen zwei
+Dateien unter `/.well-known/` liegen. `next.config.ts` leitet sie auf Routen
+um, die aus der Umgebung lesen — ohne Werte antworten sie mit 404, denn eine
+halbe Datei würde Apple stundenlang zwischenspeichern.
+
+| Datei | Variable | Woher |
+|---|---|---|
+| `apple-app-site-association` | `APPLE_TEAM_ID` | developer.apple.com → Membership, zehn Zeichen |
+| `assetlinks.json` | `ANDROID_CERT_SHA256` | Play Console → App-Signatur, oder `eas credentials`; mehrere kommagetrennt |
+
+Prüfen: `curl https://levizz.com/.well-known/apple-app-site-association` muss
+JSON mit `applinks` liefern, ohne Umleitung.
+
+In der App landet so ein Link auf `+not-found`, weil `/vetura/…` keine Route
+der App ist. `lib/i18n/match-pathname.ts` — dieselbe Pfadtabelle wie die
+Website — sagt, welcher Bildschirm das ist, und die App leitet um. Was sie
+nicht hat (Nachrichten, Händler), bekommt einen Knopf zur Website.
 
 ### Selbst prüfen
 
@@ -643,6 +696,35 @@ Rückübersetzung vom Datensatz in die Felder (`form-values.ts`) ist dieselbe
 wie für die Bearbeiten-Seite der Website. **Profil** mit Name, Telefon,
 Wohnort, Sprache; Feldfehler kommen als Schlüssel aus `account` und werden in
 der App übersetzt.
+
+### Was in Phase 3 drin ist
+
+**Push.** Nach der Anmeldung holt die App ein Token vom Push-Dienst von Expo
+und hinterlegt es unter `POST /devices`; beim Abmelden meldet sie es ab.
+Angetippte Meldungen führen dorthin, wo sie hingehören — in der App, wenn
+sie den Bildschirm hat, sonst auf die Website — und gelten als gelesen.
+**Meldungen** haben einen eigenen Bildschirm: der erste im ganzen Projekt,
+der diese Tabelle liest. **Deep Links** von levizz.com landen im richtigen
+Bildschirm (siehe „Universal Links und App Links"). **Teilen** aus Meine
+Inserate und nach dem Veröffentlichen — geteilt wird immer die Adresse der
+Website, mit App landet der Empfänger in der App.
+
+**Was du dafür einmalig tun musst** (alles ohne Mac):
+
+1. `cd mobile && npx eas init` — legt das EAS-Projekt an und schreibt die
+   `projectId` nach `app.json`. Ohne sie gibt es kein Push-Token; die App
+   sagt das im Protokoll, statt zu stürzen.
+2. Android: ein Firebase-Projekt anlegen, App `com.levizz.app` hinzufügen,
+   `google-services.json` nach `mobile/` legen und in `app.json` unter
+   `android.googleServicesFile` eintragen. Dann den FCM-V1-Dienstkontoschlüssel
+   mit `npx eas credentials` hochladen.
+3. iOS: mit `npx eas credentials` einen APNs-Schlüssel erzeugen lassen
+   (braucht das Apple-Entwicklerkonto).
+4. Server: `PUSH_DRIVER=expo` in der `.env`.
+
+Seit SDK 53 kommen Push-Meldungen auf Android nicht mehr in Expo Go an —
+dafür braucht es einen Development Build (`npx eas build --profile
+development`). iOS Expo Go zeigt sie.
 
 **Was noch auf die Website führt:** Nachrichten — kommen mit Phase 4.
 

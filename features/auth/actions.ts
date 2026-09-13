@@ -177,6 +177,10 @@ export async function resetPasswordAction(input: unknown): Promise<ActionResult>
       where: { userId: record.userId, revokedAt: null },
       data: { revokedAt: new Date() },
     }),
+    // Und die Push-Meldungen: ein Telefon, das nicht mehr angemeldet ist,
+    // soll auch keine "Neue Nachricht von ..." mehr auf dem Sperrbildschirm
+    // zeigen. Bei der naechsten Anmeldung meldet die App das Geraet neu an.
+    prisma.deviceToken.deleteMany({ where: { userId: record.userId } }),
   ]);
 
   return ok();

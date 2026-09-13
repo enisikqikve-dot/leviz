@@ -48,6 +48,18 @@ export const tokenStore = {
   },
 };
 
+/**
+ * Das Push-Token dieses Geraets, wie es beim Server angemeldet ist -- damit
+ * das Abmelden es auch nach einem Neustart der App noch kennt.
+ */
+const PUSH = 'leviz.push';
+
+export const pushTokenStore = {
+  load: (): Promise<string | null> => speicher.get(PUSH),
+  save: (token: string): Promise<void> => speicher.set(PUSH, token),
+  clear: (): Promise<void> => speicher.remove(PUSH),
+};
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,

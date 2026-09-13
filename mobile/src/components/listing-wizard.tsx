@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { STEP_SCHEMAS, STEPS, type ListingFormValues, type StepId } from '@/features/listings/schemas';
@@ -17,6 +17,7 @@ import { PhotoStep, type ImagesUpdate } from '~/components/photos';
 import { Button, Card, Chip, Input, Txt } from '~/components/ui';
 import { ApiError } from '~/lib/api';
 import { useI18n, type Locale } from '~/lib/i18n';
+import { webUrlFor } from '~/lib/links';
 import { useCatalog, useListingCommand, useListingOptions, useSaveListing } from '~/lib/queries';
 import { fonts, radius, spacing, useTheme } from '~/lib/theme';
 import type { ListingStatus, PublishResult } from '~/lib/types';
@@ -152,7 +153,17 @@ export function ListingWizard({
         </Txt>
         {pending ? <Txt color={theme.muted} style={{ textAlign: 'center' }}>{t('listing.success.pendingHint')}</Txt> : null}
         {live && 'slug' in ergebnis ? (
-          <Button label={t('listing.success.view')} onPress={() => router.replace(`/vehicle/${ergebnis.slug}`)} />
+          <>
+            <Button label={t('listing.success.view')} onPress={() => router.replace(`/vehicle/${ergebnis.slug}`)} />
+            <Button
+              label={t('vehicleDetail.share')}
+              variant="outline"
+              onPress={() => {
+                const url = webUrlFor(locale, '/vehicle/[slug]', { slug: ergebnis.slug });
+                Share.share({ message: url, url }).catch(() => {});
+              }}
+            />
+          </>
         ) : null}
         <Button label={t('listing.success.myListings')} variant={live ? 'outline' : 'primary'} onPress={() => router.replace('/listings')} />
       </View>

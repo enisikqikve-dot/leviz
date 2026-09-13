@@ -286,19 +286,20 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  vehicles      Vehicle[]      @relation("VehicleSeller")
-  favorites     Favorite[]
-  refreshTokens RefreshToken[]
-  savedSearches SavedSearch[]
-  searchHistory SearchHistory[]
-  notifications Notification[]
+  vehicles       Vehicle[]       @relation("VehicleSeller")
+  favorites      Favorite[]
+  refreshTokens  RefreshToken[]
+  deviceTokens   DeviceToken[]
+  savedSearches  SavedSearch[]
+  searchHistory  SearchHistory[]
+  notifications  Notification[]
   priceEstimates PriceEstimate[]
 
-  sentMessages   Message[]      @relation("MessageSender")
-  buyerThreads   Conversation[] @relation("ConversationBuyer")
-  sellerThreads  Conversation[] @relation("ConversationSeller")
-  inquiries      ListingInquiry[]
-  listingViews   ListingView[]
+  sentMessages  Message[]        @relation("MessageSender")
+  buyerThreads  Conversation[]   @relation("ConversationBuyer")
+  sellerThreads Conversation[]   @relation("ConversationSeller")
+  inquiries     ListingInquiry[]
+  listingViews  ListingView[]
 
   bugReports        BugReport[] @relation("BugReporter")
   bugReportsHandled BugReport[] @relation("BugHandler")
@@ -306,11 +307,11 @@ model User {
   verificationRequests VerificationRequest[] @relation("VerificationSubject")
   verificationsHandled VerificationRequest[] @relation("VerificationReviewer")
 
-  vouchersCreated   VoucherCode[]       @relation("VoucherCreator")
+  vouchersCreated    VoucherCode[]       @relation("VoucherCreator")
   voucherRedemptions VoucherRedemption[]
 
-  reportsFiled    Report[] @relation("ReportReporter")
-  reportsHandled  Report[] @relation("ReportHandler")
+  reportsFiled      Report[]  @relation("ReportReporter")
+  reportsHandled    Report[]  @relation("ReportHandler")
   vehiclesModerated Vehicle[] @relation("VehicleModerator")
 
   reviewsWritten Review[] @relation("ReviewAuthor")
@@ -388,13 +389,13 @@ model VerificationToken {
 /// Einmalcodes für die Anmeldung per Telefonnummer. Es wird nur der Hash
 /// gespeichert, damit ein Datenbankzugriff keine gültigen Codes preisgibt.
 model PhoneVerification {
-  id        String   @id @default(cuid())
-  phone     String
-  codeHash  String
-  attempts  Int      @default(0)
-  expiresAt DateTime
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
   consumedAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt  DateTime  @default(now())
 
   @@index([phone, expiresAt])
 }
@@ -438,6 +439,55 @@ model RefreshToken {
   @@index([userId, revokedAt])
 }
 
+enum DevicePlatform {
+  IOS
+  ANDROID
+  WEB
+}
+
+/// Ein Telefon, das Push-Meldungen bekommen will.
+///
+/// Das Token stellt der Push-Dienst von Expo aus (ExponentPushToken[...]);
+/// dahinter stehen FCM fuer Android und APNs fuer iOS. Ein Token gehoert
+/// genau einem Konto: meldet sich auf demselben Geraet jemand anderes an,
+/// wandert es -- sonst bekaeme der Vorgaenger die Nachrichten des Nachfolgers.
+///
+/// Meldet der Dienst "DeviceNotRegistered" (App geloescht, Berechtigung
+/// entzogen), wird `disabledAt` gesetzt statt der Zeile geloescht: so bleibt
+/// sichtbar, warum ein Nutzer nichts mehr bekommt.
+model DeviceToken {
+  id         String         @id @default(cuid())
+  userId     String
+  token      String         @unique
+  platform   DevicePlatform
+  /// Womit sich das Geraet vorgestellt hat, etwa "iPhone 15".
+  device     String?
+  createdAt  DateTime       @default(now())
+  lastSeenAt DateTime       @default(now())
+  disabledAt DateTime?
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tickets PushTicket[]
+
+  @@index([userId, disabledAt])
+}
+
+/// Eine Quittung, die der Push-Dienst noch schuldig ist.
+///
+/// Expo nimmt eine Nachricht an (Ticket) und meldet erst spaeter, ob FCM oder
+/// APNs sie zugestellt haben (Receipt). Ein geloeschtes Telefon faellt oft
+/// erst dort auf -- als DeviceNotRegistered. Deshalb werden Tickets kurz
+/// aufgehoben und nach einer Minute nachgeschlagen; danach sind sie weg.
+model PushTicket {
+  id        String   @id
+  tokenId   String
+  createdAt DateTime @default(now())
+
+  token DeviceToken @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}
+
 // ===========================================================================
 // Händler
 // ===========================================================================
@@ -479,9 +529,9 @@ model Dealer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  country       Country?            @relation(fields: [countryId], references: [id], onDelete: SetNull)
-  city          City?               @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country       Country?       @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  city          City?          @relation(fields: [cityId], references: [id], onDelete: SetNull)
   vehicles      Vehicle[]
   reviews       Review[]
   subscriptions Subscription[]
@@ -495,9 +545,9 @@ model Review {
   dealerId String
   authorId String
 
-  rating  Int
-  title   String?
-  body    String?
+  rating   Int
+  title    String?
+  body     String?
   /// Nur Käufer mit nachweisbarem Kontakt erhalten das Abzeichen.
   verified Boolean @default(false)
 
@@ -623,19 +673,19 @@ model Country {
   nameDe String
   nameEn String
 
-  phonePrefix String
-  currency    String  @default("EUR")
+  phonePrefix    String
+  currency       String  @default("EUR")
   /// Kernmärkte stehen in Auswahllisten oben.
-  isCoreMarket Boolean @default(false)
+  isCoreMarket   Boolean @default(false)
   /// Länder, aus denen typischerweise importiert wird.
   isImportOrigin Boolean @default(false)
-  sortOrder   Int     @default(0)
+  sortOrder      Int     @default(0)
 
-  cities          City[]
-  dealers         Dealer[]
-  profiles        Profile[]
-  vehicles        Vehicle[]        @relation("VehicleCountry")
-  importedVehicles Vehicle[]       @relation("VehicleImportOrigin")
+  cities           City[]
+  dealers          Dealer[]
+  profiles         Profile[]
+  vehicles         Vehicle[] @relation("VehicleCountry")
+  importedVehicles Vehicle[] @relation("VehicleImportOrigin")
 
   @@index([isCoreMarket, sortOrder])
 }
@@ -669,10 +719,10 @@ model City {
 // ===========================================================================
 
 model Vehicle {
-  id String @id @default(cuid())
+  id         String @id @default(cuid())
   /// Sprechende Adresse mit Kurzcode am Ende:
   /// bmw-320d-xdrive-2021-prishtine-a7f3k2
-  slug String @unique
+  slug       String @unique
   /// Stabiler Kurzcode. Der Titel darf sich ändern, ohne den Link zu brechen.
   publicCode String @unique
 
@@ -871,7 +921,7 @@ model SavedSearch {
   userId String
 
   /// Vom Nutzer vergeben, etwa BMW 3er unter 30k.
-  name String
+  name  String
   /// Die Filter exakt so, wie sie in der Adresszeile stehen. Damit ist die
   /// gespeicherte Suche jederzeit wieder aufrufbar und teilbar.
   query Json
@@ -1002,7 +1052,7 @@ model Message {
   conversationId String
   senderId       String
 
-  body String
+  body           String
   /// Anhaenge liegen im Dateispeicher; hier stehen nur Verweise.
   attachmentUrls String[]
 
@@ -1030,11 +1080,17 @@ model Notification {
 
   readAt    DateTime?
   createdAt DateTime  @default(now())
+  /// Wann die Meldung aufs Telefon ging -- gesetzt vom Push-Versand, der
+  /// alle paar Sekunden nachsieht, was noch nicht unterwegs war. Die Meldung
+  /// wird an zehn Stellen in Transaktionen angelegt; der Versand danach ist
+  /// die eine Stelle, die sie alle abholt -- und nur, was auch angekommen ist.
+  pushedAt  DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, readAt, createdAt])
   @@index([userId, createdAt])
+  @@index([pushedAt, createdAt])
 }
 
 // ===========================================================================
@@ -1173,7 +1229,7 @@ model VoucherCode {
   kind VoucherKind
 
   /// Bei PERCENT gesetzt, sonst leer.
-  percentOff Int?
+  percentOff     Int?
   /// Bei AMOUNT gesetzt, sonst leer. In Cent.
   amountOffCents Int?
 
