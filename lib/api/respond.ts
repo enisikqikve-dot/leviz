@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 
+import type { ActionResult } from '@/lib/action-result';
+
 /**
  * Eine Antwortform fuer die ganze API.
  *
@@ -10,11 +12,14 @@ import { ZodError } from 'zod';
  * Entwickler, nicht fuer die Anzeige: uebersetzt wird in der App.
  */
 
+export type FieldError = { path: string; message: string };
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
     message?: string,
+    readonly fields?: FieldError[],
   ) {
     super(message ?? code);
   }
@@ -34,8 +39,36 @@ export function noContent(): NextResponse {
   return new NextResponse(null, { status: 204 });
 }
 
-export function failure(status: number, code: string, message?: string): NextResponse {
-  return NextResponse.json({ error: { code, message: message ?? code } }, { status });
+export function failure(
+  status: number,
+  code: string,
+  message?: string,
+  fields?: FieldError[],
+): NextResponse {
+  return NextResponse.json(
+    { error: { code, message: message ?? code, ...(fields ? { fields } : {}) } },
+    { status },
+  );
+}
+
+/**
+ * Ein ActionResult der Fachlogik auspacken.
+ *
+ * Die Kerne (Inserat speichern, Profil aendern) geben Fehler als Ergebnis
+ * zurueck, damit Formulare sie anzeigen koennen. Fuer die API wird daraus
+ * ein 400 mit Code `invalid`, die Meldung als `message` und die Feldfehler
+ * in derselben Form wie bei Zod -- die App zeigt beides unter dem Feld.
+ */
+export function unwrap<T>(result: ActionResult<T>): T {
+  if (result.ok) return result.data;
+
+  const fields = result.fieldErrors
+    ? Object.entries(result.fieldErrors).flatMap(([path, messages]) =>
+        messages.map((message) => ({ path, message })),
+      )
+    : undefined;
+
+  throw new ApiError(400, 'invalid', result.error, fields);
 }
 
 /**
@@ -56,7 +89,9 @@ export function handle(
     try {
       return await fn(request, context);
     } catch (fehler) {
-      if (fehler instanceof ApiError) return failure(fehler.status, fehler.code, fehler.message);
+      if (fehler instanceof ApiError) {
+        return failure(fehler.status, fehler.code, fehler.message, fehler.fields);
+      }
 
       if (fehler instanceof ZodError) {
         return NextResponse.json(

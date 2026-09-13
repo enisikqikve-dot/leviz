@@ -8,6 +8,8 @@ import { prisma } from '@/lib/db';
 import type { UserRole } from '@/lib/generated/prisma/enums';
 import { getPathname } from '@/lib/i18n/navigation';
 
+import { ADMIN_ROLES } from './permissions';
+
 export type SessionUser = {
   id: string;
   role: UserRole;
@@ -17,8 +19,6 @@ export type SessionUser = {
   image?: string | null;
 };
 
-/** Rollen, die den gesamten Bestand verwalten duerfen. */
-const ADMIN_ROLES: readonly UserRole[] = ['ADMIN', 'SUPER_ADMIN'];
 
 /**
  * Nachschlagen des Kontos zum Token.
@@ -106,19 +106,6 @@ export async function requireDealer(): Promise<SessionUser & { dealerId: string 
   return user as SessionUser & { dealerId: string };
 }
 
-export function isAdmin(user: Pick<SessionUser, 'role'>): boolean {
-  return ADMIN_ROLES.includes(user.role);
-}
-
-/**
- * Besitzpruefung fuer Inserate und andere eigene Inhalte. Verwaltende Rollen
- * duerfen ueberall eingreifen, alle anderen nur an eigenen Datensaetzen.
- */
-export function canManage(
-  user: Pick<SessionUser, 'id' | 'role' | 'dealerId'>,
-  resource: { sellerId: string; dealerId?: string | null },
-): boolean {
-  if (isAdmin(user)) return true;
-  if (resource.sellerId === user.id) return true;
-  return Boolean(user.dealerId) && resource.dealerId === user.dealerId;
-}
+// Die reinen Pruefungen wohnen in permissions.ts, damit die Kerne der
+// Fachlogik sie ohne Next-Importe erreichen. Hier nur weitergereicht.
+export { canManage, isAdmin } from './permissions';

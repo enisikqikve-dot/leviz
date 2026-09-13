@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Button } from '@/components/ui/button';
 import { ListingActions } from '@/features/listings/components/listing-actions';
+import { loadOwnListings } from '@/features/listings/mine';
 import { FeatureListing } from '@/features/packages/components/feature-listing';
 import { getEurToAllRate } from '@/features/search/data';
 import { variantFromTitle } from '@/features/vehicles/format';
@@ -43,21 +44,9 @@ export default async function MyListingsPage({ params }: PageProps) {
   const t = await getTranslations('myListings');
 
   const [vehicles, featurePackages, currency, eurToAll] = await Promise.all([
-    prisma.vehicle.findMany({
-      // Eigene Inserate und, für Händler, die des Autohauses.
-      where: user.dealerId
-        ? { OR: [{ sellerId: user.id }, { dealerId: user.dealerId }] }
-        : { sellerId: user.id },
-      select: {
-        id: true, slug: true, title: true, status: true, priceCents: true,
-        viewCount: true, inquiryCount: true, favoriteCount: true, qualityScore: true,
-        featuredUntil: true,
-        brand: { select: { name: true } },
-        model: { select: { name: true } },
-        images: { select: { url: true }, orderBy: { position: 'asc' }, take: 1 },
-      },
-      orderBy: [{ updatedAt: 'desc' }],
-    }),
+    // Dieselbe Abfrage wie fuer die App -- eigene Inserate und, fuer
+    // Haendler, die des Autohauses.
+    loadOwnListings(user),
     // Nur Pakete, die tatsächlich eine Laufzeit als Hervorhebung gewähren.
     prisma.package.findMany({
       where: { active: true, featuredDays: { gt: 0 }, isDealerPackage: false },
