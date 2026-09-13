@@ -29,6 +29,7 @@
     "brand:social": "node scripts/brand-social.mjs",
     "brand:shots": "node scripts/capture-shots.mjs",
     "brand:video": "node scripts/brand-video.mjs",
+    "brand:app-icons": "node scripts/app-icons.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
