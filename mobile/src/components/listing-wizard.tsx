@@ -15,6 +15,7 @@ import { formatPrice } from '@/lib/currency';
 import { ChipSelect, Field, MultiChipSelect, NumberField, PickerField, Toggle, type Option } from '~/components/form';
 import { PhotoStep, type ImagesUpdate } from '~/components/photos';
 import { Button, Card, Chip, Input, Txt } from '~/components/ui';
+import { useAnalytics } from '~/lib/analytics';
 import { ApiError } from '~/lib/api';
 import { useI18n, type Locale } from '~/lib/i18n';
 import { webUrlFor } from '~/lib/links';
@@ -66,6 +67,7 @@ export function ListingWizard({
   const { data: katalog } = useCatalog(locale, werte.brandSlug);
   const speichern = useSaveListing();
   const befehl = useListingCommand();
+  const analytics = useAnalytics();
 
   const aktuell: StepId = STEPS[schritt];
   const letzter = schritt === STEPS.length - 1;
@@ -112,11 +114,13 @@ export function ListingWizard({
       setGespeichertId(gespeichert.id);
 
       if (!veroeffentlichen) {
+        analytics.track('listing_saved', { photos: werte.images?.length ?? 0, edit: Boolean(vehicleId) });
         setErgebnis({ status: 'DRAFT' });
         return;
       }
 
       const live = (await befehl.mutateAsync({ id: gespeichert.id, command: 'publish' })) as PublishResult;
+      analytics.track('listing_published', { status: live.status, photos: werte.images?.length ?? 0, edit: Boolean(vehicleId) });
       setErgebnis(live);
     } catch (e) {
       if (e instanceof ApiError && e.fields?.length) {

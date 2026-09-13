@@ -30,7 +30,9 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "themeSystem": "System",
-    "toggleTheme": "Toggle appearance"
+    "toggleTheme": "Toggle appearance",
+    "analytics": "Share usage data",
+    "analyticsHint": "Helps us see what works. No name, no email; crash reports included."
   },
   "locales": {
     "sq": "Albanian",
@@ -1416,6 +1418,14 @@
             "Other users see what is published in a listing, and the name shown with a message.",
             "Service providers process data on our behalf: hosting, database, file storage, payment provider, and email and SMS delivery. They are bound by contract and may not use the data for their own purposes.",
             "Data is disclosed to authorities only where required by law."
+          ]
+        },
+        {
+          "heading": "The LEVIZ app",
+          "body": [
+            "The iOS and Android app processes the same data as the website — account, listings, messages — through the same server.",
+            "Push notifications are delivered through the Expo service and the services of Apple and Google. For this we store a device token; it is deleted when you log out or switch notifications off. The title and a short excerpt of the notification text pass through these services.",
+            "To see what works and where errors occur, the app sends usage data and crash reports to PostHog (servers in the EU). Not included are your name, email address or phone number — only a technical identifier and the screens used. You can switch this off in the app under Account → \"Share usage data\"."
           ]
         },
         {

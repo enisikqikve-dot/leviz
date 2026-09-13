@@ -8,6 +8,7 @@ import { formatPrice } from '@/lib/currency';
 
 import { Field, Toggle } from '~/components/form';
 import { Button, Input, Txt } from '~/components/ui';
+import { useAnalytics } from '~/lib/analytics';
 import { ApiError } from '~/lib/api';
 import { useI18n } from '~/lib/i18n';
 import { useCatalog, useSaveSearch } from '~/lib/queries';
@@ -33,6 +34,7 @@ export function SaveSearchSheet({
   const { t, locale } = useI18n();
   const insets = useSafeAreaInsets();
   const speichern = useSaveSearch();
+  const analytics = useAnalytics();
   const { data: katalog } = useCatalog(locale, filters.make);
 
   const params = useMemo(() => parseSearchParams(filters as Record<string, string>), [filters]);
@@ -64,6 +66,7 @@ export function SaveSearchSheet({
     setFehler(null);
     try {
       await speichern.mutateAsync({ name: wert.trim(), query, notifyByEmail: mail });
+      analytics.track('search_saved', { filters: Object.keys(query).length, notify: mail });
       setName(null);
       onClose(true);
     } catch (e) {

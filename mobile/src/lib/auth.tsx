@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
 
+import { useAnalytics } from './analytics';
 import { api, ApiError, pushTokenStore, tokenStore } from './api';
 import { registerDevice, unregisterDevice } from './push';
 import type { Account, SessionResponse } from './types';
@@ -80,6 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     retry: false,
   });
 
+  // Die Nutzungsdaten kennen das Konto nur als Kennung -- nie Name, nie E-Mail.
+  const analytics = useAnalytics();
+  const userId = data?.id ?? null;
+  useEffect(() => {
+    if (userId) analytics.identify(userId);
+  }, [userId, analytics]);
+
   const value = useMemo<AuthState>(() => {
     const uebernehmen = async (session: SessionResponse) => {
       await tokenStore.save({ accessToken: session.accessToken, refreshToken: session.refreshToken });
@@ -124,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }).catch(() => {});
         }
         await tokenStore.clear();
+        analytics.reset();
         client.setQueryData(['me'], null);
         client.removeQueries({ queryKey: ['favorites'] });
         client.removeQueries({ queryKey: ['notifications'] });
@@ -131,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         client.removeQueries({ queryKey: ['profile'] });
       },
     };
-  }, [client, data, isPending]);
+  }, [client, data, isPending, analytics]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

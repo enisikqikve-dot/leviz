@@ -2,8 +2,10 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Toggle } from '~/components/form';
 import { Logo } from '~/components/logo';
 import { Button, Card, Chip, Txt } from '~/components/ui';
+import { useAnalytics } from '~/lib/analytics';
 import { useAuth } from '~/lib/auth';
 import { locales, useI18n, type Locale } from '~/lib/i18n';
 import { useConversations, useNotifications } from '~/lib/queries';
@@ -19,6 +21,7 @@ export default function AccountScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user, ready, logout } = useAuth();
+  const analytics = useAnalytics();
   const { data: meldungen } = useNotifications(Boolean(user));
   const ungelesen = meldungen?.pages[0]?.unread ?? 0;
   const { data: gespraeche } = useConversations(Boolean(user));
@@ -79,6 +82,10 @@ export default function AccountScreen() {
           ))}
         </View>
       </View>
+
+      {analytics.available ? (
+        <Toggle label={t('settings.analytics')} hint={t('settings.analyticsHint')} value={analytics.enabled} onChange={(v) => void analytics.setEnabled(v)} />
+      ) : null}
 
       {user ? <Button label={t('dashboard.logout')} variant="ghost" onPress={() => logout()} /> : null}
 

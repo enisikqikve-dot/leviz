@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { AnalyticsProvider } from '~/lib/analytics';
 import { api } from '~/lib/api';
 import { AuthProvider } from '~/lib/auth';
 import { defaultLocale, I18nContext, translate, type Locale } from '~/lib/i18n';
@@ -78,6 +79,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <I18nContext.Provider value={i18n}>
         <QueryClientProvider client={queryClient}>
+          <AnalyticsProvider>
           <AuthProvider>
             <PushTaps />
             <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
@@ -108,6 +110,7 @@ export default function RootLayout() {
               <Stack.Screen name="dealer/[slug]" options={{ title: '' }} />
             </Stack>
           </AuthProvider>
+          </AnalyticsProvider>
         </QueryClientProvider>
       </I18nContext.Provider>
     </GestureHandlerRootView>

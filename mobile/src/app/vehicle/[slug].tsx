@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator, Dimensions, Linking, Pressable, ScrollView, Share, StyleSheet, View,
 } from 'react-native';
@@ -11,6 +11,7 @@ import { formatPrice } from '@/lib/currency';
 import { Button, Card, Chip, Txt } from '~/components/ui';
 import { VehicleCard } from '~/components/vehicle-card';
 import { imageUrl } from '~/lib/api';
+import { useAnalytics } from '~/lib/analytics';
 import { useAuth } from '~/lib/auth';
 import { useI18n } from '~/lib/i18n';
 import { webUrlFor } from '~/lib/links';
@@ -35,6 +36,14 @@ export default function VehicleScreen() {
   const { data, isLoading, isError } = useVehicle(slug);
   const toggle = useToggleFavorite();
   const [bild, setBild] = useState(0);
+  const analytics = useAnalytics();
+
+  // Ein Aufruf zaehlt einmal je Fahrzeug -- der Server zaehlt die Ansicht
+  // ohnehin, hier geht es um den Weg dorthin.
+  const gesehen = data?.vehicle.id;
+  useEffect(() => {
+    if (gesehen) analytics.track('vehicle_viewed', { slug, seller_type: data?.vehicle.sellerType ?? null });
+  }, [gesehen, slug, analytics, data?.vehicle.sellerType]);
 
   if (isLoading) return <ActivityIndicator style={{ marginTop: spacing.xxl }} color={theme.primary} />;
   if (isError || !data) {
@@ -58,8 +67,13 @@ export default function VehicleScreen() {
 
   const merken = () => {
     if (!user) return router.push('/login');
+    analytics.track('favorite_toggled', { slug: vehicle.slug, favorited: !favorited });
     toggle.mutate({ vehicleId: vehicle.id, favorited });
   };
+
+  /** Jeder Weg zum Verkaeufer zaehlt -- welcher, ist die interessante Zahl. */
+  const kontakt = (channel: 'call' | 'whatsapp' | 'viber' | 'message') =>
+    analytics.track('seller_contacted', { slug: vehicle.slug, channel, seller_type: vehicle.sellerType });
 
   const nachricht = encodeURIComponent(t('vehicleDetail.seller.message', { vehicle: titel, url: webUrl }));
 
@@ -190,19 +204,19 @@ export default function VehicleScreen() {
 
             {telefon ? (
               <View style={{ gap: spacing.sm }}>
-                <Button label={`${t('vehicleDetail.callSeller')} · ${telefon}`} onPress={() => Linking.openURL(`tel:${telefon}`)} />
+                <Button label={`${t('vehicleDetail.callSeller')} · ${telefon}`} onPress={() => { kontakt('call'); Linking.openURL(`tel:${telefon}`); }} />
                 <View style={{ flexDirection: 'row', gap: spacing.sm }}>
                   <Button
                     label={t('vehicleDetail.seller.whatsapp')}
                     variant="outline"
                     style={{ flex: 1 }}
-                    onPress={() => Linking.openURL(`https://wa.me/${ziffern}?text=${nachricht}`)}
+                    onPress={() => { kontakt('whatsapp'); Linking.openURL(`https://wa.me/${ziffern}?text=${nachricht}`); }}
                   />
                   <Button
                     label={t('vehicleDetail.seller.viber')}
                     variant="outline"
                     style={{ flex: 1 }}
-                    onPress={() => Linking.openURL(`viber://chat?number=${encodeURIComponent(`+${ziffern}`)}`)}
+                    onPress={() => { kontakt('viber'); Linking.openURL(`viber://chat?number=${encodeURIComponent(`+${ziffern}`)}`); }}
                   />
                 </View>
               </View>
@@ -213,9 +227,11 @@ export default function VehicleScreen() {
               <Button
                 label={t('vehicleDetail.contactSeller')}
                 variant={telefon ? 'outline' : 'primary'}
-                onPress={() => (user
-                  ? router.push({ pathname: '/messages/new', params: { vehicleId: vehicle.id, title: titel } })
-                  : router.push('/login'))}
+                onPress={() => {
+                  if (!user) return router.push('/login');
+                  kontakt('message');
+                  router.push({ pathname: '/messages/new', params: { vehicleId: vehicle.id, title: titel } });
+                }}
               />
             ) : null}
 
@@ -239,7 +255,7 @@ export default function VehicleScreen() {
           <Txt variant="small" style={{ fontFamily: fonts.medium }}>{t('vehicleDetail.save')}</Txt>
         </Pressable>
         <Pressable
-          onPress={() => Share.share({ message: `${titel} — ${webUrl}`, url: webUrl })}
+          onPress={() => { analytics.track('vehicle_shared', { slug: vehicle.slug }); Share.share({ message: `${titel} — ${webUrl}`, url: webUrl }); }}
           style={[styles.leisteKnopf, { borderColor: theme.border }]}
         >
           <Txt style={{ fontSize: 18 }}>↗</Txt>

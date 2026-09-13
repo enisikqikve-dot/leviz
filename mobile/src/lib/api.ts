@@ -54,6 +54,13 @@ export const tokenStore = {
  */
 const PUSH = 'leviz.push';
 
+/** Kleine Einstellungen der App (Schalter), im selben Speicher. */
+export const prefsStore = {
+  get: (key: string): Promise<string | null> => speicher.get(key),
+  set: (key: string, value: string): Promise<void> => speicher.set(key, value),
+  remove: (key: string): Promise<void> => speicher.remove(key),
+};
+
 export const pushTokenStore = {
   load: (): Promise<string | null> => speicher.get(PUSH),
   save: (token: string): Promise<void> => speicher.set(PUSH, token),

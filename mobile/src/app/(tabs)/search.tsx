@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,6 +8,7 @@ import { SORT_OPTIONS } from '@/features/search/schema';
 import { SaveSearchSheet } from '~/components/save-search';
 import { Button, Chip, Empty, Txt } from '~/components/ui';
 import { VehicleCard } from '~/components/vehicle-card';
+import { useAnalytics } from '~/lib/analytics';
 import { useAuth } from '~/lib/auth';
 import { useI18n } from '~/lib/i18n';
 import { useSearch, type SearchFilters } from '~/lib/queries';
@@ -42,6 +43,21 @@ export default function SearchScreen() {
   const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useSearch(filters);
   const treffer = data?.pages.flatMap((p) => p.items) ?? [];
   const gesamt = data?.pages[0]?.total ?? 0;
+
+  // Eine Suche zaehlt, wenn ihre Treffer da sind -- mit Filterzahl und Marke,
+  // ohne Freitext: der koennte ein Kennzeichen oder ein Name sein.
+  const analytics = useAnalytics();
+  const suchSchluessel = JSON.stringify({ ...filters, q: undefined });
+  const ersteSeite = data?.pages[0];
+  const zuletztGezaehlt = useRef<string | null>(null);
+  useEffect(() => {
+    if (!ersteSeite || zuletztGezaehlt.current === suchSchluessel) return;
+    zuletztGezaehlt.current = suchSchluessel;
+    analytics.track('search_performed', {
+      filters: aktiveFilter, make: filters.make ?? null, sort: filters.sort ?? 'relevance',
+      results: ersteSeite.total, with_text: Boolean(filters.q),
+    });
+  }, [suchSchluessel, ersteSeite, analytics, aktiveFilter, filters.make, filters.sort, filters.q]);
 
   const setSort = (sort: string) => router.setParams({ ...params, sort });
 

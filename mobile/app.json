@@ -77,6 +77,10 @@
             "node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf",
             "node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf",
             "node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf",
+            "node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf",
+            "node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf",
+            "node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf",
+            "node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf",
             "node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"
           ]
         }
@@ -87,11 +91,20 @@
           "color": "#2F5BFF",
           "defaultChannel": "default"
         }
-      ]
+      ],
+      "expo-localization",
+      "posthog-react-native/expo"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e0402317-215f-45d1-b029-fd66f689d1e8"
+      }
+    },
+    "owner": "kqiku"
   }
 }

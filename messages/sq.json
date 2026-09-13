@@ -30,7 +30,9 @@
     "themeLight": "E ndritshme",
     "themeDark": "E errët",
     "themeSystem": "Sistemi",
-    "toggleTheme": "Ndrysho pamjen"
+    "toggleTheme": "Ndrysho pamjen",
+    "analytics": "Ndaj të dhënat e përdorimit",
+    "analyticsHint": "Na ndihmon të shohim çfarë funksionon. Pa emër, pa email; raportet e defekteve përfshihen."
   },
   "locales": {
     "sq": "Shqip",
@@ -1416,6 +1418,14 @@
             "Përdoruesit e tjerë shohin atë që publikohet në një shpallje, si dhe emrin që shfaqet me një mesazh.",
             "Ofruesit e shërbimeve i përpunojnë të dhënat për llogari tonë: hostimi, baza e të dhënave, ruajtja e skedarëve, ofruesi i pagesave dhe dërgimi i email-eve dhe SMS-ve. Ata janë të lidhur me kontratë dhe nuk mund t'i përdorin të dhënat për qëllimet e veta.",
             "Të dhënat u jepen autoriteteve vetëm kur kjo kërkohet me ligj."
+          ]
+        },
+        {
+          "heading": "Aplikacioni LEVIZ",
+          "body": [
+            "Aplikacioni për iOS dhe Android përpunon të njëjtat të dhëna si faqja — llogari, shpallje, mesazhe — përmes të njëjtit server.",
+            "Njoftimet push dërgohen përmes shërbimit të Expo dhe shërbimeve të Apple dhe Google. Për këtë ruajmë një shenjë (token) të pajisjes; me çaktivizim ose dalje nga llogaria ajo fshihet. Titulli dhe një pjesë e shkurtër e tekstit të njoftimit kalojnë nëpër këto shërbime.",
+            "Për të kuptuar çfarë funksionon dhe ku ndodhin defekte, aplikacioni dërgon të dhëna përdorimi dhe raporte defektesh te PostHog (serverë në BE). Nuk përfshihet emri, email-i apo numri i telefonit — vetëm një identifikues teknik dhe ekranet e përdorura. Këtë e çaktivizon në aplikacion te Llogaria → „Ndaj të dhënat e përdorimit\"."
           ]
         },
         {

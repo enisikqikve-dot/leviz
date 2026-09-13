@@ -761,6 +761,31 @@ genau den gespeicherten Filtern.
 Bewertungsrechner, Pakete kaufen (Apple verlangt dafür In-App-Käufe — der
 Kauf bleibt bewusst im Browser).
 
+### Nutzungsdaten und Absturzberichte
+
+Hinter `mobile/src/lib/analytics.tsx` steht **PostHog (EU)** — Analytics
+und Fehlerberichte in einem, verbunden über `npx eas
+integrations:posthog:connect --region EU --no-session-replay`. Der Befehl
+schreibt die Schlüssel nach `mobile/.env.local` (nicht im Repository) und
+als EAS-Umgebungsvariablen für den Bau; ohne `EXPO_PUBLIC_POSTHOG_API_KEY`
+wird nichts erfasst, und die App sagt das im Protokoll.
+
+Grundsätze, im Code festgeschrieben:
+
+- `identify` nur mit der Nutzerkennung — nie Name, nie E-Mail.
+- Kein Session-Replay, kein Mitschneiden von Tippen oder Berührungen.
+- Bildschirme als Routenmuster (`/vehicle/[slug]`), Ereignisse mit Zahlen
+  und Slugs: `search_performed`, `vehicle_viewed`, `seller_contacted`
+  (Kanal), `favorite_toggled`, `vehicle_shared`, `listing_published`,
+  `search_saved`. Kein Freitext — der könnte ein Kennzeichen sein.
+- Ein Schalter im Konto: „Nutzungsdaten teilen". Aus heißt aus, auch für
+  Absturzberichte.
+- Source Maps für lesbare Absturzberichte lädt EAS Build hoch
+  (`getPostHogExpoConfig` in `metro.config.js`, nur wenn `EAS_BUILD=true`).
+
+Die Datenschutzerklärung der Website hat dafür den Abschnitt „Die
+LEVIZ-App" — sie gilt für die App mit, und die Stores verlangen den Link.
+
 ### Bauen und einreichen — ohne Mac
 
 Kommt mit Phase 5 (EAS Build und EAS Submit). Die Kennungen stehen schon in

@@ -30,7 +30,9 @@
     "themeLight": "Hell",
     "themeDark": "Dunkel",
     "themeSystem": "System",
-    "toggleTheme": "Darstellung wechseln"
+    "toggleTheme": "Darstellung wechseln",
+    "analytics": "Nutzungsdaten teilen",
+    "analyticsHint": "Hilft uns zu sehen, was funktioniert. Ohne Name, ohne E-Mail; Absturzberichte eingeschlossen."
   },
   "locales": {
     "sq": "Albanisch",
@@ -1416,6 +1418,14 @@
             "Andere Nutzer sehen, was in einem Inserat veröffentlicht wird, sowie den bei einer Nachricht angezeigten Namen.",
             "Dienstleister verarbeiten Daten in unserem Auftrag: Hosting, Datenbank, Dateispeicher, Zahlungsdienstleister sowie E-Mail- und SMS-Versand. Sie sind vertraglich gebunden und dürfen die Daten nicht für eigene Zwecke nutzen.",
             "Eine Weitergabe an Behörden erfolgt nur, soweit gesetzlich vorgeschrieben."
+          ]
+        },
+        {
+          "heading": "Die LEVIZ-App",
+          "body": [
+            "Die App für iOS und Android verarbeitet dieselben Daten wie die Website — Konto, Inserate, Nachrichten — über denselben Server.",
+            "Push-Meldungen werden über den Dienst von Expo und die Dienste von Apple und Google zugestellt. Dafür speichern wir ein Gerätekennzeichen (Token); beim Abmelden oder Abschalten wird es gelöscht. Titel und ein kurzer Ausschnitt des Meldungstextes laufen über diese Dienste.",
+            "Um zu sehen, was funktioniert und wo Fehler auftreten, sendet die App Nutzungsdaten und Absturzberichte an PostHog (Server in der EU). Nicht enthalten sind Name, E-Mail-Adresse oder Telefonnummer — nur eine technische Kennung und die aufgerufenen Bildschirme. Abschalten lässt sich das in der App unter Konto → „Nutzungsdaten teilen\"."
           ]
         },
         {

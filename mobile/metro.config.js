@@ -11,12 +11,16 @@
  */
 const path = require('node:path');
 
-const { getDefaultConfig } = require('expo/metro-config');
+const { getPostHogExpoConfig } = require('posthog-react-native/metro');
 
 const projekt = __dirname;
 const wurzel = path.resolve(__dirname, '..');
 
-const config = getDefaultConfig(projekt);
+// Die Standardkonfiguration von Expo, plus die Metro-Erweiterung von PostHog:
+// sie erzeugt beim Bauen Source Maps mit Kennung, damit ein Absturzbericht
+// die echte Zeile zeigt und nicht Zeile 1 von 40 000. Nur beim Bauen auf EAS
+// -- in der Entwicklung kostet sie nur Zeit.
+const config = getPostHogExpoConfig(projekt, { enabled: process.env.EAS_BUILD === 'true' });
 
 config.watchFolders = [wurzel];
 
