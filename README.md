@@ -788,10 +788,32 @@ LEVIZ-App" — sie gilt für die App mit, und die Stores verlangen den Link.
 
 ### Bauen und einreichen — ohne Mac
 
-Kommt mit Phase 5 (EAS Build und EAS Submit). Die Kennungen stehen schon in
-`app.json`: `com.levizz.app` für beide Stores, Name **LEVIZ**, Schema
-`leviz://`, und die Pfade für Universal Links auf `levizz.com` in allen drei
-Sprachen.
+Gebaut wird in der Cloud von Expo (EAS Build); der Rechner braucht weder
+Xcode noch Android Studio. `mobile/eas.json` hat drei Profile:
+
+| Profil | Wofür | Ergebnis |
+|---|---|---|
+| `preview` | zum Anschauen auf dem eigenen Telefon | Android-APK zum Installieren; iOS nur für registrierte Geräte |
+| `development` | Entwicklung mit Expo Dev Client statt Expo Go (nötig für Push auf Android) | dito |
+| `production` | für die Stores | AAB für Play, IPA für App Store; Versionsnummer zählt EAS hoch |
+
+`preview` und `production` bauen gegen `https://levizz.com`
+(`EXPO_PUBLIC_API_URL` im Profil). Die PostHog-Schlüssel kommen aus den
+EAS-Umgebungsvariablen, nicht aus dem Repository.
+
+```bash
+cd mobile && npx eas build --platform android --profile preview
+```
+
+Beim ersten Mal fragt EAS, ob es einen Android-Signierschlüssel erzeugen
+soll — **ja**; er bleibt bei EAS. Nach 10–20 Minuten gibt es einen Link
+und einen QR-Code; das APK lässt sich direkt auf dem Telefon installieren.
+Für iOS braucht es das Apple-Entwicklerkonto (`--platform ios`), EAS legt
+Zertifikate und Profile selbst an.
+
+Kennungen in `app.json`: `com.levizz.app` für beide Stores, Name **LEVIZ**,
+Schema `leviz://`, Universal Links auf `levizz.com`, EAS-Projekt
+`@kqiku/leviz`.
 
 ---
 
