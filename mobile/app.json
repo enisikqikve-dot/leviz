@@ -11,6 +11,7 @@
       "bundleIdentifier": "com.levizz.app",
       "supportsTablet": false,
       "associatedDomains": [
+        "applinks:levizz.com",
         "applinks:levizz.com"
       ],
       "infoPlist": {
@@ -27,6 +28,31 @@
       },
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "levizz.com",
+              "pathPrefix": "/vetura/"
+            },
+            {
+              "scheme": "https",
+              "host": "levizz.com",
+              "pathPrefix": "/de/fahrzeug/"
+            },
+            {
+              "scheme": "https",
+              "host": "levizz.com",
+              "pathPrefix": "/en/vehicle/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
         {
           "action": "VIEW",
           "autoVerify": true,
@@ -104,6 +130,12 @@
         "projectId": "e0402317-215f-45d1-b029-fd66f689d1e8"
       }
     },
-    "owner": "kqiku"
+    "owner": "kqiku",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e0402317-215f-45d1-b029-fd66f689d1e8"
+    }
   }
 }
