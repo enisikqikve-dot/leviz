@@ -206,11 +206,22 @@ export default function VehicleScreen() {
                   />
                 </View>
               </View>
-            ) : (
-              // Ohne Telefonnummer bleibt das Kontaktformular der Website.
-              // Nachrichten in der App kommen mit Phase 4.
-              <Button label={t('vehicleDetail.contactSeller')} variant="outline" onPress={() => Linking.openURL(webUrl)} />
-            )}
+            ) : null}
+
+            {/* Nachricht ueber LEVIZ -- nicht an sich selbst, nicht bei Verkauftem. */}
+            {vehicle.status === 'ACTIVE' && user?.id !== vehicle.seller.id ? (
+              <Button
+                label={t('vehicleDetail.contactSeller')}
+                variant={telefon ? 'outline' : 'primary'}
+                onPress={() => (user
+                  ? router.push({ pathname: '/messages/new', params: { vehicleId: vehicle.id, title: titel } })
+                  : router.push('/login'))}
+              />
+            ) : null}
+
+            {vehicle.dealer ? (
+              <Button label={t('vehicleDetail.seller.viewProfile')} variant="ghost" onPress={() => router.push(`/dealer/${vehicle.dealer!.slug}`)} />
+            ) : null}
           </Card>
         </Abschnitt>
 

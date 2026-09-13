@@ -5,8 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SORT_OPTIONS } from '@/features/search/schema';
 
+import { SaveSearchSheet } from '~/components/save-search';
 import { Button, Chip, Empty, Txt } from '~/components/ui';
 import { VehicleCard } from '~/components/vehicle-card';
+import { useAuth } from '~/lib/auth';
 import { useI18n } from '~/lib/i18n';
 import { useSearch, type SearchFilters } from '~/lib/queries';
 import { fonts, radius, spacing, useTheme } from '~/lib/theme';
@@ -26,6 +28,9 @@ export default function SearchScreen() {
   const params = useLocalSearchParams<Record<string, string>>();
 
   const [text, setText] = useState(params.q ?? '');
+  const [speichernOffen, setSpeichernOffen] = useState(false);
+  const [gespeichert, setGespeichert] = useState(false);
+  const { user } = useAuth();
 
   const filters = useMemo<SearchFilters>(() => {
     const { q: _q, ...rest } = params;
@@ -63,10 +68,24 @@ export default function SearchScreen() {
               ⚙ {t('search.filters')}{aktiveFilter ? ` · ${aktiveFilter}` : ''}
             </Txt>
           </Pressable>
-          <Txt variant="small" color={theme.muted}>
+          {aktiveFilter > 0 || filters.q ? (
+            <Pressable
+              onPress={() => (user ? setSpeichernOffen(true) : router.push('/login'))}
+              style={[styles.filterKnopf, { backgroundColor: theme.card, borderColor: theme.border }]}
+            >
+              <Txt variant="small" style={{ fontFamily: fonts.medium }}>{gespeichert ? `✓ ${t('searches.saved')}` : `☆ ${t('searches.save')}`}</Txt>
+            </Pressable>
+          ) : null}
+          <Txt variant="small" color={theme.muted} style={{ flex: 1, textAlign: 'right' }}>
             {isLoading ? t('search.loading') : gesamt === 1 ? t('search.resultsOne') : t('search.resultsMany', { count: gesamt })}
           </Txt>
         </View>
+
+        <SaveSearchSheet
+          visible={speichernOffen}
+          filters={filters}
+          onClose={(ok) => { setSpeichernOffen(false); if (ok) setGespeichert(true); }}
+        />
 
         <FlatList
           horizontal

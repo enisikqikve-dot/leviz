@@ -531,6 +531,18 @@ der App. Ein Validierungsfehler trägt `fields` mit Pfad und Meldung.
 | PATCH | `/me/profile` | speichern; Feldfehler als Schlüssel aus `account` |
 | POST | `/devices` | `{ token, platform, device? }` — das Telefon für Push anmelden (201/200) |
 | DELETE | `/devices` | `{ token }` — beim Abmelden → 204 |
+| GET | `/conversations` | eigene Gespräche, neueste zuerst, plus `unread` |
+| POST | `/conversations` | `{ vehicleId, body }` — Gespräch beginnen; zum selben Fahrzeug gibt es genau eines (201) |
+| GET | `/conversations/{id}` | der Faden mit allen Nachrichten; fremde: 404 |
+| POST | `/conversations/{id}/messages` | `{ body }` → die Nachricht (201) |
+| POST | `/conversations/{id}/read` | gelesen → 204 |
+| POST | `/conversations/{id}/block` | blockieren ↔ freigeben; nur der Blockierende darf freigeben |
+| GET | `/searches` | Suchaufträge mit Trefferzahl und neuen Treffern |
+| POST | `/searches` | `{ name, query, notifyByEmail? }` — `query` ist die Adresszeile der Suche (201) |
+| DELETE | `/searches/{id}` | → 204 |
+| POST | `/searches/{id}/seen` | neue Treffer gelten als gesehen → 204 |
+| GET | `/dealers?q=&verified=&sort=` | Händlerverzeichnis |
+| GET | `/dealers/{slug}` | Händlerprofil; der Bestand kommt über `/vehicles?dealer=` |
 
 Die Ratenbegrenzung für Anmeldung und Registrierung ist dieselbe wie auf der
 Website. Nur öffentliche Inserate sind über die API erreichbar — ein Entwurf
@@ -544,8 +556,9 @@ Moderation, Qualitätswert und die Magic-Byte-Prüfung der Fotos gibt es
 deshalb genau einmal. Fachliche Fehler (`ActionResult` mit `ok: false`)
 werden zu `400 invalid` mit `message` und denselben `fields` wie bei Zod.
 
-Noch nicht dabei, kommt mit den jeweiligen App-Bildschirmen: Nachrichten,
-Suchaufträge.
+Die Antworten zu Gesprächen enthalten **nie die E-Mail-Adresse der
+Gegenseite** — ein Käufer erreicht den Verkäufer über LEVIZ, nicht an LEVIZ
+vorbei.
 
 ### Push-Meldungen
 
@@ -726,7 +739,27 @@ Seit SDK 53 kommen Push-Meldungen auf Android nicht mehr in Expo Go an —
 dafür braucht es einen Development Build (`npx eas build --profile
 development`). iOS Expo Go zeigt sie.
 
-**Was noch auf die Website führt:** Nachrichten — kommen mit Phase 4.
+### Was in Phase 4 drin ist
+
+**Nachrichten.** Gesprächsliste mit Fahrzeug, Gegenseite und ungelesen;
+der Faden mit Blasen (eigene rechts), Schreibfeld, Blockieren. „Kontakto
+shitësin" auf der Fahrzeugseite schreibt jetzt in der App — dieselbe
+Funktion und Ratenbegrenzung wie das Formular der Website. Kein Websocket:
+ein offener Faden holt alle 15 Sekunden nach, und die Push-Meldung kommt
+ohnehin sofort.
+
+**Suchaufträge.** Aus der Suche heraus speichern — der Namensvorschlag ist
+`suggestSearchName` aus dem Hauptprojekt, mit denselben Beschriftungen.
+Die Liste zeigt Treffer und neue Treffer; Antippen öffnet die Suche mit
+genau den gespeicherten Filtern.
+
+**Händler.** Verzeichnis mit Suche und Sortierung, Profil mit Kontakt,
+Öffnungszeiten, Bewertungen und dem Bestand — derselben Liste wie die Suche
+(`/vehicles?dealer=`). Von der Fahrzeugseite aus erreichbar.
+
+**Was noch auf die Website führt:** Bewertung schreiben, Vergleich,
+Bewertungsrechner, Pakete kaufen (Apple verlangt dafür In-App-Käufe — der
+Kauf bleibt bewusst im Browser).
 
 ### Bauen und einreichen — ohne Mac
 

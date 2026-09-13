@@ -200,3 +200,89 @@ export type Profile = {
   hasPassword: boolean;
   cities: { slug: string; name: string; countryCode: string }[];
 };
+
+// --- Phase 4: Gespraeche, Suchauftraege, Haendler ----------------------------
+
+export type ConversationVehicle = {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  priceCents: number;
+  image: string | null;
+};
+
+export type Conversation = {
+  id: string;
+  status: 'OPEN' | 'BLOCKED' | string;
+  isBuyer: boolean;
+  blockedByMe: boolean;
+  counterpartName: string;
+  lastMessageAt: string;
+  unread: boolean;
+  vehicle: ConversationVehicle;
+  lastMessage: { body: string; createdAt: string; mine: boolean } | null;
+};
+
+export type Message = { id: string; body: string; createdAt: string; mine: boolean };
+
+export type ConversationThread = {
+  id: string;
+  status: 'OPEN' | 'BLOCKED' | string;
+  isBuyer: boolean;
+  blockedByMe: boolean;
+  counterpartName: string;
+  vehicle: ConversationVehicle;
+  messages: Message[];
+};
+
+export type SavedSearch = {
+  id: string;
+  name: string;
+  query: Record<string, string>;
+  filterCount: number;
+  notifyByEmail: boolean;
+  createdAt: string;
+  lastCheckedAt: string | null;
+  matchCount: number;
+  newCount: number;
+};
+
+export type DealerCard = {
+  id: string;
+  slug: string;
+  companyName: string;
+  logoUrl: string | null;
+  description: string | null;
+  verified: boolean;
+  ratingAvg: number;
+  ratingCount: number;
+  city: { name: string; slug: string } | null;
+  countryCode: string | null;
+  vehicleCount: number;
+};
+
+export type DealerProfile = {
+  id: string;
+  slug: string;
+  companyName: string;
+  description: string | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  website: string | null;
+  phone: string | null;
+  publicEmail: string | null;
+  addressLine: string | null;
+  postalCode: string | null;
+  city: { name: string; slug: string } | null;
+  country: { code: string; nameSq: string; nameDe: string; nameEn: string } | null;
+  openingHours: Record<string, string | null> | null;
+  verified: boolean;
+  verifiedAt: string | null;
+  ratingAvg: number;
+  ratingCount: number;
+  vehicleCount: number;
+  memberSince: string;
+  reviews: { id: string; rating: number; title: string | null; body: string | null; verified: boolean; createdAt: string; author: { name: string | null; image: string | null } }[];
+};
+

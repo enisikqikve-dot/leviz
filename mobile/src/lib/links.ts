@@ -48,8 +48,18 @@ export function targetFor(input: string): Target {
       return { href: '/login' };
     case '/register':
       return { href: '/register' };
+    case '/messages':
+      return { href: '/messages' };
+    case '/messages/[id]':
+      return { href: `/messages/${params.id}` };
+    case '/searches':
+      return { href: '/searches' };
+    case '/dealers':
+      return { href: '/dealers' };
+    case '/dealer/[slug]':
+      return { href: `/dealer/${params.slug}` };
     default:
-      // Nachrichten, Haendler, Vergleich, rechtliche Seiten: noch Website.
+      // Vergleich, Bewertung, rechtliche Seiten: Website.
       return { web };
   }
 }

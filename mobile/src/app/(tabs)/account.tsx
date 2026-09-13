@@ -1,22 +1,17 @@
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Linking, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Logo } from '~/components/logo';
 import { Button, Card, Chip, Txt } from '~/components/ui';
-import { API_URL } from '~/lib/api';
 import { useAuth } from '~/lib/auth';
 import { locales, useI18n, type Locale } from '~/lib/i18n';
-import { useNotifications } from '~/lib/queries';
+import { useConversations, useNotifications } from '~/lib/queries';
 import { spacing, useTheme } from '~/lib/theme';
 
 /**
  * Das Konto: wer man ist, die Sprache, die Abmeldung -- und der Einstieg zu
- * Meine Inserate und Profil.
- *
- * Nachrichten fuehren noch auf die Website; sie kommen mit Phase 4 in die
- * App. Bis dahin ist ein Verweis, der funktioniert, besser als ein Knopf,
- * der nichts tut.
+ * allem Eigenen: Inserate, Nachrichten, Meldungen, Suchauftraege, Profil.
  */
 export default function AccountScreen() {
   const theme = useTheme();
@@ -26,9 +21,9 @@ export default function AccountScreen() {
   const { user, ready, logout } = useAuth();
   const { data: meldungen } = useNotifications(Boolean(user));
   const ungelesen = meldungen?.pages[0]?.unread ?? 0;
+  const { data: gespraeche } = useConversations(Boolean(user));
+  const ungeleseneGespraeche = gespraeche?.unread ?? 0;
 
-  const webPfad = (sq: string, de: string, en: string) =>
-    `${API_URL}${{ sq, de: `/de${de}`, en: `/en${en}` }[locale]}`;
 
   return (
     <ScrollView
@@ -63,7 +58,8 @@ export default function AccountScreen() {
             <Button label={t('dashboard.myListings')} variant="outline" onPress={() => router.push('/listings')} />
             <Button label={ungelesen ? `${t('notifications.title')} · ${ungelesen}` : t('notifications.title')} variant="outline" onPress={() => router.push('/notifications')} />
             <Button label={t('account.profileTitle')} variant="outline" onPress={() => router.push('/profile')} />
-            <Button label={t('nav.messages')} variant="outline" onPress={() => Linking.openURL(webPfad('/mesazhet', '/nachrichten', '/messages'))} />
+            <Button label={ungeleseneGespraeche ? `${t('nav.messages')} · ${ungeleseneGespraeche}` : t('nav.messages')} variant="outline" onPress={() => router.push('/messages')} />
+            <Button label={t('searches.title')} variant="outline" onPress={() => router.push('/searches')} />
           </View>
         </>
       ) : (

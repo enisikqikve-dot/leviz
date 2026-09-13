@@ -100,6 +100,12 @@ export default function RootLayout() {
               <Stack.Screen name="listings/[id]" options={{ title: '' }} />
               <Stack.Screen name="profile" options={{ title: '' }} />
               <Stack.Screen name="notifications" options={{ title: '' }} />
+              <Stack.Screen name="messages/index" options={{ title: '' }} />
+              <Stack.Screen name="messages/[id]" options={{ title: '' }} />
+              <Stack.Screen name="messages/new" options={{ presentation: 'modal', title: '' }} />
+              <Stack.Screen name="searches" options={{ title: '' }} />
+              <Stack.Screen name="dealers" options={{ title: '' }} />
+              <Stack.Screen name="dealer/[slug]" options={{ title: '' }} />
             </Stack>
           </AuthProvider>
         </QueryClientProvider>

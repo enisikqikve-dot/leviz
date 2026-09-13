@@ -68,6 +68,11 @@ export default function HomeScreen() {
           >
             {data.latest.slice(0, 8).map((v) => <VehicleCard key={v.id} vehicle={v} />)}
           </Abschnitt>
+
+          <Abschnitt title={t('home.dealers.title')}>
+            <Txt variant="small" color={theme.muted}>{t('home.dealers.subtitle')}</Txt>
+            <Button label={t('home.dealers.all')} variant="outline" onPress={() => router.push('/dealers')} />
+          </Abschnitt>
         </>
       )}
     </ScrollView>

@@ -2,8 +2,9 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 
 import { api } from './api';
 import type {
-  Catalog, ListingDetail, ListingFormValues, ListingOptions, Notification, OwnListing, Profile,
-  PublishResult, SaveResult, SearchResponse, VehicleResponse, VehicleCard,
+  Catalog, Conversation, ConversationThread, DealerCard, DealerProfile, ListingDetail, ListingFormValues,
+  ListingOptions, Message, Notification, OwnListing, Profile, PublishResult, SavedSearch, SaveResult,
+  SearchResponse, VehicleResponse, VehicleCard,
 } from './types';
 
 /**
@@ -216,3 +217,121 @@ export function useMarkNotificationRead() {
     onSuccess: () => client.invalidateQueries({ queryKey: ['notifications'] }),
   });
 }
+
+// --- Phase 4: Gespraeche ------------------------------------------------------
+
+export function useConversations(enabled: boolean) {
+  return useQuery({
+    queryKey: ['conversations'],
+    queryFn: () => api<{ items: Conversation[]; unread: number }>('/conversations'),
+    enabled,
+    staleTime: 15_000,
+  });
+}
+
+/**
+ * Ein Faden -- solange er offen ist, alle 15 Sekunden neu geholt. Kein
+ * Websocket: eine Antwort in einer Viertelminute ist fuer ein Autogeschaeft
+ * schnell genug, und die Push-Meldung kommt ohnehin sofort.
+ */
+export function useConversation(id: string | undefined) {
+  return useQuery({
+    queryKey: ['conversation', id],
+    queryFn: () => api<ConversationThread>(`/conversations/${id}`),
+    enabled: Boolean(id),
+    refetchInterval: 15_000,
+  });
+}
+
+export function useMarkConversationRead() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api(`/conversations/${id}/read`, { method: 'POST' }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['conversations'] }),
+  });
+}
+
+/** Antworten; die neue Nachricht wird sofort an den Faden gehaengt. */
+export function useSendMessage(conversationId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: string) => api<Message>(`/conversations/${conversationId}/messages`, { method: 'POST', body: { body } }),
+    onSuccess: (message) => {
+      client.setQueryData<ConversationThread>(['conversation', conversationId], (alt) =>
+        alt ? { ...alt, messages: [...alt.messages, message] } : alt,
+      );
+      client.invalidateQueries({ queryKey: ['conversations'] });
+    },
+  });
+}
+
+export function useStartConversation() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { vehicleId: string; body: string }) =>
+      api<{ conversationId: string }>('/conversations', { method: 'POST', body: input }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['conversations'] }),
+  });
+}
+
+export function useToggleBlock(conversationId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<{ blocked: boolean }>(`/conversations/${conversationId}/block`, { method: 'POST' }),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ['conversation', conversationId] });
+      client.invalidateQueries({ queryKey: ['conversations'] });
+    },
+  });
+}
+
+// --- Phase 4: Suchauftraege -------------------------------------------------------
+
+export function useSavedSearches(enabled: boolean) {
+  return useQuery({
+    queryKey: ['searches'],
+    queryFn: () => api<{ items: SavedSearch[] }>('/searches'),
+    enabled,
+  });
+}
+
+export function useSaveSearch() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { name: string; query: Record<string, string>; notifyByEmail: boolean }) =>
+      api<{ id: string }>('/searches', { method: 'POST', body: input }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['searches'] }),
+  });
+}
+
+export function useSearchCommand() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, command }: { id: string; command: 'seen' | 'delete' }) =>
+      command === 'delete'
+        ? api(`/searches/${id}`, { method: 'DELETE' })
+        : api(`/searches/${id}/seen`, { method: 'POST' }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['searches'] }),
+  });
+}
+
+// --- Phase 4: Haendler -----------------------------------------------------------
+
+export function useDealers(q: string, sort: 'rating' | 'vehicles' | 'name') {
+  const params = new URLSearchParams({ sort });
+  if (q.trim()) params.set('q', q.trim());
+  return useQuery({
+    queryKey: ['dealers', q.trim(), sort],
+    queryFn: () => api<{ items: DealerCard[] }>(`/dealers?${params.toString()}`, { anonymous: true }),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useDealer(slug: string | undefined) {
+  return useQuery({
+    queryKey: ['dealer', slug],
+    queryFn: () => api<DealerProfile>(`/dealers/${encodeURIComponent(slug!)}`, { anonymous: true }),
+    enabled: Boolean(slug),
+  });
+}
+
