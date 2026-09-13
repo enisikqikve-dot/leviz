@@ -454,6 +454,89 @@ wartet.
 
 ---
 
+## API für die App
+
+Die Website arbeitet mit Server Actions. Die kann nur die Website selbst
+aufrufen — eine App nicht. Unter `/api/v1` liegt deshalb ein zweiter Eingang
+zu **denselben Funktionen**: dieselbe Suche, dasselbe Ranking, dieselbe
+Passwortprüfung, dieselbe Kontoanlage. Nichts davon ist doppelt geschrieben;
+wo die Website vorher eigene Logik in einer Action hatte, ist sie in eine
+gemeinsame Funktion gewandert, die beide rufen:
+
+| Gemeinsam | Website | App |
+|---|---|---|
+| `lib/auth/password-login.ts` | Auth.js-Anbieter | `POST /auth/login` |
+| `features/auth/create-account.ts` | `registerAction` | `POST /auth/register` |
+| `features/favorites/core.ts` | `toggleFavoriteAction` | `/favorites` |
+| `features/search/queries.ts` | Suchseite | `GET /vehicles` |
+
+Ein Auto, das die App anlegt, erscheint auf der Website und in der
+Verwaltung, weil es dieselbe Datenbank und dieselbe Funktion ist.
+
+### Anmeldung ohne Cookie
+
+Eine App hat keine Cookies, die ein Browser für sie verwaltet. Sie bekommt
+zwei Token:
+
+- **Zugriffs-Token** — ein signiertes JWT, 15 Minuten gültig, in jeder Anfrage
+  als `Authorization: Bearer …`. Geprüft ohne Datenbank; Rolle und Sperrstatus
+  tragen darin mit und gelten für seine kurze Laufzeit.
+- **Erneuerungs-Token** — ein zufälliger Wert, 30 Tage gültig, in der
+  Datenbank nur als Prüfsumme (`RefreshToken`). Bei jeder Erneuerung ersetzt.
+
+Der Schlüssel des Zugriffs-Tokens wird aus `AUTH_SECRET` **abgeleitet**, nicht
+direkt übernommen: Auth.js signiert seine Cookies mit demselben Geheimnis. So
+geht ein Cookie-JWT hier niemals als Zugriffs-Token durch.
+
+**Diebstahlerkennung.** Die App hält immer nur das neueste Erneuerungs-Token.
+Taucht ein bereits ersetztes ein zweites Mal auf, wurde es kopiert — dann
+verlieren *alle* Anmeldungen des Kontos ihre Gültigkeit, nicht nur diese
+eine. Wer sein Passwort zurücksetzt, beendet ebenfalls alle App-Anmeldungen.
+
+### Antwortform
+
+Erfolg `{ "data": … }`, Fehler `{ "error": { "code", "message" } }` mit dem
+passenden Status. Der `code` ist stabil und maschinenlesbar; übersetzt wird in
+der App. Ein Validierungsfehler trägt `fields` mit Pfad und Meldung.
+
+### Endpunkte
+
+| | Pfad | Zweck |
+|---|---|---|
+| POST | `/auth/login` | `{ email, password, device? }` → Konto + Token |
+| POST | `/auth/register` | wie das Formular, plus `locale`, `device` → 201 + Token |
+| POST | `/auth/refresh` | `{ refreshToken }` → neues Paar |
+| POST | `/auth/logout` | `{ refreshToken }` → 204 |
+| GET | `/me` | das eigene Konto |
+| GET | `/vehicles?…` | Suche — dieselben Filter wie `/kerko`, mit Marktpreis-Siegel |
+| GET | `/vehicles/{slug}` | Fahrzeug, Verkäufer, Ähnliche, Preisschätzung, `favorited` |
+| GET | `/catalog?locale=&make=` | Marken, Modelle, Städte, Länder, Ausstattung, Aufzählungen |
+| GET | `/favorites` | Merkliste |
+| POST | `/favorites` | `{ vehicleId }` merken |
+| DELETE | `/favorites/{vehicleId}` | vergessen |
+| GET | `/notifications?cursor=&limit=` | eigene Meldungen + `unread` |
+| POST | `/notifications/{id}/read` | gelesen |
+
+Die Ratenbegrenzung für Anmeldung und Registrierung ist dieselbe wie auf der
+Website. Nur öffentliche Inserate sind über die API erreichbar — ein Entwurf
+ist von außen nicht da, auch nicht für den, der die Adresse kennt.
+
+Noch nicht dabei, kommt mit den jeweiligen App-Bildschirmen: Inserat anlegen
+und Fotos hochladen, Nachrichten, Suchaufträge, Profil bearbeiten, Push.
+
+### Selbst prüfen
+
+```bash
+curl -s localhost:3000/api/v1/vehicles?make=bmw | head -c 400
+```
+
+```bash
+curl -s -X POST localhost:3000/api/v1/auth/login -H 'content-type: application/json' \
+  -d '{"email":"buyer@leviz.dev","password":"Leviz2026!"}'
+```
+
+---
+
 ## Rechtliche Seiten
 
 Sechs Seiten, in allen drei Sprachen mit übersetzten Pfaden:

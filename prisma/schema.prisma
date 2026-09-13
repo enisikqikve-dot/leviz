@@ -288,6 +288,7 @@ model User {
 
   vehicles      Vehicle[]      @relation("VehicleSeller")
   favorites     Favorite[]
+  refreshTokens RefreshToken[]
   savedSearches SavedSearch[]
   searchHistory SearchHistory[]
   notifications Notification[]
@@ -408,6 +409,33 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+/// Eine Anmeldung der App auf einem Geraet.
+///
+/// Die Website haelt ihre Sitzung im Cookie; eine App hat keine Cookies, die
+/// der Browser fuer sie verwaltet. Sie bekommt stattdessen ein kurzlebiges
+/// Zugriffs-Token und dieses langlebige Erneuerungs-Token. Gespeichert wird
+/// nur die Pruefsumme -- wer die Tabelle liest, kann sich damit nicht
+/// anmelden.
+///
+/// Jede Erneuerung ersetzt das Token. Taucht ein bereits ersetztes noch einmal
+/// auf, wurde es gestohlen und kopiert: dann verlieren alle Anmeldungen des
+/// Kontos ihre Gueltigkeit, nicht nur diese eine.
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  /// Womit sich das Geraet vorgestellt hat, etwa "iPhone 15" -- damit der
+  /// Nutzer eine fremde Anmeldung in seiner Liste erkennen kann.
+  device    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
 }
 
 // ===========================================================================

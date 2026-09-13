@@ -4,21 +4,19 @@ import { createHash, randomBytes } from 'node:crypto';
 
 import { getLocale } from 'next-intl/server';
 
-import { notifyAdminsOfSignup } from '@/features/admin/signup-notice';
-// slugify ist allgemein und liegt nur zufaellig bei den Fahrzeugen.
-import { slugify } from '@/features/vehicles/slug';
 import { fail, fromZod, ok, type ActionResult } from '@/lib/action-result';
 import { hashPassword } from '@/lib/auth/password';
 import { issuePhoneCode } from '@/lib/auth/phone-code';
 import { prisma } from '@/lib/db';
-import { EMAIL_FROM, sendEmail } from '@/lib/email';
-import { passwordResetEmail, welcomeEmail } from '@/lib/email/templates';
+import { sendEmail } from '@/lib/email';
+import { passwordResetEmail } from '@/lib/email/templates';
 import type { Locale } from '@/lib/i18n/routing';
 import { RATE_LIMITS, rateLimiter } from '@/lib/rate-limit';
 import { getRequestIp } from '@/lib/request-ip';
 import { siteConfig } from '@/lib/site';
 import { sendSms } from '@/lib/sms';
 
+import { createAccount } from './create-account';
 import {
   forgotPasswordSchema,
   phoneCodeRequestSchema,
@@ -43,31 +41,6 @@ async function limited(
 
 // ---------------------------------------------------------------------------
 
-/**
- * Ein freier Pfad fuer das Haendlerprofil.
- *
- * Zwei Autohaeuser koennen denselben Namen tragen -- "Auto Center" gibt es in
- * jeder Stadt einmal. Der Pfad steht in der Adresse des Profils und muss
- * eindeutig bleiben, sonst scheitert die Registrierung an einem
- * Datenbankfehler, den der Anmelder nicht versteht.
- */
-async function freierHaendlerpfad(companyName: string): Promise<string> {
-  const basis = slugify(companyName).slice(0, 60) || 'autosallon';
-
-  for (let versuch = 0; versuch < 20; versuch += 1) {
-    const kandidat = versuch === 0 ? basis : `${basis}-${versuch + 1}`;
-    const belegt = await prisma.dealer.findUnique({
-      where: { slug: kandidat },
-      select: { id: true },
-    });
-
-    if (!belegt) return kandidat;
-  }
-
-  // Nach zwanzig gleichnamigen Haeusern entscheidet der Zufall.
-  return `${basis}-${Date.now().toString(36)}`;
-}
-
 export async function registerAction(
   input: unknown,
 ): Promise<ActionResult<{ email: string }>> {
@@ -79,81 +52,18 @@ export async function registerAction(
   const parsed = registerSchema.safeParse(input);
   if (!parsed.success) return fromZod(parsed.error.issues);
 
-  const { accountType, name, email, password, companyName, registrationNumber } = parsed.data;
+  const locale = (await getLocale()) as Locale;
 
-  const existing = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true },
-  });
+  // Derselbe Weg wie in der App-API -- siehe features/auth/create-account.
+  const ergebnis = await createAccount(parsed.data, locale);
 
-  if (existing) {
+  if (!ergebnis.ok) {
     return fail('Diese E-Mail-Adresse ist bereits registriert', {
       email: ['Diese E-Mail-Adresse ist bereits registriert'],
     });
   }
 
-  const locale = (await getLocale()) as Locale;
-  const passwordHash = await hashPassword(password);
-
-  const istHaendler = accountType === 'DEALER' && companyName !== null;
-
-  await prisma.user.create({
-    data: {
-      name,
-      email,
-      passwordHash,
-      locale,
-      // Wer sich registriert, will meist auch verkaufen koennen.
-      role: istHaendler ? 'DEALER' : 'PRIVATE_SELLER',
-      profile: { create: {} },
-      ...(istHaendler
-        ? {
-            dealer: {
-              create: {
-                companyName,
-                registrationNumber,
-                // Ungeprueft: das Abzeichen kommt erst nach der
-                // Ausweispruefung. Inserieren darf er trotzdem sofort.
-                slug: await freierHaendlerpfad(companyName),
-              },
-            },
-          }
-        : {}),
-    },
-  });
-
-  const template = welcomeEmail(locale, name);
-
-  // Das Konto steht bereits. Scheitert der Versand -- falsches Postfach,
-  // gesperrter Port --, waere es das Schlechteste, die Registrierung mit
-  // einem Fehler zu beenden: der Nutzer haette ein Konto, wuesste es nicht
-  // und legte ein zweites an. Der Gruss ist die Zugabe, nicht der Zweck.
-  try {
-    await sendEmail({
-      to: email,
-      subject: template.subject,
-      text: template.text,
-      replyTo: EMAIL_FROM,
-    });
-  } catch (fehler) {
-    console.error('  LEVIZ: Willkommensmail nicht zustellbar —', fehler);
-  }
-
-  // Die Verwaltung erfaehrt vom Zulauf, ohne die Uebersicht offen zu haben.
-  // Aus demselben Grund abgesichert wie der Gruss oben: das Konto steht
-  // bereits, und ein stummes Postfach darf die Registrierung nicht scheitern
-  // lassen.
-  try {
-    await notifyAdminsOfSignup({
-      name,
-      email,
-      dealer: istHaendler ? companyName : null,
-    });
-  } catch (fehler) {
-    console.error('  LEVIZ: Verwaltermeldung fehlgeschlagen —', fehler);
-  }
-
-  return ok({ email });
+  return ok({ email: parsed.data.email });
 }
 
 // ---------------------------------------------------------------------------
@@ -261,6 +171,12 @@ export async function resetPasswordAction(input: unknown): Promise<ActionResult>
       data: { usedAt: new Date() },
     }),
     prisma.session.deleteMany({ where: { userId: record.userId } }),
+    // Auch die App-Anmeldungen: wer sein Passwort zuruecksetzt, tut das oft,
+    // weil jemand anderes drin ist -- und der sitzt vielleicht in der App.
+    prisma.refreshToken.updateMany({
+      where: { userId: record.userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    }),
   ]);
 
   return ok();

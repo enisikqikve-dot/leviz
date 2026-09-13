@@ -4,7 +4,7 @@ import Credentials from 'next-auth/providers/credentials';
 import GitHub from 'next-auth/providers/github';
 
 import { prisma } from '@/lib/db';
-import { verifyPassword } from '@/lib/auth/password';
+import { authenticateWithPassword } from '@/lib/auth/password-login';
 import { consumePhoneCode } from '@/lib/auth/phone-code';
 import { notifyAdminsOfSignup } from '@/features/admin/signup-notice';
 import { credentialsLoginSchema, phoneLoginSchema } from '@/features/auth/schemas';
@@ -33,44 +33,8 @@ export const authConfig = {
         const parsed = credentialsLoginSchema.safeParse(raw);
         if (!parsed.success) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email.toLowerCase() },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            image: true,
-            role: true,
-            status: true,
-            passwordHash: true,
-            dealer: { select: { id: true } },
-          },
-        });
-
-        // Konten ohne Passwort entstehen ueber OAuth. Der Vergleich laeuft
-        // trotzdem gegen einen Platzhalter, damit die Antwortzeit nicht
-        // verraet, ob es die Adresse gibt.
-        if (!user?.passwordHash) {
-          await verifyPassword(
-            '$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHR2YWx1ZQ$0000000000000000000000000000000000000000000',
-            parsed.data.password,
-          );
-          return null;
-        }
-
-        const valid = await verifyPassword(user.passwordHash, parsed.data.password);
-        if (!valid) return null;
-        if (user.status !== 'ACTIVE') return null;
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          role: user.role,
-          status: user.status,
-          dealerId: user.dealer?.id ?? null,
-        };
+        // Dieselbe Pruefung wie in der App-API -- siehe lib/auth/password-login.
+        return authenticateWithPassword(parsed.data.email, parsed.data.password);
       },
     }),
 
