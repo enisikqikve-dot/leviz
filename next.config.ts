@@ -18,7 +18,19 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'images.pexels.com' },
     ],
-    formats: ['image/avif', 'image/webp'],
+    // Nur WebP. AVIF ist das teuerste Format, das es gibt: ein 12-Megapixel-
+    // Handyfoto belegt beim Kodieren Hunderte MB und Sekunden auf dem einen
+    // Kern des Servers, und eine Fahrzeugseite loest davon dreissig
+    // gleichzeitig aus. Am 13.09.2026 hat genau das den Server mit 4 GB
+    // eingefroren. WebP kostet einen Bruchteil und ist bei Fotos praktisch
+    // gleich klein.
+    formats: ['image/webp'],
+    // Weniger Breiten, weniger Umrechnungen je Foto. 4K braucht hier niemand.
+    deviceSizes: [640, 828, 1080, 1280, 1920],
+    // Fertig gerechnete Bilder bleiben 31 Tage im Cache. Die Fotos der
+    // Verkaeufer aendern sich unter ihrer Adresse ohnehin nie (immutable),
+    // die Vorgabe von vier Stunden gilt nur fuer die Seed-Bilder von aussen.
+    minimumCacheTTL: 2678400,
   },
   experimental: {
     // forbidden() liefert eine echte 403-Antwort statt einer Notloesung.

@@ -95,6 +95,12 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # sonst waeren die Bilder nach jedem Neustart weg.
 RUN mkdir -p /app/public/uploads && chown leviz:leviz /app/public/uploads
 
+# Der Cache der fertig gerechneten Bildgroessen. Das Verzeichnis muss im Abbild
+# schon dem Anwendungsnutzer gehoeren: Docker uebernimmt beim ersten Einhaengen
+# des Speichers die Rechte von hier -- fehlt es, gehoert der Speicher root, und
+# die Anwendung kann nichts ablegen.
+RUN mkdir -p /app/.next/cache/images && chown -R leviz:leviz /app/.next/cache
+
 # Ausweisbelege. Eigenes Verzeichnis ausserhalb von public/, damit sie nicht
 # ueber ihre Adresse abrufbar sind; auch hier haengt ein dauerhafter Speicher.
 RUN mkdir -p /app/var/verification && chown -R leviz:leviz /app/var

@@ -776,6 +776,25 @@ In der `.env` mindestens ausfüllen: `SITE_DOMAIN`, `NEXT_PUBLIC_SITE_URL`,
 **Die Domäne muss vorher per DNS auf den Server zeigen.** Sonst bekommt Caddy
 kein Zertifikat, und der Start endet in einer Schleife aus Fehlversuchen.
 
+**Swap anlegen — nicht überspringen.** Ein VPS mit 4 GB und ohne Swap friert
+ein, statt abzustürzen: ist der Speicher voll, kann der Kernel nur noch den
+Dateicache wegwerfen, also die Programmseiten von sshd, Caddy und Node selbst.
+Jeder Prozess liest dann seinen eigenen Code alle paar Millisekunden neu von
+der Platte, nichts antwortet mehr, und der OOM-Killer greift nie, weil er ja
+„noch etwas freimachen" kann. Genau so stand levizz.com am 13.09.2026 drei
+Stunden mit 40 MB freiem Speicher, bevor SSH und HTTPS ganz verstummten.
+
+```bash
+fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+```
+
+```bash
+echo '/swapfile none swap sw 0 0' >> /etc/fstab && echo 'vm.swappiness=10' > /etc/sysctl.d/90-swap.conf && sysctl -p /etc/sysctl.d/90-swap.conf
+```
+
+`swapon --show` muss danach die 2 GB zeigen. `swappiness=10` heißt: der Swap
+ist Reserve für den Notfall, nicht Alltag.
+
 ### Starten
 
 ```bash
@@ -818,6 +837,48 @@ docker compose run --rm app npx tsx scripts/create-admin.ts deine@adresse.tld "D
 ```bash
 git pull && docker compose up -d --build
 ```
+
+### Speicher: was den Server einfrieren kann
+
+Die teuerste Arbeit auf dem Server ist das **Umrechnen der Fotos**. Verkäufer
+laden Handybilder mit 12 Megapixeln hoch; für jede Anzeige rechnet
+`next/image` daraus die passenden Breiten. Ein einzelnes Bild belegt beim
+Dekodieren ~50 MB, und eine Fahrzeugseite mit zwanzig Fotos löst zwanzig
+solche Umrechnungen gleichzeitig aus. In AVIF kostete das zusätzlich
+Sekunden je Bild auf dem einen Kern — deshalb ist in `next.config.ts` nur
+noch WebP eingeschaltet, mit fünf statt acht Breiten und 31 Tagen Cache.
+
+Drei Sicherungen halten das im Zaum, alle in `docker-compose.yml`:
+
+| | |
+|---|---|
+| `mem_limit` je Behälter | 2 GB Anwendung, 768 MB Datenbank, 256 MB Caddy. Stirbt die Anwendung an ihrer Grenze, startet sie zehn Sekunden später neu — der Server selbst bleibt erreichbar. |
+| `memswap_limit` = `mem_limit` | Kein Swap für die Behälter. Lieber ein sauberer Neustart als minutenlang über die Platte kriechen. |
+| `image-cache` | Der Cache der fertigen Bildgrößen überlebt ein Deploy. Sonst rechnet der Server nach jedem `up --build` jedes Foto neu — genau die Welle, die ihn eingefroren hat. |
+
+Dazu `NODE_OPTIONS=--max-old-space-size=1024` (V8 räumt auf, lange bevor die
+Grenze greift) und `MALLOC_ARENA_MAX=2` (glibc gibt sonst den Speicher nach
+einer Bildspitze nie zurück — der Belegstand blieb nach jeder Welle höher als
+vor ihr).
+
+**Wenn es trotzdem hängt** — Ping geht, Ports sind offen, aber HTTPS und SSH
+liefern nichts — ist es fast sicher der Speicher. Über die Web-Konsole im
+Hostinger-Panel oder nach einem Neustart:
+
+```bash
+sar -r -f /var/log/sysstat/sa$(date +%d) | tail -n 20
+```
+
+zeigt den Speicherverlauf des Tages in 10-Minuten-Schritten (`kbavail` unter
+100 000 = Alarm), und
+
+```bash
+journalctl -b -1 --no-pager | grep -c 'memory pressure'
+```
+
+zählt die Warnungen von journald im vorigen Lauf. `journalctl --list-boots`
+sagt, welcher Lauf welcher ist; ein Neustart aus dem Panel erzeugt zwei
+Einträge, der eigentliche Lauf davor ist dann `-2`.
 
 ### Sicherung
 

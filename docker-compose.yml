@@ -52,6 +52,10 @@ services:
   db:
     image: postgres:18-alpine
     restart: unless-stopped
+    # Speichergrenzen, siehe app. Postgres kommt mit seinen Vorgaben (128 MB
+    # Puffer, 4 MB je Sortierung) weit unter dieser Grenze aus.
+    mem_limit: 768m
+    memswap_limit: 768m
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-leviz}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
@@ -107,10 +111,31 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+    # Harte Speichergrenze. Ohne sie hat eine Bildspitze am 13.09.2026 den
+    # ganzen Server gefressen: kein Swap, kein freier Speicher, und weil der
+    # Kernel dann nur noch den Dateicache wegwerfen kann, friert alles ein --
+    # auch SSH. Mit Grenze stirbt schlimmstenfalls die Anwendung und steht
+    # zehn Sekunden spaeter wieder (restart: unless-stopped). memswap_limit
+    # gleich mem_limit heisst: kein Swap fuer den Behaelter -- lieber sauber
+    # neu starten als minutenlang ueber die Platte kriechen.
+    mem_limit: 2g
+    memswap_limit: 2g
     environment:
       <<: *app-environment
+      # V8 raeumt ab 1 GB Heap auf, lange bevor die Grenze des Behaelters
+      # greift. Der Rest bis 2 GB gehoert der Bildverarbeitung (sharp), die
+      # ausserhalb des Heaps arbeitet.
+      NODE_OPTIONS: --max-old-space-size=1024
+      # glibc legt sonst je Thread eigene Speicherbereiche an, die nach einer
+      # Bildspitze nie zurueckgegeben werden: der Belegstand blieb so nach
+      # jeder Welle hoeher als vor ihr, bis nichts mehr frei war.
+      MALLOC_ARENA_MAX: '2'
 
     volumes:
+      # Fertig gerechnete Bildgroessen. Ohne diesen Speicher verschwindet der
+      # Cache mit jedem Deploy, und der Server rechnet danach jedes Foto fuer
+      # jede Breite neu -- genau die Welle, die ihn eingefroren hat.
+      - image-cache:/app/.next/cache/images
       # Ohne diesen Speicher waeren die Fotos der Verkaeufer nach jedem
       # Neustart des Behaelters verschwunden.
       - uploads:/app/public/uploads
@@ -121,6 +146,9 @@ services:
   web:
     image: caddy:2-alpine
     restart: unless-stopped
+    # Caddy braucht 30 bis 60 MB; die Grenze ist Sicherheitsnetz, nicht Korsett.
+    mem_limit: 256m
+    memswap_limit: 256m
     depends_on:
       - app
     ports:
@@ -138,6 +166,7 @@ services:
 volumes:
   db-data:
   uploads:
+  image-cache:
   verification:
   caddy-data:
   caddy-config:
