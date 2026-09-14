@@ -15,7 +15,7 @@ export type SettingsData = {
   citySlug: string | null;
   notifyByEmail: boolean;
   notifyBySms: boolean;
-  /** Konten aus GitHub oder Telefonanmeldung haben kein Passwort. */
+  /** Konten aus Google, Apple, GitHub oder Telefonanmeldung haben kein Passwort. */
   hasPassword: boolean;
   cities: SettingsCity[];
 };

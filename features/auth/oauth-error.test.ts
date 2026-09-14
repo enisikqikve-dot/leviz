@@ -8,12 +8,12 @@ import { authErrorKey } from './oauth-error';
 
 describe('authErrorKey', () => {
   it('erklaert das haeufigste Missverstaendnis eigens', () => {
-    // Wer sich mit Passwort registriert hat und spaeter den GitHub-Knopf
-    // drueckt, landet genau hier.
+    // Wer sich mit Passwort registriert hat und spaeter den Google-Knopf
+    // drueckt, landet genau hier -- ebenso wer Google und Apple mischt.
     expect(authErrorKey('OAuthAccountNotLinked')).toBe('errorAccountExists');
   });
 
-  it('erkennt den Abbruch auf der GitHub-Seite', () => {
+  it('erkennt den Abbruch beim Anbieter', () => {
     expect(authErrorKey('AccessDenied')).toBe('errorAccessDenied');
   });
 

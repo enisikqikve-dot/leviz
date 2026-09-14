@@ -4,7 +4,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { AuthShell } from '@/features/auth/components/auth-shell';
 import { RegisterForm } from '@/features/auth/components/register-form';
+import { SocialSignIn } from '@/features/auth/components/social-sign-in';
 import { getSessionUser } from '@/lib/auth/guards';
+import { configuredSocialProviders } from '@/lib/auth/social';
 import { Link } from '@/lib/i18n/navigation';
 
 export async function generateMetadata({
@@ -42,6 +44,10 @@ export default async function RegisterPage({
         </>
       }
     >
+      {/* Ueber dem Formular: mit Google oder Apple ist das Konto ein Klick,
+          das Formular bleibt fuer alle anderen -- und fuer Autohaeuser, die
+          Firmenname und Registernummer angeben. */}
+      <SocialSignIn providers={configuredSocialProviders()} mode="register" />
       <RegisterForm />
     </AuthShell>
   );

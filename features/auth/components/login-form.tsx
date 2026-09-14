@@ -13,19 +13,22 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { requestPhoneCodeAction } from '@/features/auth/actions';
 import { Field } from '@/features/auth/components/field';
+import { SocialSignIn } from '@/features/auth/components/social-sign-in';
 import {
   credentialsLoginSchema,
   phoneLoginSchema,
   type CredentialsLoginInput,
   type PhoneLoginInput,
 } from '@/features/auth/schemas';
+import type { SocialProvider } from '@/lib/auth/social';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 
 export function LoginForm({
-  githubEnabled,
+  socialProviders,
   phoneEnabled,
 }: {
-  githubEnabled: boolean;
+  /** Google, Apple, GitHub -- nur die eingerichteten, in Anzeigereihenfolge. */
+  socialProviders: SocialProvider[];
   /** Ob ein echter SMS-Anbieter eingerichtet ist. */
   phoneEnabled: boolean;
 }) {
@@ -68,24 +71,7 @@ export function LoginForm({
         </TabsContent>
       ) : null}
 
-      {githubEnabled ? (
-        <div className="mt-6">
-          <div className="relative text-center">
-            <span className="bg-card text-muted-foreground relative z-10 px-3 text-xs">
-              {t('orContinue')}
-            </span>
-            <span className="bg-border absolute inset-x-0 top-1/2 h-px" aria-hidden />
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-4 w-full"
-            onClick={() => signIn('github', { redirectTo: '/dashboard' })}
-          >
-            {t('github')}
-          </Button>
-        </div>
-      ) : null}
+      <SocialSignIn providers={socialProviders} mode="login" />
     </Tabs>
   );
 }

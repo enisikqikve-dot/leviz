@@ -33,7 +33,7 @@ LEVIZ echte Datenfelder, Filter und Abzeichen statt Fließtext in der Beschreibu
 | Sprache | TypeScript im Strict-Modus |
 | Oberfläche | Tailwind CSS v4 · shadcn/ui · lucide-react |
 | Datenbank | PostgreSQL 17 · Prisma 7 |
-| Anmeldung | Auth.js v5 — E-Mail+Passwort, Telefon+SMS, GitHub |
+| Anmeldung | Auth.js v5 — E-Mail+Passwort, Telefon+SMS, Google, Apple, GitHub |
 | Mehrsprachigkeit | next-intl — Albanisch (Standard), Deutsch, Englisch |
 | Validierung | Zod 4 · React Hook Form |
 | Tests | Vitest · Playwright |
@@ -201,10 +201,108 @@ aus, während Prisma als Eigentümer der Tabellen weiterarbeitet.
 npx auth secret
 ```
 
-### Anmeldung über GitHub
+### Anmeldung über Google, Apple und GitHub
 
-Der Knopf „Mit GitHub anmelden" erscheint nur, wenn beide Werte gesetzt sind —
-ohne sie wird der Anbieter überall ausgeblendet, auch serverseitig.
+Neben E-Mail und Passwort kann man sich mit einem Google-, Apple- oder
+GitHub-Konto anmelden — und damit auch registrieren: Name und Adresse kommen
+vom Anbieter, das Konto entsteht beim ersten Klick. Auf der Registrierseite
+stehen die Knöpfe über dem Formular, auf der Anmeldeseite darunter.
+
+Ein Knopf erscheint nur, wenn beide Werte des Anbieters gesetzt sind
+(`AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `AUTH_APPLE_ID`/`AUTH_APPLE_SECRET`,
+`AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`) — sonst wird der Anbieter überall
+ausgeblendet, auch serverseitig (`lib/auth/social.ts`). Die Rückrufadresse ist
+bei allen dreien gleich gebaut:
+
+```
+https://levizz.com/api/auth/callback/google
+https://levizz.com/api/auth/callback/apple
+https://levizz.com/api/auth/callback/github
+```
+
+Auf dem Server gehören die Werte in die `.env` neben der `docker-compose.yml`
+(Vorlage: `docker/env.example`), danach `docker compose up -d`. Umgebungs-
+variablen werden nur beim Start gelesen.
+
+#### Google
+
+1. https://console.cloud.google.com → Projekt anlegen (z. B. „LEVIZ").
+2. **APIs & Dienste → OAuth-Zustimmungsbildschirm**: Nutzertyp *Extern*,
+   App-Name „LEVIZ", Support-Adresse, Startseite `https://levizz.com`,
+   Links auf Datenschutz (`https://levizz.com/privatesia`) und Nutzungs-
+   bedingungen (`https://levizz.com/kushtet`). Bereiche: nur `email`,
+   `profile`, `openid` — mehr fragt LEVIZ nicht ab. Danach **Veröffentlichen**,
+   sonst dürfen sich nur eingetragene Testkonten anmelden.
+3. **Anmeldedaten → Anmeldedaten erstellen → OAuth-Client-ID**, Typ
+   *Webanwendung*:
+
+   | Feld | Wert |
+   |---|---|
+   | Name | `LEVIZ Website` |
+   | Autorisierte JavaScript-Quellen | `https://levizz.com` |
+   | Autorisierte Weiterleitungs-URIs | `https://levizz.com/api/auth/callback/google` |
+
+   Für die Entwicklung zusätzlich `http://localhost:3000` und
+   `http://localhost:3000/api/auth/callback/google` eintragen — Google erlaubt
+   mehrere Adressen je Client.
+
+4. Client-ID und Client-Schlüssel in die `.env`:
+
+   ```
+   AUTH_GOOGLE_ID="1234567890-abc.apps.googleusercontent.com"
+   AUTH_GOOGLE_SECRET="GOCSPX-..."
+   ```
+
+#### Apple
+
+Voraussetzung ist eine Mitgliedschaft im Apple Developer Program (99 $ im
+Jahr) — dieselbe, die auch die iOS-App braucht. Apple lässt **keine
+`http://localhost`-Rückrufe** zu; der Knopf lässt sich nur mit der echten
+Domäne ausprobieren.
+
+1. https://developer.apple.com/account → **Certificates, Identifiers &
+   Profiles → Identifiers**.
+2. **App ID** anlegen (falls für die App noch nicht geschehen): Bundle ID
+   `com.levizz.app`, Capability **Sign in with Apple** anhaken.
+3. **Services ID** anlegen: Identifier `com.levizz.web`, Beschreibung
+   „LEVIZ Website". **Sign in with Apple** anhaken → *Configure*: Primary App
+   ID = die App ID von oben, Domains `levizz.com`, Return URLs
+   `https://levizz.com/api/auth/callback/apple`. Diese Services ID ist der
+   `AUTH_APPLE_ID`.
+4. **Keys → +**: Name „LEVIZ Sign in with Apple", **Sign in with Apple**
+   anhaken, Primary App ID wählen. Herunterladen — die Datei
+   `AuthKey_<KEY_ID>.p8` gibt es **nur einmal**; sicher ablegen, nie ins
+   Repository (`.gitignore` schließt `*.p8` aus). Die *Key ID* steht daneben,
+   die *Team ID* oben rechts im Konto.
+5. Das Geheimnis erzeugen — Apple gibt keines heraus, sondern verlangt ein
+   selbst signiertes JWT:
+
+   ```bash
+   npm run auth:apple-secret -- --team ABCDE12345 --key-id XYZ9876543 --client-id com.levizz.web --p8 ./AuthKey_XYZ9876543.p8
+   ```
+
+   Das Skript druckt `AUTH_APPLE_ID` und `AUTH_APPLE_SECRET` zum Einfügen in
+   die `.env` und das Ablaufdatum.
+
+**Das Apple-Geheimnis läuft nach sechs Monaten ab.** Danach scheitert jede
+Apple-Anmeldung mit `invalid_client`, ohne dass sich am Code etwas geändert
+hätte. Kalendereintrag setzen, Schritt 5 wiederholen, Wert auf dem Server
+tauschen, `docker compose up -d`.
+
+Zwei Eigenheiten von Apple:
+
+- **„E-Mail verbergen"**: Apple gibt dann eine Weiterleitungsadresse
+  `xyz@privaterelay.appleid.com` heraus. Mails dorthin kommen nur an, wenn die
+  Absenderdomäne bei Apple eingetragen ist: **Services → Sign in with Apple
+  for Email Communication** → Domäne `levizz.com` und die Absenderadresse aus
+  `EMAIL_FROM` registrieren (Apple prüft SPF). Sonst verschwinden Willkommens-
+  und Suchauftragsmails an solche Konten still.
+- **Der Name kommt nur beim ersten Mal.** Bricht jemand die erste Anmeldung
+  ab und kommt später wieder, liefert Apple nur noch die Adresse; das Konto
+  heißt dann wie seine E-Mail. Zum Zurücksetzen: auf dem iPhone unter
+  *Einstellungen → Apple-ID → Mit Apple anmelden → LEVIZ → Löschen*.
+
+#### GitHub
 
 1. https://github.com/settings/developers → **OAuth Apps** → **New OAuth App**
 2. Ausfüllen:
@@ -222,20 +320,25 @@ ohne sie wird der Anbieter überall ausgeblendet, auch serverseitig.
    AUTH_GITHUB_SECRET="..."
    ```
 
-4. Entwicklungsserver neu starten — Umgebungsvariablen werden nur beim Start
-   gelesen.
-
 Für die Produktion braucht es eine zweite OAuth-App mit der echten Domäne; eine
-App kann nur eine Callback-Adresse führen.
+GitHub-App kann nur eine Callback-Adresse führen.
 
-**Konten werden nicht automatisch verschmolzen.** Wer sich mit E-Mail und
-Passwort registriert hat und später den GitHub-Knopf drückt, bekommt eine
-Erklärung statt einer Anmeldung. Auth.js böte dafür
+#### Konten werden nicht automatisch verschmolzen
+
+Wer sich mit E-Mail und Passwort registriert hat und später den Google-Knopf
+drückt, bekommt eine Erklärung statt einer Anmeldung — ebenso, wer erst mit
+Google und dann mit Apple kommt. Auth.js böte dafür
 `allowDangerousEmailAccountLinking`, doch die Option setzt voraus, dass die
 Adresse des bestehenden Kontos bestätigt ist — bei LEVIZ ist sie das nicht.
 Sonst könnte sich jemand mit einer fremden Adresse registrieren und käme an
-das Konto, sobald deren echter Inhaber sich über GitHub anmeldet. Sobald die
+das Konto, sobald deren echter Inhaber sich über Google anmeldet. Sobald die
 Registrierung die Adresse bestätigt, lässt sich das gefahrlos umstellen.
+
+Ein Konto aus Google oder Apple hat kein Passwort. Für die App, die sich
+bisher nur mit E-Mail und Passwort anmeldet, heißt das: Wer auf der Website
+über Google kam, kann sich in der App noch nicht anmelden — bis die App
+dieselben Knöpfe bekommt oder das Konto in den Einstellungen ein Passwort
+setzen kann.
 
 ### Ohne Zugangsschlüssel arbeiten
 
@@ -1445,7 +1548,7 @@ Bereichen, jeder für sich speicherbar:
 Die E-Mail-Adresse steht nur zur Anzeige. Sie zu ändern hieße, sie danach zu
 bestätigen — und diese Bestätigung gibt es in LEVIZ noch nicht.
 
-Konten aus GitHub oder Telefonanmeldung haben nie ein Passwort gesetzt; dort
+Konten aus Google, Apple, GitHub oder Telefonanmeldung haben nie ein Passwort gesetzt; dort
 steht statt des Formulars ein Hinweis. Der Wechsel ist auf sechs Versuche je
 Viertelstunde begrenzt, gezählt nach Konto: gebremst wird nicht der
 Anmeldeversuch, sondern das Durchprobieren des alten Passworts an einem offen

@@ -6,6 +6,7 @@ import { AuthShell } from '@/features/auth/components/auth-shell';
 import { LoginForm } from '@/features/auth/components/login-form';
 import { authErrorKey } from '@/features/auth/oauth-error';
 import { getSessionUser } from '@/lib/auth/guards';
+import { configuredSocialProviders } from '@/lib/auth/social';
 import { smsConfigured } from '@/lib/sms';
 import { Link } from '@/lib/i18n/navigation';
 
@@ -33,8 +34,6 @@ export default async function LoginPage({
   if (await getSessionUser()) redirect(`/${locale}/dashboard`);
 
   const t = await getTranslations('auth');
-  const githubEnabled =
-    Boolean(process.env.AUTH_GITHUB_ID) && Boolean(process.env.AUTH_GITHUB_SECRET);
 
   // Auth.js leitet gescheiterte OAuth-Anmeldungen hierher zurueck und haengt
   // den Grund als Parameter an. Ohne diese Zeilen bliebe er unsichtbar.
@@ -62,7 +61,7 @@ export default async function LoginPage({
         </p>
       ) : null}
 
-      <LoginForm githubEnabled={githubEnabled} phoneEnabled={smsConfigured()} />
+      <LoginForm socialProviders={configuredSocialProviders()} phoneEnabled={smsConfigured()} />
     </AuthShell>
   );
 }

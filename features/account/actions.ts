@@ -71,7 +71,7 @@ export async function changePasswordAction(input: unknown): Promise<ActionResult
     select: { passwordHash: true },
   });
 
-  // Konten aus GitHub oder Telefonanmeldung haben nie ein Passwort gesetzt.
+  // Konten aus Google, Apple, GitHub oder Telefonanmeldung haben nie ein Passwort gesetzt.
   if (!account?.passwordHash) {
     return fail('errorNoPassword');
   }

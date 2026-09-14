@@ -30,6 +30,15 @@ x-app-environment: &app-environment
   # auseinanderlaufen koennen.
   AUTH_URL: ${NEXT_PUBLIC_SITE_URL}
 
+  # Anmeldung ueber fremde Konten. Was leer bleibt, wird nicht angeboten --
+  # die Knoepfe richten sich nach genau diesen Werten.
+  AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID:-}
+  AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET:-}
+  AUTH_APPLE_ID: ${AUTH_APPLE_ID:-}
+  AUTH_APPLE_SECRET: ${AUTH_APPLE_SECRET:-}
+  AUTH_GITHUB_ID: ${AUTH_GITHUB_ID:-}
+  AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET:-}
+
   # Auf einem einzelnen Server reicht die Festplatte fuer die Fotos.
   STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
 

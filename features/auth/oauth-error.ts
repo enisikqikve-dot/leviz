@@ -8,13 +8,15 @@
 /** Fehlercodes, fuer die es eine eigene Erklaerung gibt. */
 const SPECIFIC = {
   /**
-   * Die E-Mail-Adresse des GitHub-Kontos gehoert bereits zu einem Konto mit
-   * Passwort. LEVIZ verknuepft die beiden absichtlich nicht von selbst —
-   * siehe die Begruendung in lib/auth/config.ts.
+   * Die E-Mail-Adresse des Google-, Apple- oder GitHub-Kontos gehoert bereits
+   * zu einem Konto, das anders angelegt wurde -- mit Passwort oder ueber einen
+   * anderen der drei. LEVIZ verknuepft die beiden absichtlich nicht von
+   * selbst, siehe die Begruendung in lib/auth/config.ts. Die Meldung sagt
+   * deshalb: so anmelden wie beim ersten Mal.
    */
   OAuthAccountNotLinked: 'errorAccountExists',
 
-  /** Abbruch auf der GitHub-Seite oder gesperrtes Konto. */
+  /** Abbruch beim Anbieter oder gesperrtes Konto. */
   AccessDenied: 'errorAccessDenied',
 } as const;
 
