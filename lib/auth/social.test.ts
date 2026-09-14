@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { configuredSocialProviders } from './social';
+import { configuredSocialProviders, nativeAudience } from './social';
 
 describe('configuredSocialProviders', () => {
   it('zeigt ohne Zugangswerte keinen Anbieter', () => {
@@ -35,5 +35,22 @@ describe('configuredSocialProviders', () => {
         AUTH_GOOGLE_SECRET: 'd',
       }),
     ).toEqual(['google', 'github']);
+  });
+});
+
+describe('nativeAudience', () => {
+  it('nimmt fuer Google die Web-Client-ID der Website', () => {
+    expect(nativeAudience('google', { AUTH_GOOGLE_ID: ' 123.apps.googleusercontent.com ' })).toEqual([
+      '123.apps.googleusercontent.com',
+    ]);
+    // Ohne sie ist der Weg zu -- eine leere Liste, kein Platzhalter.
+    expect(nativeAudience('google', {})).toEqual([]);
+  });
+
+  it('nimmt fuer Apple die Bundle-ID der App, ohne Einrichtung', () => {
+    // Apple braucht serverseitig kein Geheimnis: das Token traegt die App-ID,
+    // und die ist bekannt.
+    expect(nativeAudience('apple', {})).toEqual(['com.levizz.app']);
+    expect(nativeAudience('apple', { AUTH_APPLE_APP_ID: 'com.levizz.beta' })).toEqual(['com.levizz.beta']);
   });
 });

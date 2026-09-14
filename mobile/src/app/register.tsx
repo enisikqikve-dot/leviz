@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, View } from 'react-native';
 
 import { Logo } from '~/components/logo';
+import { SocialButtons } from '~/components/social-buttons';
 import { Button, Chip, Input, Txt } from '~/components/ui';
 import { API_URL, ApiError } from '~/lib/api';
 import { useAuth } from '~/lib/auth';
@@ -40,6 +41,12 @@ export default function RegisterScreen() {
     name.trim().length >= 2 && email.includes('@') && password.length >= 8 && confirm === password && zugestimmt &&
     (!haendler || firma.trim().length > 0);
 
+  // Als Fenster geoeffnet: schliessen. Direkt aufgerufen (Deep Link): zur Startseite.
+  const fertig = () => {
+    if (router.canDismiss()) router.dismiss();
+    else router.replace('/');
+  };
+
   const absenden = async () => {
     setFehler(null);
     setFeldFehler({});
@@ -56,9 +63,7 @@ export default function RegisterScreen() {
         registrationNumber: haendler ? nummer.trim() || undefined : undefined,
         locale,
       });
-      // Als Fenster geoeffnet: schliessen. Direkt aufgerufen (Deep Link): zur Startseite.
-      if (router.canDismiss()) router.dismiss();
-      else router.replace('/');
+      fertig();
     } catch (e) {
       if (e instanceof ApiError && e.status === 409) setFehler(t('auth.errorAccountExists'));
       else if (e instanceof ApiError && e.status === 429) setFehler(t('auth.errorTooMany'));
@@ -83,6 +88,10 @@ export default function RegisterScreen() {
           <Txt variant="h1">{t('auth.registerTitle')}</Txt>
           <Txt color={theme.muted} style={{ marginTop: 4 }}>{t('auth.registerSubtitle')}</Txt>
         </View>
+
+        {/* Ueber dem Formular, wie auf der Website: mit Google oder Apple ist
+            das Konto ein Klick; das Formular bleibt fuer Autohaeuser. */}
+        <SocialButtons mode="register" onDone={fertig} />
 
         <View style={{ gap: 8 }}>
           <Txt variant="small" style={{ fontFamily: fonts.medium }}>{t('auth.accountType')}</Txt>

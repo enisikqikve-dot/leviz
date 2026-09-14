@@ -12,6 +12,8 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
     include: ['**/*.test.{ts,tsx}'],
-    exclude: ['node_modules', '.next', 'e2e', 'mobile'],
+    // .claude/worktrees: Arbeitskopien, die Claude Code fuer Nebenaufgaben
+    // anlegt -- eine zweite Fassung des ganzen Repos, samt Tests.
+    exclude: ['node_modules', '.next', 'e2e', 'mobile', '.claude/**'],
   },
 });

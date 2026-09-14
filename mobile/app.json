@@ -11,12 +11,12 @@
       "bundleIdentifier": "com.levizz.app",
       "supportsTablet": false,
       "associatedDomains": [
-        "applinks:levizz.com",
         "applinks:levizz.com"
       ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "com.levizz.app",
@@ -28,31 +28,6 @@
       },
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "data": [
-            {
-              "scheme": "https",
-              "host": "levizz.com",
-              "pathPrefix": "/vetura/"
-            },
-            {
-              "scheme": "https",
-              "host": "levizz.com",
-              "pathPrefix": "/de/fahrzeug/"
-            },
-            {
-              "scheme": "https",
-              "host": "levizz.com",
-              "pathPrefix": "/en/vehicle/"
-            }
-          ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
-        },
         {
           "action": "VIEW",
           "autoVerify": true,
@@ -102,10 +77,6 @@
             "node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf",
             "node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf",
             "node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf",
-            "node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf",
-            "node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.ttf",
-            "node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.ttf",
-            "node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.ttf",
             "node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.ttf"
           ]
         }
@@ -118,7 +89,8 @@
         }
       ],
       "expo-localization",
-      "posthog-react-native/expo"
+      "posthog-react-native/expo",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

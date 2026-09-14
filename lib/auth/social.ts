@@ -34,3 +34,27 @@ export function configuredSocialProviders(
     ENV_KEYS[provider].every((key) => Boolean(env[key]?.trim())),
   );
 }
+
+/**
+ * Fuer wen ein ID-Token aus der App ausgestellt sein muss (`aud`).
+ *
+ * Google: die Web-Client-ID -- dieselbe wie fuer die Website. Die
+ * Anmeldebibliothek der App bekommt sie als `webClientId` und laesst Google
+ * das Token darauf ausstellen. Apple: die Bundle-ID der App; auf der
+ * Website ist es die Services ID, in der App die App selbst.
+ *
+ * Eine leere Liste heisst: dieser Weg ist nicht eingerichtet, und die
+ * Pruefung lehnt jedes Token ab.
+ */
+export const APP_BUNDLE_ID = 'com.levizz.app';
+
+export function nativeAudience(
+  provider: 'google' | 'apple',
+  env: Record<string, string | undefined> = process.env,
+): string[] {
+  if (provider === 'google') {
+    const id = env.AUTH_GOOGLE_ID?.trim();
+    return id ? [id] : [];
+  }
+  return [env.AUTH_APPLE_APP_ID?.trim() || APP_BUNDLE_ID];
+}

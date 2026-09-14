@@ -334,11 +334,59 @@ Sonst könnte sich jemand mit einer fremden Adresse registrieren und käme an
 das Konto, sobald deren echter Inhaber sich über Google anmeldet. Sobald die
 Registrierung die Adresse bestätigt, lässt sich das gefahrlos umstellen.
 
-Ein Konto aus Google oder Apple hat kein Passwort. Für die App, die sich
-bisher nur mit E-Mail und Passwort anmeldet, heißt das: Wer auf der Website
-über Google kam, kann sich in der App noch nicht anmelden — bis die App
-dieselben Knöpfe bekommt oder das Konto in den Einstellungen ein Passwort
-setzen kann.
+Ein Konto aus Google oder Apple hat kein Passwort. In der App meldet man
+sich mit demselben Google- oder Apple-Konto an — die Knöpfe dort führen zum
+selben Datensatz, siehe den nächsten Abschnitt.
+
+#### In der App
+
+Die App zeigt dieselben Knöpfe, geht aber einen anderen Weg: das Telefon
+spricht selbst mit Google beziehungsweise Apple (die Anmeldedialoge des
+Systems) und bekommt ein **ID-Token** — ein signiertes JWT, das sagt, wer
+sich gerade ausgewiesen hat. Das schickt die App an `POST /api/v1/auth/social`,
+der Server prüft Signatur, Aussteller, Empfänger und Ablauf gegen die
+öffentlichen Schlüssel des Anbieters (`lib/auth/id-token.ts`) und gibt
+dieselbe Sitzung aus wie nach Passwort oder Registrierung. Ein Konto, das auf
+der Website über Google entstand, wird in der App über dieselbe
+Anbieter-Kennung wiedergefunden — und umgekehrt.
+
+**Apple** braucht dafür nichts Zusätzliches: das Token trägt die Bundle-ID
+`com.levizz.app`, und die kennt der Server. Der Knopf erscheint auf jedem
+iPhone (`ios.usesAppleSignIn` in `mobile/app.json`); auf Android gibt es ihn
+nicht. Der App Store verlangt ihn, sobald die App Google anbietet.
+
+**Google** braucht in derselben Google-Cloud-Konsole wie oben zwei weitere
+OAuth-Clients und drei Werte für den Bau der App:
+
+1. **Anmeldedaten → OAuth-Client-ID**, Typ *Android*: Paketname
+   `com.levizz.app`, SHA-1 des Signaturschlüssels. Den zeigt
+   `npx.cmd eas credentials -p android` unter *Keystore → SHA1 Fingerprint*.
+   Sobald die App über Google Play mit *Play App Signing* läuft, zusätzlich
+   den SHA-1 aus der Play Console (*Einrichtung → App-Signatur*) als zweiten
+   Android-Client eintragen — sonst funktioniert Google nur im Preview-APK.
+2. **OAuth-Client-ID**, Typ *iOS*: Bundle-ID `com.levizz.app`. Ergibt die
+   iOS-Client-ID und darunter das *URL-Schema*
+   (`com.googleusercontent.apps.<Nummer>`).
+3. Die Werte für den Bau bei EAS hinterlegen — als Projektvariablen, jeweils
+   für `preview` und `production`:
+
+   ```bash
+   npx.cmd eas env:create --environment preview --visibility plaintext --name EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID --value "1234567890-abc.apps.googleusercontent.com"
+   ```
+
+   | Variable | Wert |
+   |---|---|
+   | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` | die Web-Client-ID — dieselbe wie `AUTH_GOOGLE_ID` auf dem Server; auf sie stellt Google das Token aus |
+   | `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` | die iOS-Client-ID aus Schritt 2 |
+   | `GOOGLE_IOS_URL_SCHEME` | das URL-Schema aus Schritt 2; `mobile/app.config.ts` hängt damit das Google-Plugin ein |
+
+   Lokal gehören sie in `mobile/.env.local` (Vorlage: `mobile/.env.example`).
+
+Ohne die Werte gibt es den Google-Knopf in der App nicht — wie auf der
+Website. Und weil Google und Apple native Module sind, braucht es nach dem
+Einrichten einen **neuen Build** (`npx.cmd eas build --platform android --profile preview`);
+ein EAS-Update reicht nicht. Im Browser (`npm --prefix mobile run web`) gibt
+es beide Knöpfe nicht: die Google-Bibliothek hat dort keine Umsetzung.
 
 ### Ohne Zugangsschlüssel arbeiten
 
@@ -570,6 +618,7 @@ gemeinsame Funktion gewandert, die beide rufen:
 |---|---|---|
 | `lib/auth/password-login.ts` | Auth.js-Anbieter | `POST /auth/login` |
 | `features/auth/create-account.ts` | `registerAction` | `POST /auth/register` |
+| `features/auth/social-login.ts` | Auth.js-Adapter (Google, Apple) | `POST /auth/social` |
 | `features/favorites/core.ts` | `toggleFavoriteAction` | `/favorites` |
 | `features/search/queries.ts` | Suchseite | `GET /vehicles` |
 
@@ -608,6 +657,7 @@ der App. Ein Validierungsfehler trägt `fields` mit Pfad und Meldung.
 |---|---|---|
 | POST | `/auth/login` | `{ email, password, device? }` → Konto + Token |
 | POST | `/auth/register` | wie das Formular, plus `locale`, `device` → 201 + Token |
+| POST | `/auth/social` | `{ provider: google\|apple, idToken, name?, locale?, device? }` → Konto + Token, 201 beim ersten Mal; 401 `invalid-token`, 409 `account-exists`, 403 `account-suspended` |
 | POST | `/auth/refresh` | `{ refreshToken }` → neues Paar |
 | POST | `/auth/logout` | `{ refreshToken }` → 204 |
 | GET | `/me` | das eigene Konto |

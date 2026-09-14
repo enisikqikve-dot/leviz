@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { Logo } from '~/components/logo';
+import { SocialButtons } from '~/components/social-buttons';
 import { Button, Input, Txt } from '~/components/ui';
 import { ApiError } from '~/lib/api';
 import { useAuth } from '~/lib/auth';
@@ -27,14 +28,18 @@ export default function LoginScreen() {
   const [fehler, setFehler] = useState<string | null>(null);
   const [laeuft, setLaeuft] = useState(false);
 
+  // Als Fenster geoeffnet: schliessen. Direkt aufgerufen (Deep Link): zur Startseite.
+  const fertig = () => {
+    if (router.canDismiss()) router.dismiss();
+    else router.replace('/');
+  };
+
   const absenden = async () => {
     setFehler(null);
     setLaeuft(true);
     try {
       await login(email.trim(), password);
-      // Als Fenster geoeffnet: schliessen. Direkt aufgerufen (Deep Link): zur Startseite.
-      if (router.canDismiss()) router.dismiss();
-      else router.replace('/');
+      fertig();
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) setFehler(t('auth.invalidCredentials'));
       else if (e instanceof ApiError && e.status === 429) setFehler(t('auth.errorTooMany'));
@@ -77,6 +82,8 @@ export default function LoginScreen() {
         />
 
         <Button label={t('auth.submitLogin')} onPress={absenden} loading={laeuft} disabled={!email || !password} />
+
+        <SocialButtons mode="login" onDone={fertig} />
 
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
           <Txt variant="small" color={theme.muted}>{t('auth.noAccount')}</Txt>

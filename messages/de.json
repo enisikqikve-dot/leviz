@@ -184,6 +184,7 @@
     "backToLogin": "Zurück zur Anmeldung",
     "acceptTerms": "Ich akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung",
     "socialTerms": "Mit Google, Apple oder GitHub akzeptierst du die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>. Es entsteht ein Privatkonto.",
+    "socialTermsPlain": "Mit Google oder Apple akzeptierst du die Nutzungsbedingungen und die Datenschutzerklärung. Es entsteht ein Privatkonto.",
     "orContinue": "oder weiter mit",
     "orEmail": "oder mit E-Mail",
     "google": "Weiter mit Google",

@@ -184,6 +184,7 @@
     "backToLogin": "Back to login",
     "acceptTerms": "I accept the terms of use and the privacy policy",
     "socialTerms": "By continuing with Google, Apple or GitHub you accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>. A private account is created.",
+    "socialTermsPlain": "By continuing with Google or Apple you accept the terms of use and the privacy policy. A private account is created.",
     "orContinue": "or continue with",
     "orEmail": "or with email",
     "google": "Continue with Google",

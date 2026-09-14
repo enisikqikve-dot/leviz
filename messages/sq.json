@@ -184,6 +184,7 @@
     "backToLogin": "Kthehu te hyrja",
     "acceptTerms": "Pranoj kushtet e përdorimit dhe politikën e privatësisë",
     "socialTerms": "Duke vazhduar me Google, Apple ose GitHub pranon <terms>kushtet e përdorimit</terms> dhe <privacy>politikën e privatësisë</privacy>. Krijohet një llogari private.",
+    "socialTermsPlain": "Duke vazhduar me Google ose Apple pranon kushtet e përdorimit dhe politikën e privatësisë. Krijohet një llogari private.",
     "orContinue": "ose vazhdo me",
     "orEmail": "ose me email",
     "google": "Vazhdo me Google",

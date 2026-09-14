@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'r
 import { useAnalytics } from './analytics';
 import { api, ApiError, pushTokenStore, tokenStore } from './api';
 import { registerDevice, unregisterDevice } from './push';
+import type { SocialCredential } from './social';
 import type { Account, SessionResponse } from './types';
 
 /**
@@ -21,6 +22,8 @@ type AuthState = {
   ready: boolean;
   user: Account | null;
   login: (email: string, password: string) => Promise<void>;
+  /** Mit dem ID-Token aus dem Google- oder Apple-Dialog; legt beim ersten Mal das Konto an. */
+  loginWithSocial: (credential: SocialCredential, locale: string) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -103,6 +106,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const session = await api<SessionResponse>('/auth/login', {
           method: 'POST',
           body: { email, password, device: 'LEVIZ App' },
+          anonymous: true,
+        });
+        await uebernehmen(session);
+      },
+      async loginWithSocial(credential, locale) {
+        const session = await api<SessionResponse>('/auth/social', {
+          method: 'POST',
+          body: { ...credential, locale, device: 'LEVIZ App' },
           anonymous: true,
         });
         await uebernehmen(session);

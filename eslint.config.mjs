@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "lib/generated/**",
     ".video-work/**",
     ".chrome-capture/**",
+    // Arbeitskopien von Claude Code fuer Nebenaufgaben: ein zweites Repo im Repo.
+    ".claude/**",
   ]),
 ]);
 
